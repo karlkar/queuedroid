@@ -23,6 +23,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -42,15 +43,12 @@ public class MainActivity extends AppCompatActivity {
     public static final String TAG = "MAINACTIVITY";
     private CallbackManager mCallbackManager;
     private AccessToken mAccessToken = null;
-    private ArrayAdapter<Player> mAdapter;
-    private static float mDensity;
+    private PlayerChooserView mPlayerChooser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        mDensity = getBaseContext().getResources().getDisplayMetrics().density;
 
         FacebookSdk.sdkInitialize(getApplicationContext());
         AppEventsLogger.activateApp(getApplication());
@@ -75,21 +73,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Button addFb = (Button) findViewById(R.id.add_fb_friend);
-        addFb.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mAccessToken == null)
-                    LoginManager.getInstance().logInWithReadPermissions(MainActivity.this, Arrays.asList("user_friends"));
-                else
-                    requestFriends(null);
-            }
-        });
+        PlayerChooserAdapter adapter = new PlayerChooserAdapter(this);
 
-        mAdapter = new AutocompleteAdapter(getApplicationContext(), android.R.layout.simple_list_item_1);
-
-        AutoCompleteTextView textView = (AutoCompleteTextView) findViewById(R.id.auto);
-        textView.setAdapter(mAdapter);
+        mPlayerChooser = (PlayerChooserView) findViewById(R.id.chooser);
+        mPlayerChooser.setAdapter(adapter);
+        LoginManager.getInstance().logInWithReadPermissions(MainActivity.this, Arrays.asList("user_friends"));
 
         AdView adView = (AdView) findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
@@ -114,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
                         JSONArray friendArray = response.getJSONObject().getJSONArray("data");
                         for (int i = 0; i < friendArray.length(); ++i) {
                             Log.d(TAG, "onCompleted: FRIEND = " + friendArray.get(i).toString());
-                            mAdapter.add(Player.createFacebookFriend(friendArray.getJSONObject(i)));
+                            mPlayerChooser.addPlayerToAdapter(Player.createFacebookFriend(friendArray.getJSONObject(i)));
                         }
                         if (!response.getJSONObject().isNull("paging")) {
                             String token = response.getJSONObject().getJSONObject("paging").getJSONObject("cursors").getString("after");
@@ -132,69 +120,5 @@ public class MainActivity extends AppCompatActivity {
             req.setParameters(parameters);
         }
         req.executeAsync();
-    }
-
-    private class AutocompleteAdapter extends ArrayAdapter<Player> {
-
-        public AutocompleteAdapter(Context context, int resourceId) {
-            super(context, resourceId);
-            setNotifyOnChange(true);
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ViewHolder holder;
-            if (convertView == null) {
-                convertView = getLayoutInflater().inflate(R.layout.row_autocomplete, parent, false);
-                holder = new ViewHolder();
-                holder.image = (ImageView) convertView.findViewById(R.id.thumbnail);
-                holder.text = (TextView) convertView.findViewById(R.id.text);
-                convertView.setTag(holder);
-            } else
-                holder = (ViewHolder) convertView.getTag();
-
-            Player player = getItem(position);
-            holder.text.setText(player.getName());
-
-            if (player.getImage() != null) {
-                ThumbnailLoader loader = new ThumbnailLoader(holder.image);
-                loader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, player.getImage());
-            } else
-                holder.image.setImageDrawable(null);
-
-            return convertView;
-        }
-    }
-
-    private static class ViewHolder {
-        ImageView image;
-        TextView text;
-    }
-
-    private class ThumbnailLoader extends AsyncTask<String, Void, Drawable> {
-
-        private final ImageView mImageView;
-
-        public ThumbnailLoader(ImageView imageView) {
-            mImageView = imageView;
-        }
-
-        @Override
-        protected Drawable doInBackground(String... params) {
-            try {
-                InputStream is = (InputStream) new URL(params[0]).getContent();
-                Drawable d = Drawable.createFromStream(is, null);
-                return d;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Drawable drawable) {
-            super.onPostExecute(drawable);
-            mImageView.setImageDrawable(drawable);
-        }
     }
 }
