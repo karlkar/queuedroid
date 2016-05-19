@@ -12,7 +12,10 @@
         android:id="@+id/text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:inputType="textPersonName|textNoSuggestions"
         android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"/>
+        android:layout_marginRight="10dp"
+        android:hint="NAZWA GRACZA"
+        android:imeOptions="actionNext"/>
 
 </merge>
