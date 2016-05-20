@@ -39,6 +39,7 @@ public class PlayerChooserAdapter extends ArrayAdapter<Player> {
         } else
             holder = (PlayerViewHolder) convertView.getTag();
 
+        holder.position = position;
         Player player = getItem(position);
         holder.text.setText(player.getName());
 
@@ -52,7 +53,7 @@ public class PlayerChooserAdapter extends ArrayAdapter<Player> {
             }
             holder.image.setImageDrawable(drawable);
             if (drawable == null) {
-                ThumbnailLoader loader = new ThumbnailLoader(player.getName(), holder.image);
+                ThumbnailLoader loader = new ThumbnailLoader(holder, position);
                 loader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, player.getImage());
             }
         }
@@ -63,16 +64,17 @@ public class PlayerChooserAdapter extends ArrayAdapter<Player> {
     static class PlayerViewHolder {
         ImageView image;
         TextView text;
+        int position;
     }
 
     private class ThumbnailLoader extends AsyncTask<String, Void, Drawable> {
 
-        private String mPlayerName;
-        private ImageView mImageView;
+        private PlayerViewHolder mViewHolder;
+        private final int mPosition;
 
-        public ThumbnailLoader(String playerName, ImageView imageView) {
-            mPlayerName = playerName;
-            mImageView = imageView;
+        public ThumbnailLoader(PlayerViewHolder viewHolder, int position) {
+            mViewHolder = viewHolder;
+            mPosition = position;
         }
 
         @Override
@@ -91,9 +93,10 @@ public class PlayerChooserAdapter extends ArrayAdapter<Player> {
         protected void onPostExecute(Drawable drawable) {
             super.onPostExecute(drawable);
             synchronized (mThumbnailHashMap) {
-                mThumbnailHashMap.put(mPlayerName, drawable);
+                mThumbnailHashMap.put(mViewHolder.text.getText().toString(), drawable);
             }
-            mImageView.setImageDrawable(drawable);
+            if (mPosition == mViewHolder.position)
+                mViewHolder.image.setImageDrawable(drawable);
         }
     }
 }
