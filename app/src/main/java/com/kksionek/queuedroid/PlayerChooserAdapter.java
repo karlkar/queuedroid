@@ -2,6 +2,7 @@ package com.kksionek.queuedroid;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,7 +46,9 @@ public class PlayerChooserAdapter extends ArrayAdapter<Player> {
 
         if (player.getImage() == null)
             holder.image.setImageDrawable(null);
-        else {
+        else if (player.getImage().startsWith("content")) {
+            holder.image.setImageURI(Uri.parse(player.getImage()));
+        } else {
             Drawable drawable = null;
             synchronized (mThumbnailHashMap) {
                 if (mThumbnailHashMap.containsKey(player.getName()))

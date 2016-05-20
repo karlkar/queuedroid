@@ -1,88 +1,45 @@
 package com.kksionek.queuedroid;
 
-import com.facebook.AccessToken;
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
-import com.facebook.FacebookSdk;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
-import com.facebook.HttpMethod;
-import com.facebook.appevents.AppEventsLogger;
-import com.facebook.login.LoginManager;
-import com.facebook.login.LoginResult;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.transition.TransitionManager;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.Arrays;
-
 public class MainActivity extends AppCompatActivity {
 
     public static final String TAG = "MAINACTIVITY";
-    private CallbackManager mCallbackManager;
-    private AccessToken mAccessToken = null;
+    private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 2233;
     private LinearLayout mButtonContainer;
     private PlayerChooserAdapter mAdapter;
     private RelativeLayout mRoot;
-    private Player mMyProfile;
+    private FbController mFb = null;
+    private ContactsController mContactsController = null;
+    private boolean mFbEnabled = false;
+    private boolean mContactsEnabled = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, PERMISSIONS_REQUEST_READ_CONTACTS);
+        else
+            mContactsEnabled = true;
+
         mRoot = (RelativeLayout) findViewById(R.id.root);
-
-        FacebookSdk.sdkInitialize(getApplicationContext());
-        AppEventsLogger.activateApp(getApplication());
-
-        mCallbackManager = CallbackManager.Factory.create();
-        LoginManager.getInstance().registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-                Log.d(TAG, "onSuccess: Facebook logged in");
-                mAccessToken = loginResult.getAccessToken();
-                GraphRequest req = GraphRequest.newMeRequest(mAccessToken, new GraphRequest.GraphJSONObjectCallback() {
-                    @Override
-                    public void onCompleted(JSONObject object, GraphResponse response) {
-                        Log.d(TAG, "onCompleted: " + object.toString());
-                        mMyProfile = Player.createFacebookFriend(object);
-                        mAdapter.add(mMyProfile);
-                        requestFriends(null);
-                    }
-                });
-                Bundle parameters = new Bundle();
-                parameters.putString("fields", "id,name,picture");
-                req.setParameters(parameters);
-                req.executeAsync();
-            }
-
-            @Override
-            public void onCancel() {
-                Log.d(TAG, "onCancel: Facebook login cancelled");
-            }
-
-            @Override
-            public void onError(FacebookException error) {
-                Log.d(TAG, "onError: Facebook login error");
-            }
-        });
 
         mAdapter = new PlayerChooserAdapter(this);
 
@@ -110,7 +67,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        LoginManager.getInstance().logInWithReadPermissions(MainActivity.this, Arrays.asList("user_friends"));
+        Button startButton = (Button) findViewById(R.id.start_game_btn);
+        startButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        loadPlayersFromContacts();
+        loadPlayersFromFacebook();
 
         AdView adView = (AdView) findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
@@ -118,40 +84,36 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        mCallbackManager.onActivityResult(requestCode, resultCode, data);
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == PERMISSIONS_REQUEST_READ_CONTACTS) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                mContactsEnabled = true;
+                loadPlayersFromContacts();
+            } else
+                mContactsEnabled = false;
+        }
     }
 
-    private void requestFriends(String nextToken) {
-        GraphRequest req = new GraphRequest(mAccessToken, "/me/taggable_friends", null, HttpMethod.GET, new GraphRequest.Callback() {
-            @Override
-            public void onCompleted(GraphResponse response) {
-                Log.d(TAG, "onCompleted: response = " + response.toString());
-                if (response.getError() != null)
-                    Log.e(TAG, "onCompleted: Couldn't obtain friend data.");
-                else {
-                    try {
-                        JSONArray friendArray = response.getJSONObject().getJSONArray("data");
-                        for (int i = 0; i < friendArray.length(); ++i) {
-                            Log.d(TAG, "onCompleted: FRIEND = " + friendArray.get(i).toString());
-                            mAdapter.add(Player.createFacebookFriend(friendArray.getJSONObject(i)));
-                        }
-                        if (!response.getJSONObject().isNull("paging")) {
-                            String token = response.getJSONObject().getJSONObject("paging").getJSONObject("cursors").getString("after");
-                            requestFriends(token);
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
-        if (nextToken != null) {
-            Bundle parameters = new Bundle();
-            parameters.putString("after", nextToken);
-            req.setParameters(parameters);
+    private void loadPlayersFromContacts() {
+        if (mContactsEnabled) {
+            if (mContactsController == null)
+                mContactsController = new ContactsController();
+            mContactsController.loadContacts(this, mAdapter);
         }
-        req.executeAsync();
+    }
+
+    private void loadPlayersFromFacebook() {
+        if (mFbEnabled) {
+            if (mFb == null)
+                mFb = new FbController(getApplication());
+            mFb.getFriendData(this, mAdapter);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (mFbEnabled)
+            mFb.onActivityResult(requestCode, resultCode, data);
     }
 }
