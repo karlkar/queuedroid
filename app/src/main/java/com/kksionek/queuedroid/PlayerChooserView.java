@@ -7,6 +7,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
@@ -50,8 +51,11 @@ public class PlayerChooserView extends LinearLayout {
                     View nextFocus = focusSearch(FOCUS_DOWN);
                     if (nextFocus instanceof AutoCompleteTextView)
                         nextFocus.requestFocus();
-                    else
+                    else {
+                        InputMethodManager imm =  (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(mPlayerName.getWindowToken(), 0);
                         v.clearFocus();
+                    }
                     return true;
                 }
                 return false;
@@ -66,8 +70,11 @@ public class PlayerChooserView extends LinearLayout {
                 View nextFocus = focusSearch(FOCUS_DOWN);
                 if (nextFocus instanceof AutoCompleteTextView)
                     nextFocus.requestFocus();
-                else
+                else {
                     mPlayerName.clearFocus();
+                    InputMethodManager imm =  (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(mPlayerName.getWindowToken(), 0);
+                }
             }
         });
     }
