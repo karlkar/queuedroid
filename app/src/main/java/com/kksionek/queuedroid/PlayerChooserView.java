@@ -6,10 +6,12 @@ import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 public class PlayerChooserView extends LinearLayout {
 
@@ -41,6 +43,20 @@ public class PlayerChooserView extends LinearLayout {
                 return false;
             }
         });
+        mPlayerName.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_NEXT) {
+                    View nextFocus = focusSearch(FOCUS_DOWN);
+                    if (nextFocus instanceof AutoCompleteTextView)
+                        nextFocus.requestFocus();
+                    else
+                        v.clearFocus();
+                    return true;
+                }
+                return false;
+            }
+        });
 
         mPlayerName.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -50,6 +66,8 @@ public class PlayerChooserView extends LinearLayout {
                 View nextFocus = focusSearch(FOCUS_DOWN);
                 if (nextFocus instanceof AutoCompleteTextView)
                     nextFocus.requestFocus();
+                else
+                    mPlayerName.clearFocus();
             }
         });
     }
