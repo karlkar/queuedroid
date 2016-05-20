@@ -14,6 +14,7 @@ import android.widget.TextView;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Comparator;
 import java.util.HashMap;
 
 public class PlayerChooserAdapter extends ArrayAdapter<Player> {
@@ -24,7 +25,27 @@ public class PlayerChooserAdapter extends ArrayAdapter<Player> {
     public PlayerChooserAdapter(Context context) {
         super(context, R.layout.row_autocomplete);
         mCtx = context;
-        setNotifyOnChange(true);
+    }
+
+    @Override
+    public void add(Player object) {
+        if (getPosition(object) == -1)
+            super.add(object);
+        else {
+            if (object instanceof FacebookPlayer) {
+                remove(object);
+                super.add(object);
+            } else {
+                return;
+            }
+        }
+        sort(new Comparator<Player>() {
+            @Override
+            public int compare(Player lhs, Player rhs) {
+                return lhs.getName().compareTo(rhs.getName());
+            }
+        });
+        notifyDataSetChanged();
     }
 
     @Override

@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private RelativeLayout mRoot;
     private FbController mFb = null;
     private ContactsController mContactsController = null;
-    private boolean mFbEnabled = false;
+    private boolean mFbEnabled = true;
     private boolean mContactsEnabled = false;
 
     @Override

@@ -11,6 +11,13 @@ public class Player {
         mName = name;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Player)
+            return mName.equals(((Player)o).mName);
+        return false;
+    }
+
     public String getId() {
         return null;
     }
