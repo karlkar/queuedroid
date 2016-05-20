@@ -17,7 +17,8 @@ public class ContactsController {
                 String name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
                 String photo = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.PHOTO_THUMBNAIL_URI));
 
-                adapter.add(new ContactsPlayer(name, id, photo));
+                if (!name.contains("@"))
+                    adapter.add(new ContactsPlayer(name, id, photo));
             }
         }
         cursor.close();
