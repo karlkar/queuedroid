@@ -15,7 +15,7 @@
         android:inputType="textNoSuggestions|textPersonName"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:hint="NAZWA GRACZA"
+        android:hint="Wpisz nazwę gracza..."
         android:imeOptions="actionNext"/>
 
 </merge>

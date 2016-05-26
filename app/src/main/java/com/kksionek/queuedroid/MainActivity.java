@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
                 params.setMargins(0, (int) getResources().getDimension(R.dimen.main_activity_margin_buttons), 0, 0);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
                     TransitionManager.beginDelayedTransition(mRoot);
-                mButtonContainer.addView(view, params);
+                mButtonContainer.addView(view, mButtonContainer.getChildCount() - 1, params);
             }
         });
 
