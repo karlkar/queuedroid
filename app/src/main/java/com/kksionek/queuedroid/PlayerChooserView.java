@@ -1,6 +1,13 @@
 package com.kksionek.queuedroid;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.os.Bundle;
+import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -18,6 +25,8 @@ public class PlayerChooserView extends LinearLayout {
 
     private ImageView mPlayerThumbnail;
     private AutoCompleteTextView mPlayerName;
+    private Activity mActivity;
+    private boolean mWaitingForPhoto = false;
 
     public PlayerChooserView(Context context) {
         this(context, null);
@@ -37,6 +46,19 @@ public class PlayerChooserView extends LinearLayout {
 
         mPlayerThumbnail = (ImageView) getChildAt(0);
         mPlayerThumbnail.setImageResource(R.drawable.ic_contact_picture);
+        mPlayerThumbnail.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mPlayerName != null && mPlayerName.getText().length() > 0) {
+                    Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    if (takePictureIntent.resolveActivity(v.getContext().getPackageManager()) != null) {
+                        mActivity.startActivityForResult(takePictureIntent, MainActivity.REQUEST_IMAGE_CAPTURE);
+                        mWaitingForPhoto = true;
+                    }
+                }
+            }
+        });
+
         mPlayerName = (AutoCompleteTextView) getChildAt(1);
         mPlayerName.setOnKeyListener(new OnKeyListener() {
             @Override
@@ -80,7 +102,23 @@ public class PlayerChooserView extends LinearLayout {
         });
     }
 
-    public void setAdapter(PlayerChooserAdapter adapter) {
+    public void setAdapter(@Nullable PlayerChooserAdapter adapter) {
         mPlayerName.setAdapter(adapter);
+    }
+
+    public void setActivity(@NonNull Activity activity) {
+        mActivity = activity;
+    }
+
+    public boolean onPhotoCreated(@Nullable Intent data) {
+        if (!mWaitingForPhoto)
+            return false;
+        mWaitingForPhoto = false;
+        if (data != null) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            mPlayerThumbnail.setImageBitmap(imageBitmap);
+        }
+        return true;
     }
 }

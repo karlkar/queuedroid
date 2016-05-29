@@ -1,12 +1,13 @@
 package com.kksionek.queuedroid;
 
-import com.facebook.GraphRequest;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
 import android.Manifest;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -23,6 +24,8 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
     public static final String TAG = "MAINACTIVITY";
+    public static final int REQUEST_IMAGE_CAPTURE = 9876;
+    public static final int REQUEST_IMAGE_CROP = 9877;
     private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 2233;
     private LinearLayout mButtonContainer;
     private PlayerChooserAdapter mAdapter;
@@ -50,9 +53,11 @@ public class MainActivity extends AppCompatActivity {
 
         PlayerChooserView playerChooser = (PlayerChooserView) findViewById(R.id.chooser1);
         playerChooser.setAdapter(mAdapter);
+        playerChooser.setActivity(this);
 
         playerChooser = (PlayerChooserView) findViewById(R.id.chooser2);
         playerChooser.setAdapter(mAdapter);
+        playerChooser.setActivity(this);
 
         Button addPlayer = (Button) findViewById(R.id.add_player_btn);
         addPlayer.setOnClickListener(new View.OnClickListener() {
@@ -60,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 PlayerChooserView view = new PlayerChooserView(MainActivity.this);
                 view.setAdapter(mAdapter);
+                view.setActivity(MainActivity.this);
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -118,8 +124,40 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE) {
+            if (resultCode != RESULT_OK || !performCrop(data.getData()))
+                setImageData(resultCode == RESULT_OK ? data : null);
+            return;
+        } else if (requestCode == REQUEST_IMAGE_CROP) {
+            setImageData(resultCode == RESULT_OK ? data : null);
+            return;
+        }
         super.onActivityResult(requestCode, resultCode, data);
         if (mFbEnabled)
             mFb.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private boolean performCrop(Uri data) {
+        try {
+            Intent cropIntent = new Intent("com.android.camera.action.CROP");
+            cropIntent.setDataAndType(data, "image/*");
+            cropIntent.putExtra("crop", "true");
+            cropIntent.putExtra("aspectX", 1);
+            cropIntent.putExtra("aspectY", 1);
+            cropIntent.putExtra("return-data", true);
+            startActivityForResult(cropIntent, REQUEST_IMAGE_CROP);
+        }
+        catch (ActivityNotFoundException ex) {
+            return false;
+        }
+        return true;
+    }
+
+    private void setImageData(Intent data) {
+        for (int i = 0; i < mButtonContainer.getChildCount() - 1; ++i) {
+            PlayerChooserView playerChooserView = (PlayerChooserView) mButtonContainer.getChildAt(i);
+            if (playerChooserView.onPhotoCreated(data))
+                return;
+        }
     }
 }
