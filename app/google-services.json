@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "988486025062",
+    "firebase_url": "https://queuedroid.firebaseio.com",
+    "project_id": "queuedroid",
+    "storage_bucket": "queuedroid.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:988486025062:android:827daa6915d4bb5c",
+        "android_client_info": {
+          "package_name": "com.kksionek.queuedroid"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "988486025062-t9c7tm7s13ei7s1q4atc29dvnkaah5ka.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBr1uvHVP0tWHwmYjkonv3LVCjktTkcStA"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
