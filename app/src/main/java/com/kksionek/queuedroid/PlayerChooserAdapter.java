@@ -66,7 +66,7 @@ public class PlayerChooserAdapter extends ArrayAdapter<Player> {
         holder.text.setText(player.getName());
 
         if (player.getImage() == null)
-            holder.image.setImageDrawable(null);
+            holder.image.setImageResource(R.drawable.ic_contact_picture);
         else if (player.getImage().startsWith("content")) {
             holder.image.setImageURI(Uri.parse(player.getImage()));
         } else {

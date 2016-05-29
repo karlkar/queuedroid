@@ -36,11 +36,12 @@ public class PlayerChooserView extends LinearLayout {
         setBackgroundResource(R.drawable.btn_big);
 
         mPlayerThumbnail = (ImageView) getChildAt(0);
+        mPlayerThumbnail.setImageResource(R.drawable.ic_contact_picture);
         mPlayerName = (AutoCompleteTextView) getChildAt(1);
         mPlayerName.setOnKeyListener(new OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
-                mPlayerThumbnail.setImageDrawable(null);
+                mPlayerThumbnail.setImageResource(R.drawable.ic_contact_picture);
                 return false;
             }
         });
