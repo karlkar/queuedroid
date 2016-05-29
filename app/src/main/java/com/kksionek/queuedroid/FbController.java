@@ -17,11 +17,17 @@ import com.facebook.HttpMethod;
 import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
+import com.facebook.share.Sharer;
+import com.facebook.share.model.ShareOpenGraphAction;
+import com.facebook.share.model.ShareOpenGraphContent;
+import com.facebook.share.model.ShareOpenGraphObject;
+import com.facebook.share.widget.ShareDialog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class FbController {
@@ -113,5 +119,42 @@ public class FbController {
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         mCallbackManager.onActivityResult(requestCode, resultCode, data);
+    }
+
+    public void shareOnFacebook(Activity activity, ArrayList<String> list) {
+
+        ShareOpenGraphObject object = new ShareOpenGraphObject.Builder()
+                .putString("og:type", "games.game")
+                .putString("og:title", "What a game!")
+                .build();
+
+        ShareOpenGraphAction action = new ShareOpenGraphAction.Builder()
+                .setActionType("queuedroid-test:play")
+                .putObject("game", object)
+                .putStringArrayList("tags", list)
+                .build();
+
+        ShareOpenGraphContent content = new ShareOpenGraphContent.Builder()
+                .setPreviewPropertyName("game")
+                .setAction(action)
+                .build();
+        ShareDialog dlg = new ShareDialog(activity);
+        dlg.registerCallback(mCallbackManager, new FacebookCallback<Sharer.Result>() {
+            @Override
+            public void onSuccess(Sharer.Result result) {
+                Log.d(TAG, "onSuccess: SUCCESS");
+            }
+
+            @Override
+            public void onCancel() {
+                Log.d(TAG, "onCancel: CANCEL");
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                Log.d(TAG, "onError: " + error.toString());
+            }
+        });
+        dlg.show(content);
     }
 }

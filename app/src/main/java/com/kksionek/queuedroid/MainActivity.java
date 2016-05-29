@@ -1,5 +1,6 @@
 package com.kksionek.queuedroid;
 
+import com.facebook.GraphRequest;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
@@ -16,6 +17,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -71,7 +74,10 @@ public class MainActivity extends AppCompatActivity {
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                if (mFbEnabled && mFb != null) {
+                    ArrayList<String> list = new ArrayList<>();
+                    mFb.shareOnFacebook(MainActivity.this, list);
+                }
             }
         });
 
