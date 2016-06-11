@@ -15,12 +15,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Comparator;
-import java.util.HashMap;
 
 public class PlayerChooserAdapter extends ArrayAdapter<Player> {
 
     private Context mCtx;
-    private HashMap<String, Drawable> mThumbnailHashMap = new HashMap<>();
 
     public PlayerChooserAdapter(Context context) {
         super(context, R.layout.row_autocomplete);
@@ -65,25 +63,21 @@ public class PlayerChooserAdapter extends ArrayAdapter<Player> {
         Player player = getItem(position);
         holder.text.setText(player.getName());
 
-        if (player.getImage() == null)
-            holder.image.setImageResource(R.drawable.ic_contact_picture);
-        else if (player.getImage().startsWith("content")) {
-            holder.image.setImageURI(Uri.parse(player.getImage()));
-        } else {
-            Drawable drawable = null;
-            synchronized (mThumbnailHashMap) {
-//                if (mThumbnailHashMap.containsKey(player.getName()))
-//                    drawable = mThumbnailHashMap.get(player.getName());
-                drawable = player.getDrawable();
-            }
-            if (drawable == null) {
+        Drawable drawable = player.getDrawable();
+        if (drawable == null) {
+            if (player.getImage() == null) {
+                holder.image.setImageResource(R.drawable.ic_contact_picture);
+                player.setDrawable(holder.image.getDrawable());
+            } else if (player.getImage().startsWith("content")) {
+                holder.image.setImageURI(Uri.parse(player.getImage()));
+                player.setDrawable(holder.image.getDrawable());
+            } else {
                 holder.image.setImageResource(R.drawable.ic_contact_picture);
                 ThumbnailLoader loader = new ThumbnailLoader(holder, position, player);
                 loader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-            } else {
-                holder.image.setImageDrawable(drawable);
             }
-        }
+        } else
+            holder.image.setImageDrawable(drawable);
 
         return convertView;
     }
@@ -121,10 +115,7 @@ public class PlayerChooserAdapter extends ArrayAdapter<Player> {
         @Override
         protected void onPostExecute(Drawable drawable) {
             super.onPostExecute(drawable);
-            synchronized (mThumbnailHashMap) {
-//                mThumbnailHashMap.put(mViewHolder.text.getText().toString(), drawable);
-                mPlayer.setDrawable(drawable);
-            }
+            mPlayer.setDrawable(drawable);
             if (mPosition == mViewHolder.position)
                 mViewHolder.image.setImageDrawable(drawable);
         }

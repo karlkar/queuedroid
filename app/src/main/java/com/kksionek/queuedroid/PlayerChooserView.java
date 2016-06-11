@@ -27,6 +27,7 @@ public class PlayerChooserView extends LinearLayout {
     private AutoCompleteTextView mPlayerName;
     private Activity mActivity;
     private boolean mWaitingForPhoto = false;
+    private Player mPlayer = new Player("-", "", "", Player.Type.CUSTOM);
 
     public PlayerChooserView(Context context) {
         this(context, null);
@@ -64,6 +65,11 @@ public class PlayerChooserView extends LinearLayout {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 mPlayerThumbnail.setImageResource(R.drawable.ic_contact_picture);
+                if (!mPlayer.isCustom())
+                    mPlayer = new Player("-", mPlayerName.getText().toString(), null, Player.Type.CUSTOM);
+                else
+                    mPlayer.setName(mPlayerName.getText().toString());
+                mPlayer.setDrawable(mPlayerThumbnail.getDrawable());
                 return false;
             }
         });
@@ -88,8 +94,8 @@ public class PlayerChooserView extends LinearLayout {
         mPlayerName.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                PlayerChooserAdapter.PlayerViewHolder holder = (PlayerChooserAdapter.PlayerViewHolder) view.getTag();
-                mPlayerThumbnail.setImageDrawable(holder.image.getDrawable());
+                mPlayer = (Player) parent.getItemAtPosition(position);
+                mPlayerThumbnail.setImageDrawable(mPlayer.getDrawable());
                 View nextFocus = focusSearch(FOCUS_DOWN);
                 if (nextFocus instanceof AutoCompleteTextView)
                     nextFocus.requestFocus();
@@ -118,6 +124,7 @@ public class PlayerChooserView extends LinearLayout {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
             mPlayerThumbnail.setImageBitmap(imageBitmap);
+            mPlayer.setDrawable(mPlayerThumbnail.getDrawable());
         }
         return true;
     }

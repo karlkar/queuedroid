@@ -1,6 +1,7 @@
 package com.kksionek.queuedroid;
 
 import android.graphics.drawable.Drawable;
+import android.widget.AutoCompleteTextView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -9,11 +10,12 @@ public class Player {
 
     enum Type {
         FACEBOOK,
-        CONTACTS
+        CONTACTS,
+        CUSTOM
     }
 
     private final String mId;
-    private final String mName;
+    private String mName;
     private final String mImage;
     private final Type mType;
     private Drawable mDrawable;
@@ -49,12 +51,20 @@ public class Player {
         return mDrawable;
     }
 
+    public void setName(String name) {
+        mName = name;
+    }
+
     public void setDrawable(Drawable drawable) {
         mDrawable = drawable;
     }
 
     public boolean isFromFacebook() {
         return mType == Type.FACEBOOK;
+    }
+
+    public boolean isCustom() {
+        return mType == Type.CUSTOM;
     }
 
     @Override
