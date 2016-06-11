@@ -18,7 +18,7 @@ public class ContactsController {
                 String photo = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.PHOTO_THUMBNAIL_URI));
 
                 if (!name.contains("@"))
-                    adapter.add(new ContactsPlayer(name, id, photo));
+                    adapter.add(new Player(id, name, photo, Player.Type.CONTACTS));
             }
         }
         cursor.close();

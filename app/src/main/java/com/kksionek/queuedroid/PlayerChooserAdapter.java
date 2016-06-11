@@ -32,7 +32,7 @@ public class PlayerChooserAdapter extends ArrayAdapter<Player> {
         if (getPosition(object) == -1)
             super.add(object);
         else {
-            if (object instanceof FacebookPlayer) {
+            if (object.isFromFacebook()) {
                 remove(object);
                 super.add(object);
             } else {
@@ -72,13 +72,16 @@ public class PlayerChooserAdapter extends ArrayAdapter<Player> {
         } else {
             Drawable drawable = null;
             synchronized (mThumbnailHashMap) {
-                if (mThumbnailHashMap.containsKey(player.getName()))
-                    drawable = mThumbnailHashMap.get(player.getName());
+//                if (mThumbnailHashMap.containsKey(player.getName()))
+//                    drawable = mThumbnailHashMap.get(player.getName());
+                drawable = player.getDrawable();
             }
-            holder.image.setImageDrawable(drawable);
             if (drawable == null) {
-                ThumbnailLoader loader = new ThumbnailLoader(holder, position);
-                loader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, player.getImage());
+                holder.image.setImageResource(R.drawable.ic_contact_picture);
+                ThumbnailLoader loader = new ThumbnailLoader(holder, position, player);
+                loader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            } else {
+                holder.image.setImageDrawable(drawable);
             }
         }
 
@@ -91,20 +94,22 @@ public class PlayerChooserAdapter extends ArrayAdapter<Player> {
         int position;
     }
 
-    private class ThumbnailLoader extends AsyncTask<String, Void, Drawable> {
+    private class ThumbnailLoader extends AsyncTask<Void, Void, Drawable> {
 
-        private PlayerViewHolder mViewHolder;
+        private final PlayerViewHolder mViewHolder;
         private final int mPosition;
+        private final Player mPlayer;
 
-        public ThumbnailLoader(PlayerViewHolder viewHolder, int position) {
+        public ThumbnailLoader(PlayerViewHolder viewHolder, int position, Player player) {
             mViewHolder = viewHolder;
             mPosition = position;
+            mPlayer = player;
         }
 
         @Override
-        protected Drawable doInBackground(String... params) {
+        protected Drawable doInBackground(Void... params) {
             try {
-                InputStream is = (InputStream) new URL(params[0]).getContent();
+                InputStream is = (InputStream) new URL(mPlayer.getImage()).getContent();
                 Drawable d = Drawable.createFromStream(is, null);
                 return d;
             } catch (IOException e) {
@@ -117,7 +122,8 @@ public class PlayerChooserAdapter extends ArrayAdapter<Player> {
         protected void onPostExecute(Drawable drawable) {
             super.onPostExecute(drawable);
             synchronized (mThumbnailHashMap) {
-                mThumbnailHashMap.put(mViewHolder.text.getText().toString(), drawable);
+//                mThumbnailHashMap.put(mViewHolder.text.getText().toString(), drawable);
+                mPlayer.setDrawable(drawable);
             }
             if (mPosition == mViewHolder.position)
                 mViewHolder.image.setImageDrawable(drawable);

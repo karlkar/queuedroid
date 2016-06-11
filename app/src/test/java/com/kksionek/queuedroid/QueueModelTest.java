@@ -14,16 +14,16 @@ public class QueueModelTest {
     @Before
     public void setUp() {
         mModel = new QueueModel();
-        mModel.addPlayer(new Player("Mietek"));
-        mModel.addPlayer(new Player("Roman"));
+        mModel.addPlayer(new Player("1", "Mietek", null, Player.Type.CONTACTS));
+        mModel.addPlayer(new Player("2", "Roman", null, Player.Type.CONTACTS));
     }
 
     @Test
     public void addPlayer() {
         assertEquals(mModel.getPlayersCount(), 2);
-        mModel.addPlayer(new Player("Henryk"));
+        mModel.addPlayer(new Player("3", "Henryk", null, Player.Type.CONTACTS));
         assertEquals(mModel.getPlayersCount(), 3);
-        mModel.addPlayer(new Player("Zbigniew"));
+        mModel.addPlayer(new Player("4", "Zbigniew", null, Player.Type.CONTACTS));
         assertEquals(mModel.getPlayersCount(), 4);
     }
 

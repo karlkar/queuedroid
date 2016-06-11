@@ -1,14 +1,29 @@
 package com.kksionek.queuedroid;
 
+import android.graphics.drawable.Drawable;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Player {
 
-    private final String mName;
+    enum Type {
+        FACEBOOK,
+        CONTACTS
+    }
 
-    public Player(String name) {
+    private final String mId;
+    private final String mName;
+    private final String mImage;
+    private final Type mType;
+    private Drawable mDrawable;
+
+    public Player(String id, String name, String image, Type type) {
+        mId = id;
         mName = name;
+        mImage = image;
+        mType = type;
+        mDrawable = null;
     }
 
     @Override
@@ -19,7 +34,7 @@ public class Player {
     }
 
     public String getId() {
-        return null;
+        return mId;
     }
 
     public String getName() {
@@ -27,7 +42,19 @@ public class Player {
     }
 
     public String getImage() {
-        return null;
+        return mImage;
+    }
+
+    public Drawable getDrawable() {
+        return mDrawable;
+    }
+
+    public void setDrawable(Drawable drawable) {
+        mDrawable = drawable;
+    }
+
+    public boolean isFromFacebook() {
+        return mType == Type.FACEBOOK;
     }
 
     @Override
@@ -40,7 +67,7 @@ public class Player {
             String id = jsonFriend.getString("id");
             String name = jsonFriend.getString("name");
             String image = jsonFriend.getJSONObject("picture").getJSONObject("data").getString("url");
-            return new FacebookPlayer(name, id, image);
+            return new Player(id, name, image, Type.FACEBOOK);
         } catch (JSONException | NullPointerException e) {
             e.printStackTrace();
         }
