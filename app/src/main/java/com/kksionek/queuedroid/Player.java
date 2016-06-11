@@ -1,6 +1,8 @@
 package com.kksionek.queuedroid;
 
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.widget.AutoCompleteTextView;
 
 import org.json.JSONException;
@@ -20,7 +22,7 @@ public class Player {
     private final Type mType;
     private Drawable mDrawable;
 
-    public Player(String id, String name, String image, Type type) {
+    public Player(@NonNull String id, @NonNull String name, @Nullable String image, @NonNull Type type) {
         mId = id;
         mName = name;
         mImage = image;
@@ -51,7 +53,7 @@ public class Player {
         return mDrawable;
     }
 
-    public void setName(String name) {
+    public void setName(@NonNull String name) {
         mName = name;
     }
 
@@ -72,7 +74,7 @@ public class Player {
         return mName;
     }
 
-    public static Player createFacebookFriend(JSONObject jsonFriend) {
+    public static Player createFacebookFriend(@NonNull JSONObject jsonFriend) {
         try {
             String id = jsonFriend.getString("id");
             String name = jsonFriend.getString("name");

@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.facebook.AccessToken;
@@ -46,7 +48,7 @@ public class FbController {
         mCallbackManager = CallbackManager.Factory.create();
     }
 
-    public void getFriendData(Activity activity, final PlayerChooserAdapter adapter) {
+    public void getFriendData(@NonNull Activity activity, @NonNull final PlayerChooserAdapter adapter) {
         if (mAccessToken == null) {
             mLoginManager.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
                 @Override
@@ -85,7 +87,7 @@ public class FbController {
         }
     }
 
-    private void requestFriends(final PlayerChooserAdapter adapter, String nextToken) {
+    private void requestFriends(@NonNull final PlayerChooserAdapter adapter, @Nullable String nextToken) {
         GraphRequest req = new GraphRequest(mAccessToken, "/me/taggable_friends", null, HttpMethod.GET, new GraphRequest.Callback() {
             @Override
             public void onCompleted(GraphResponse response) {
@@ -121,7 +123,7 @@ public class FbController {
         mCallbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
-    public void shareOnFacebook(Activity activity, ArrayList<String> list) {
+    public void shareOnFacebook(@NonNull Activity activity, @NonNull ArrayList<String> list) {
 
         ShareOpenGraphObject object = new ShareOpenGraphObject.Builder()
                 .putString("og:type", "games.game")
