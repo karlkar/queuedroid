@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -17,17 +18,23 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class PlayerChooserView extends LinearLayout {
 
+    private final TextView mStaticName;
+    private final Button mPointsView;
     private ImageView mPlayerThumbnail;
     private AutoCompleteTextView mPlayerName;
     private Activity mActivity;
     private boolean mWaitingForPhoto = false;
-    private Player mPlayer = new Player("-", "", "", Player.Type.CUSTOM);
+    private Player mPlayer = null;
+    private boolean mEditable = true;
+
+    private OnThumbClickListener mOnThumbClickListener = new OnThumbClickListener();
 
     public PlayerChooserView(Context context) {
         this(context, null);
@@ -43,24 +50,11 @@ public class PlayerChooserView extends LinearLayout {
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.player_chooser_view, this, true);
 
-        setBackgroundResource(R.drawable.btn_big);
-
-        mPlayerThumbnail = (ImageView) getChildAt(0);
+        mPlayerThumbnail = (ImageView) findViewById(R.id.thumbnail);
         mPlayerThumbnail.setImageResource(R.drawable.ic_contact_picture);
-        mPlayerThumbnail.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mPlayerName != null && mPlayerName.getText().length() > 0) {
-                    Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    if (takePictureIntent.resolveActivity(v.getContext().getPackageManager()) != null) {
-                        mActivity.startActivityForResult(takePictureIntent, MainActivity.REQUEST_IMAGE_CAPTURE);
-                        mWaitingForPhoto = true;
-                    }
-                }
-            }
-        });
+        mPlayerThumbnail.setOnClickListener(mOnThumbClickListener);
 
-        mPlayerName = (AutoCompleteTextView) getChildAt(1);
+        mPlayerName = (AutoCompleteTextView) findViewById(R.id.text);
         mPlayerName.setOnKeyListener(new OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -106,6 +100,9 @@ public class PlayerChooserView extends LinearLayout {
                 }
             }
         });
+
+        mStaticName = (TextView) findViewById(R.id.staticText);
+        mPointsView = (Button) findViewById(R.id.pointsView);
     }
 
     public void setAdapter(@Nullable PlayerChooserAdapter adapter) {
@@ -127,5 +124,42 @@ public class PlayerChooserView extends LinearLayout {
             mPlayer.setDrawable(mPlayerThumbnail.getDrawable());
         }
         return true;
+    }
+
+    public void setEditable(boolean editable) {
+        mEditable = editable;
+        mPlayerName.setVisibility(editable ? VISIBLE : GONE);
+        mStaticName.setText(mPlayerName.getText().toString());
+        mStaticName.setVisibility(editable ? GONE : VISIBLE);
+        mPlayerThumbnail.setOnClickListener(editable ? mOnThumbClickListener : null);
+        mPointsView.setVisibility(editable ? GONE : VISIBLE);
+    }
+
+    public Player getPlayer() {
+        return mPlayer;
+    }
+
+    public void setCurrentTurn(boolean current) {
+        if (current)
+            mStaticName.setTypeface(mStaticName.getTypeface(), Typeface.BOLD);
+        else
+            mStaticName.setTypeface(mStaticName.getTypeface(), Typeface.NORMAL);
+    }
+
+    public void setPoints(int points) {
+        mPointsView.setText(String.valueOf(points));
+    }
+
+    private class OnThumbClickListener implements OnClickListener {
+        @Override
+        public void onClick(View v) {
+            if (mPlayerName != null && mPlayerName.getText().length() > 0) {
+                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (takePictureIntent.resolveActivity(v.getContext().getPackageManager()) != null) {
+                    mActivity.startActivityForResult(takePictureIntent, MainActivity.REQUEST_IMAGE_CAPTURE);
+                    mWaitingForPhoto = true;
+                }
+            }
+        }
     }
 }

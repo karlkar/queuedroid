@@ -19,14 +19,13 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
-import java.util.ArrayList;
-
 public class MainActivity extends AppCompatActivity {
 
     public static final String TAG = "MAINACTIVITY";
     public static final int REQUEST_IMAGE_CAPTURE = 9876;
     public static final int REQUEST_IMAGE_CROP = 9877;
     private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 2233;
+    private QueueModel mQueueModel = null;
     private LinearLayout mButtonContainer;
     private PlayerChooserAdapter mAdapter;
     private RelativeLayout mRoot;
@@ -34,6 +33,12 @@ public class MainActivity extends AppCompatActivity {
     private ContactsController mContactsController = null;
     private boolean mFbEnabled = true;
     private boolean mContactsEnabled = false;
+    private LinearLayout mGameModeChooser;
+    private Button mStartButton;
+    private Button mAddPlayer;
+
+    private View.OnClickListener mOnStartGameBtnClicked = new OnStartGameBtnClicked();
+    private View.OnClickListener mOnNextTurnBtnClicked = new OnNextTurnBtnClicked();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
             mContactsEnabled = true;
 
         mRoot = (RelativeLayout) findViewById(R.id.root);
+        mGameModeChooser = (LinearLayout) findViewById(R.id.game_mode_chooser);
 
         mAdapter = new PlayerChooserAdapter(this);
 
@@ -59,8 +65,8 @@ public class MainActivity extends AppCompatActivity {
         playerChooser.setAdapter(mAdapter);
         playerChooser.setActivity(this);
 
-        Button addPlayer = (Button) findViewById(R.id.add_player_btn);
-        addPlayer.setOnClickListener(new View.OnClickListener() {
+        mAddPlayer = (Button) findViewById(R.id.add_player_btn);
+        mAddPlayer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 PlayerChooserView view = new PlayerChooserView(MainActivity.this);
@@ -76,16 +82,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Button startButton = (Button) findViewById(R.id.start_game_btn);
-        startButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mFbEnabled && mFb != null) {
-                    ArrayList<String> list = new ArrayList<>();
-                    mFb.shareOnFacebook(MainActivity.this, list);
-                }
-            }
-        });
+        mStartButton = (Button) findViewById(R.id.start_game_btn);
+        mStartButton.setOnClickListener(mOnStartGameBtnClicked);
 
         loadPlayersFromContacts();
         loadPlayersFromFacebook();
@@ -160,4 +158,52 @@ public class MainActivity extends AppCompatActivity {
                 return;
         }
     }
+
+    private class OnStartGameBtnClicked implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            mQueueModel = new QueueModel();
+            PlayerChooserView tmp;
+            for (int i = 0; i < mButtonContainer.getChildCount() - 1; ++i) {
+                tmp = (PlayerChooserView) mButtonContainer.getChildAt(i);
+                if (i == 0)
+                    tmp.setCurrentTurn(true);
+                mQueueModel.addPlayer(tmp.getPlayer());
+                tmp.setEditable(false);
+            }
+            mQueueModel.newGame();
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                TransitionManager.beginDelayedTransition(mRoot);
+            mGameModeChooser.setVisibility(View.GONE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                TransitionManager.beginDelayedTransition(mRoot);
+            mStartButton.setText("NEXT TURN");
+            mStartButton.setOnClickListener(mOnNextTurnBtnClicked);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                TransitionManager.beginDelayedTransition(mRoot);
+            mAddPlayer.setVisibility(View.GONE);
+        }
+    }
+
+    private class OnNextTurnBtnClicked implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            //TODO: Get points
+            int points = 16;
+            mQueueModel.nextTurn(points);
+            PlayerChooserView tmp;
+            for (int i = 0; i < mButtonContainer.getChildCount() - 1; ++i) {
+                tmp = (PlayerChooserView) mButtonContainer.getChildAt(i);
+                if (i == mQueueModel.getCurrentPlayerIndex())
+                    tmp.setCurrentTurn(true);
+                else {
+                    tmp.setCurrentTurn(false);
+                    tmp.setPoints(mQueueModel.getPointsOfPlayer(i));
+                }
+            }
+            ((PlayerChooserView)mButtonContainer.getChildAt(mQueueModel.getCurrentPlayerIndex())).setCurrentTurn(true);
+        }
+    }
+
 }

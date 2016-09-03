@@ -22,6 +22,10 @@ public class QueueModel {
         return mPlayers.size();
     }
 
+    public int getCurrentPlayerIndex() {
+        return mCurrentPlayerIndex;
+    }
+
     public String getCurrentPlayer() {
         return mPlayers.get(mCurrentPlayerIndex).getName();
     }
@@ -43,5 +47,9 @@ public class QueueModel {
     public void resetScoreboard() {
         mPlayers.clear();
         mPoints.clear();
+    }
+
+    public int getPointsOfPlayer(int index) {
+        return mPoints.get(index);
     }
 }
