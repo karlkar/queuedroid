@@ -137,6 +137,7 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
                 TransitionManager.beginDelayedTransition(mRoot);
             mEndButton.setVisibility(View.GONE);
+            mPlayerContainerView.sort(mQueueModel);
         }
     }
 

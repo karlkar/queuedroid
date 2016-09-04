@@ -3,15 +3,20 @@ package com.kksionek.queuedroid;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.support.v4.util.Pair;
 import android.transition.TransitionManager;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 public class PlayerContainerView extends LinearLayout {
@@ -140,5 +145,22 @@ public class PlayerContainerView extends LinearLayout {
         mActivity = mainActivity;
         mParent = root;
         loadContactData();
+    }
+
+    public void sort(QueueModel queueModel) {
+        ArrayList<Pair<Integer, Integer>> list = new ArrayList<>(getChildCount() - 1);
+        for (int i = 0; i < getChildCount() - 1; ++i) {
+            list.add(new Pair<>(queueModel.getPointsOfPlayer(i), i));
+        }
+        Collections.sort(list, new Comparator<Pair<Integer, Integer>>() {
+            @Override
+            public int compare(Pair<Integer, Integer> t1, Pair<Integer, Integer> t2) {
+                return t2.first.compareTo(t1.first);
+            }
+        });
+        for (int i = 0; i < getChildCount() - 1; ++i) {
+            getChildAt(list.get(i).second).animate().translationY(getChildAt(i).getBottom()
+                    - getChildAt(list.get(i).second).getBottom()).start();
+        }
     }
 }
