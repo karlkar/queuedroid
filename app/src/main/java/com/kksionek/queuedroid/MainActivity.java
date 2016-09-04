@@ -10,7 +10,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 import android.transition.TransitionManager;
 import android.view.View;
 import android.widget.Button;
@@ -19,7 +20,7 @@ import android.widget.RelativeLayout;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends FragmentActivity implements PointsDialogFragment.PointsDialogListener {
 
     public static final String TAG = "MAINACTIVITY";
     public static final int REQUEST_IMAGE_CAPTURE = 9876;
@@ -32,8 +33,8 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout mGameModeChooser;
     private Button mStartButton;
 
-    private View.OnClickListener mOnStartGameBtnClicked = new OnStartGameBtnClicked();
-    private View.OnClickListener mOnNextTurnBtnClicked = new OnNextTurnBtnClicked();
+    private final View.OnClickListener mOnStartGameBtnClicked = new OnStartGameBtnClicked();
+    private final View.OnClickListener mOnNextTurnBtnClicked = new OnNextTurnBtnClicked();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +98,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onDialogPositiveClick(int points) {
+        mQueueModel.nextTurn(points);
+        mPlayerContainerView.nextTurn(mQueueModel.getPointsOfPreviousPlayer(), mQueueModel.getCurrentPlayerIndex());
+    }
+
     private class OnStartGameBtnClicked implements View.OnClickListener {
         @Override
         public void onClick(View v) {
@@ -117,10 +124,8 @@ public class MainActivity extends AppCompatActivity {
     private class OnNextTurnBtnClicked implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            //TODO: Get points
-            int points = 16;
-            mQueueModel.nextTurn(points);
-            mPlayerContainerView.nextTurn(mQueueModel.getPointsOfPreviousPlayer(), mQueueModel.getCurrentPlayerIndex());
+            PointsDialogFragment dialog = new PointsDialogFragment();
+            dialog.show(getSupportFragmentManager(), "PointsDialogFragment");
         }
     }
 
