@@ -27,14 +27,13 @@ public class PlayerChooserView extends LinearLayout {
 
     private final TextView mStaticName;
     private final Button mPointsView;
-    private ImageView mPlayerThumbnail;
+    private final ImageView mPlayerThumbnail;
     private AutoCompleteTextView mPlayerName;
     private Activity mActivity;
     private boolean mWaitingForPhoto = false;
     private Player mPlayer = null;
-    private boolean mEditable = true;
 
-    private OnThumbClickListener mOnThumbClickListener = new OnThumbClickListener();
+    private final OnThumbClickListener mOnThumbClickListener = new OnThumbClickListener();
 
     public PlayerChooserView(Context context) {
         this(context, null);
@@ -59,10 +58,10 @@ public class PlayerChooserView extends LinearLayout {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 mPlayerThumbnail.setImageResource(R.drawable.ic_contact_picture);
-                if (!mPlayer.isCustom())
-                    mPlayer = new Player("-", mPlayerName.getText().toString(), null, Player.Type.CUSTOM);
-                else
+                if (mPlayer.isCustom())
                     mPlayer.setName(mPlayerName.getText().toString());
+                else
+                    mPlayer = new Player("-", mPlayerName.getText().toString(), null, Player.Type.CUSTOM);
                 mPlayer.setDrawable(mPlayerThumbnail.getDrawable());
                 return false;
             }
@@ -127,7 +126,6 @@ public class PlayerChooserView extends LinearLayout {
     }
 
     public void setEditable(boolean editable) {
-        mEditable = editable;
         mPlayerName.setVisibility(editable ? VISIBLE : GONE);
         mStaticName.setText(mPlayerName.getText().toString());
         mStaticName.setVisibility(editable ? GONE : VISIBLE);

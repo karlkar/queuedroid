@@ -1,9 +1,5 @@
 <resources>
     <string name="app_name">queuedroid</string>
-
-    <string name="action_settings">Settings</string>
-
-    <string name="hello_world">Hello world!</string>
     <!-- -
         This is an ad unit ID for a banner test ad. Replace with your own banner ad unit id.
         For more information, see https://support.google.com/admob/answer/3052638

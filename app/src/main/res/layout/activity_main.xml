@@ -20,106 +20,100 @@
         ads:adSize="BANNER"
         ads:adUnitId="@string/banner_ad_unit_id"/>
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="@dimen/main_activity_margin_buttons"
         android:layout_alignParentTop="true"
-        android:layout_above="@id/adView">
+        android:layout_above="@id/adView"
+        android:background="@drawable/scroller_bg">
 
-        <ScrollView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginBottom="@dimen/main_activity_margin_buttons"
-            android:layout_alignParentTop="true"
-            android:background="@drawable/scroller_bg">
+            android:layout_marginLeft="@dimen/main_activity_margin_buttons"
+            android:layout_marginRight="@dimen/main_activity_margin_buttons"
+            android:orientation="vertical">
 
             <LinearLayout
+                android:id="@+id/game_mode_chooser"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="@dimen/main_activity_margin_buttons"
+                android:padding="@dimen/main_activity_margin_buttons"
+                android:orientation="vertical"
+                android:background="@drawable/mode_bg">
+
+                <TextView
+                    android:id="@+id/game_mode_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="TRYB GRY:"/>
+
+                <CheckBox
+                    android:id="@+id/point_checkbox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:button="@drawable/checkbox"
+                    android:paddingLeft="@dimen/main_activity_margin_buttons"
+                    android:layout_marginTop="@dimen/main_activity_margin_buttons"
+                    android:text="PUNKTOWY"/>
+
+                <CheckBox
+                    android:id="@+id/time_checkbox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:button="@drawable/checkbox"
+                    android:paddingLeft="@dimen/main_activity_margin_buttons"
+                    android:layout_marginTop="@dimen/main_activity_margin_buttons"
+                    android:text="CZASOWY"/>
+            </LinearLayout>
+
+            <com.kksionek.queuedroid.PlayerContainerView
+                android:id="@+id/button_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/main_activity_margin_buttons"
-                android:layout_marginRight="@dimen/main_activity_margin_buttons"
+                android:padding="@dimen/main_activity_margin_buttons"
+                android:layout_marginTop="@dimen/main_activity_margin_buttons"
+                android:background="@drawable/players_bg"
                 android:orientation="vertical">
 
-                <LinearLayout
-                    android:id="@+id/game_mode_chooser"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="@dimen/main_activity_margin_buttons"
-                    android:padding="@dimen/main_activity_margin_buttons"
-                    android:orientation="vertical"
-                    android:background="@drawable/mode_bg">
+                <!--<com.kksionek.queuedroid.PlayerChooserView-->
+                    <!--android:id="@+id/chooser1"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"/>-->
 
-                    <TextView
-                        android:id="@+id/game_mode_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="TRYB GRY:"/>
+                <!--<com.kksionek.queuedroid.PlayerChooserView-->
+                    <!--android:id="@+id/chooser2"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_marginTop="@dimen/main_activity_margin_buttons"/>-->
 
-                    <CheckBox
-                        android:id="@+id/point_checkbox"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:button="@drawable/checkbox"
-                        android:paddingLeft="@dimen/main_activity_margin_buttons"
-                        android:layout_marginTop="@dimen/main_activity_margin_buttons"
-                        android:text="PUNKTOWY"/>
+                <!--<Button-->
+                    <!--android:id="@+id/add_player_btn"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:background="@drawable/btn_big"-->
+                    <!--android:layout_marginTop="@dimen/main_activity_margin_buttons"-->
+                    <!--android:text="DODAJ GRACZA"/>-->
 
-                    <CheckBox
-                        android:id="@+id/time_checkbox"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:button="@drawable/checkbox"
-                        android:paddingLeft="@dimen/main_activity_margin_buttons"
-                        android:layout_marginTop="@dimen/main_activity_margin_buttons"
-                        android:text="CZASOWY"/>
-                </LinearLayout>
+            </com.kksionek.queuedroid.PlayerContainerView>
 
-                <com.kksionek.queuedroid.PlayerContainerView
-                    android:id="@+id/button_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="@dimen/main_activity_margin_buttons"
-                    android:layout_marginTop="@dimen/main_activity_margin_buttons"
-                    android:background="@drawable/players_bg"
-                    android:orientation="vertical">
+            <Button
+                android:id="@+id/start_game_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/btn_big"
+                android:layout_marginLeft="@dimen/main_activity_margin_buttons"
+                android:layout_marginRight="@dimen/main_activity_margin_buttons"
+                android:layout_marginTop="@dimen/main_activity_margin_buttons"
+                android:layout_marginBottom="@dimen/main_activity_margin_buttons"
+                android:text="GRAJ"/>
 
-                    <!--<com.kksionek.queuedroid.PlayerChooserView-->
-                        <!--android:id="@+id/chooser1"-->
-                        <!--android:layout_width="match_parent"-->
-                        <!--android:layout_height="wrap_content"/>-->
-
-                    <!--<com.kksionek.queuedroid.PlayerChooserView-->
-                        <!--android:id="@+id/chooser2"-->
-                        <!--android:layout_width="match_parent"-->
-                        <!--android:layout_height="wrap_content"-->
-                        <!--android:layout_marginTop="@dimen/main_activity_margin_buttons"/>-->
-
-                    <!--<Button-->
-                        <!--android:id="@+id/add_player_btn"-->
-                        <!--android:layout_width="match_parent"-->
-                        <!--android:layout_height="wrap_content"-->
-                        <!--android:background="@drawable/btn_big"-->
-                        <!--android:layout_marginTop="@dimen/main_activity_margin_buttons"-->
-                        <!--android:text="DODAJ GRACZA"/>-->
-
-                </com.kksionek.queuedroid.PlayerContainerView>
-
-                <Button
-                    android:id="@+id/start_game_btn"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/btn_big"
-                    android:layout_marginLeft="@dimen/main_activity_margin_buttons"
-                    android:layout_marginRight="@dimen/main_activity_margin_buttons"
-                    android:layout_marginTop="@dimen/main_activity_margin_buttons"
-                    android:layout_marginBottom="@dimen/main_activity_margin_buttons"
-                    android:text="GRAJ"/>
-
-            </LinearLayout>
-        </ScrollView>
-    </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
 
 </RelativeLayout>

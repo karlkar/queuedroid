@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,10 +79,6 @@ public class PlayerContainerView extends LinearLayout {
         ((PlayerChooserView)getChildAt(mCurrentPlayer)).setPoints(points);
         mCurrentPlayer = curPlayer;
         ((PlayerChooserView)getChildAt(mCurrentPlayer)).setCurrentTurn(true);
-    }
-
-    public void setActivity(MainActivity activity) {
-        mActivity = activity;
     }
 
     private void loadContactData() {

@@ -18,7 +18,7 @@ import java.util.Comparator;
 
 public class PlayerChooserAdapter extends ArrayAdapter<Player> {
 
-    private Context mCtx;
+    private final Context mCtx;
 
     public PlayerChooserAdapter(Context context) {
         super(context, R.layout.row_autocomplete);
@@ -105,6 +105,7 @@ public class PlayerChooserAdapter extends ArrayAdapter<Player> {
             try {
                 InputStream is = (InputStream) new URL(mPlayer.getImage()).getContent();
                 Drawable d = Drawable.createFromStream(is, null);
+                is.close();
                 return d;
             } catch (IOException e) {
                 e.printStackTrace();

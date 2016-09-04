@@ -3,7 +3,6 @@ package com.kksionek.queuedroid;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.widget.AutoCompleteTextView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,9 +31,7 @@ public class Player {
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof Player)
-            return mName.equals(((Player)o).mName);
-        return false;
+        return o instanceof Player && mName.equals(((Player) o).mName);
     }
 
     public String getId() {
