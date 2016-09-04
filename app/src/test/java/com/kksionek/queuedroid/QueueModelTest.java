@@ -3,6 +3,7 @@ package com.kksionek.queuedroid;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -14,17 +15,10 @@ public class QueueModelTest {
     @Before
     public void setUp() {
         mModel = new QueueModel();
-        mModel.addPlayer(new Player("1", "Mietek", null, Player.Type.CONTACTS));
-        mModel.addPlayer(new Player("2", "Roman", null, Player.Type.CONTACTS));
-    }
-
-    @Test
-    public void addPlayer() {
-        assertEquals(mModel.getPlayersCount(), 2);
-        mModel.addPlayer(new Player("3", "Henryk", null, Player.Type.CONTACTS));
-        assertEquals(mModel.getPlayersCount(), 3);
-        mModel.addPlayer(new Player("4", "Zbigniew", null, Player.Type.CONTACTS));
-        assertEquals(mModel.getPlayersCount(), 4);
+        ArrayList<Player> list = new ArrayList<>();
+        list.add(new Player("1", "Mietek", null, Player.Type.CONTACTS));
+        list.add(new Player("2", "Roman", null, Player.Type.CONTACTS));
+        mModel.newGame(list);
     }
 
     @Test
