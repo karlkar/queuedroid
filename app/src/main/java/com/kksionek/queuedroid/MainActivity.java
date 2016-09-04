@@ -31,8 +31,10 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
     private RelativeLayout mRoot;
     private LinearLayout mGameModeChooser;
     private Button mStartButton;
+    private Button mEndButton;
 
     private final View.OnClickListener mOnStartGameBtnClicked = new OnStartGameBtnClicked();
+    private final View.OnClickListener mOnEndGameBtnClicked = new OnEndGameBtnClicked();
     private final View.OnClickListener mOnNextTurnBtnClicked = new OnNextTurnBtnClicked();
 
     @Override
@@ -48,6 +50,9 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
 
         mStartButton = (Button) findViewById(R.id.start_game_btn);
         mStartButton.setOnClickListener(mOnStartGameBtnClicked);
+
+        mEndButton = (Button) findViewById(R.id.end_game_btn);
+        mEndButton.setOnClickListener(mOnEndGameBtnClicked);
 
         AdView adView = (AdView) findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
@@ -116,7 +121,22 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
                 TransitionManager.beginDelayedTransition(mRoot);
             mStartButton.setText("NEXT TURN");
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                TransitionManager.beginDelayedTransition(mRoot);
+            mEndButton.setVisibility(View.VISIBLE);
             mStartButton.setOnClickListener(mOnNextTurnBtnClicked);
+        }
+    }
+
+    private class OnEndGameBtnClicked implements View.OnClickListener {
+        @Override
+        public void onClick(View view) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                TransitionManager.beginDelayedTransition(mRoot);
+            mStartButton.setVisibility(View.GONE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                TransitionManager.beginDelayedTransition(mRoot);
+            mEndButton.setVisibility(View.GONE);
         }
     }
 
@@ -127,5 +147,4 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
             dialog.show(getSupportFragmentManager(), "PointsDialogFragment");
         }
     }
-
 }
