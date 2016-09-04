@@ -5,15 +5,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.transition.TransitionManager;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -28,6 +31,7 @@ public class PlayerChooserView extends LinearLayout {
     private final TextView mStaticName;
     private final Button mPointsView;
     private final ImageView mPlayerThumbnail;
+    private final ViewGroup mRoot;
     private AutoCompleteTextView mPlayerName;
     private Activity mActivity;
     private boolean mWaitingForPhoto = false;
@@ -35,12 +39,10 @@ public class PlayerChooserView extends LinearLayout {
 
     private final OnThumbClickListener mOnThumbClickListener = new OnThumbClickListener();
 
-    public PlayerChooserView(Context context) {
-        this(context, null);
-    }
+    public PlayerChooserView(Context context, ViewGroup root) {
+        super(context, null);
 
-    public PlayerChooserView(Context context, AttributeSet attrs) {
-        super(context, attrs);
+        mRoot = root;
 
         setOrientation(LinearLayout.HORIZONTAL);
         setGravity(Gravity.CENTER_VERTICAL);
@@ -50,8 +52,7 @@ public class PlayerChooserView extends LinearLayout {
         inflater.inflate(R.layout.player_chooser_view, this, true);
 
         mPlayerThumbnail = (ImageView) findViewById(R.id.thumbnail);
-        mPlayerThumbnail.setImageResource(R.drawable.ic_contact_picture);
-        mPlayerThumbnail.setOnClickListener(mOnThumbClickListener);
+        initThumbnail();
 
         mPlayerName = (AutoCompleteTextView) findViewById(R.id.text);
         mPlayerName.setOnKeyListener(new OnKeyListener() {
@@ -126,11 +127,14 @@ public class PlayerChooserView extends LinearLayout {
     }
 
     public void setEditable(boolean editable) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+            TransitionManager.beginDelayedTransition(mRoot);
+        mPointsView.setVisibility(editable ? GONE : VISIBLE);
+
         mPlayerName.setVisibility(editable ? VISIBLE : GONE);
         mStaticName.setText(mPlayerName.getText().toString());
         mStaticName.setVisibility(editable ? GONE : VISIBLE);
         mPlayerThumbnail.setOnClickListener(editable ? mOnThumbClickListener : null);
-        mPointsView.setVisibility(editable ? GONE : VISIBLE);
     }
 
     public Player getPlayer() {
@@ -138,10 +142,19 @@ public class PlayerChooserView extends LinearLayout {
     }
 
     public void setCurrentTurn(boolean current) {
-        if (current)
-            mStaticName.setTypeface(mStaticName.getTypeface(), Typeface.BOLD);
-        else
-            mStaticName.setTypeface(mStaticName.getTypeface(), Typeface.NORMAL);
+        mStaticName.setTypeface(mStaticName.getTypeface(), current ? Typeface.BOLD : Typeface.NORMAL);
+    }
+
+    public void reset() {
+        setCurrentTurn(false);
+        initThumbnail();
+        mPlayerName.setText("");
+        mStaticName.setText("");
+    }
+
+    private void initThumbnail() {
+        mPlayerThumbnail.setImageResource(R.drawable.ic_contact_picture);
+        mPlayerThumbnail.setOnClickListener(mOnThumbClickListener);
     }
 
     public void setPoints(int points) {

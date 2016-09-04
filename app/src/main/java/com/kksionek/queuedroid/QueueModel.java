@@ -4,15 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class QueueModel {
-    private final List<Player> mPlayers;
-    private final List<Integer> mPoints;
+    private final List<Player> mPlayers = new ArrayList<>();
+    private final List<Integer> mPoints = new ArrayList<>();
     private int mPreviousPlayerIndex = 0;
     private int mCurrentPlayerIndex = 0;
-
-    public QueueModel() {
-        mPlayers = new ArrayList<>();
-        mPoints = new ArrayList<>();
-    }
 
     public int getPlayersCount() {
         return mPlayers.size();
@@ -42,12 +37,12 @@ public class QueueModel {
     }
 
     public void newGame(List<Player> players) {
+        mPlayers.clear();
+        mPoints.clear();
         for (Player player : players) {
             mPlayers.add(player);
             mPoints.add(0);
         }
-        for (int i = 0; i < mPoints.size(); ++i)
-            mPoints.set(i, 0);
     }
 
     public void resetScoreboard() {

@@ -26,12 +26,13 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
     public static final int REQUEST_IMAGE_CROP = 9877;
     public static final int PERMISSIONS_REQUEST_READ_CONTACTS = 2233;
 
-    private QueueModel mQueueModel = null;
+    private QueueModel mQueueModel = new QueueModel();
     private PlayerContainerView mPlayerContainerView;
     private RelativeLayout mRoot;
     private LinearLayout mGameModeChooser;
     private Button mStartButton;
     private Button mEndButton;
+    private Button mShareButton;
 
     private final View.OnClickListener mOnStartGameBtnClicked = new OnStartGameBtnClicked();
     private final View.OnClickListener mOnEndGameBtnClicked = new OnEndGameBtnClicked();
@@ -53,6 +54,9 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
 
         mEndButton = (Button) findViewById(R.id.end_game_btn);
         mEndButton.setOnClickListener(mOnEndGameBtnClicked);
+
+        mShareButton = (Button) findViewById(R.id.share_game_btn);
+        mShareButton.setOnClickListener(null);
 
         AdView adView = (AdView) findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
@@ -111,34 +115,78 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
     private class OnStartGameBtnClicked implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            mQueueModel = new QueueModel();
             List<Player> players = mPlayerContainerView.onGameStarted();
             mQueueModel.newGame(players);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
                 TransitionManager.beginDelayedTransition(mRoot);
             mGameModeChooser.setVisibility(View.GONE);
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
                 TransitionManager.beginDelayedTransition(mRoot);
             mStartButton.setText("NEXT TURN");
+            mStartButton.setOnClickListener(mOnNextTurnBtnClicked);
+
+            mEndButton.setText("END GAME");
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
                 TransitionManager.beginDelayedTransition(mRoot);
             mEndButton.setVisibility(View.VISIBLE);
-            mStartButton.setOnClickListener(mOnNextTurnBtnClicked);
+            mEndButton.setOnClickListener(mOnEndGameBtnClicked);
         }
     }
 
     private class OnEndGameBtnClicked implements View.OnClickListener {
         @Override
         public void onClick(View view) {
+            mPlayerContainerView.onGameEnded(mQueueModel);
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
                 TransitionManager.beginDelayedTransition(mRoot);
-            mStartButton.setVisibility(View.GONE);
+            mStartButton.setText("NEW GAME");
+            mStartButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    restartGame(true);
+                }
+            });
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
                 TransitionManager.beginDelayedTransition(mRoot);
-            mEndButton.setVisibility(View.GONE);
-            mPlayerContainerView.sort(mQueueModel);
+            mEndButton.setText("ONE MORE");
+            mEndButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    restartGame(false);
+                }
+            });
+
+            mShareButton.setText("SHARE");
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                TransitionManager.beginDelayedTransition(mRoot);
+            mShareButton.setVisibility(View.VISIBLE);
+            mShareButton.setOnClickListener(null);
         }
+    }
+
+    private void restartGame(boolean hardReset) {
+        mPlayerContainerView.onGameRestarted(hardReset);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+            TransitionManager.beginDelayedTransition(mRoot);
+        mGameModeChooser.setVisibility(View.VISIBLE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+            TransitionManager.beginDelayedTransition(mRoot);
+        mStartButton.setText("START");
+        mStartButton.setOnClickListener(mOnStartGameBtnClicked);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+            TransitionManager.beginDelayedTransition(mRoot);
+        mEndButton.setVisibility(View.GONE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+            TransitionManager.beginDelayedTransition(mRoot);
+        mShareButton.setVisibility(View.GONE);
     }
 
     private class OnNextTurnBtnClicked implements View.OnClickListener {

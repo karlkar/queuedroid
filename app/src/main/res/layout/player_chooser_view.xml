@@ -49,5 +49,4 @@
         android:visibility="gone"
         android:background="@drawable/checkbox"/>
 
-
 </LinearLayout>

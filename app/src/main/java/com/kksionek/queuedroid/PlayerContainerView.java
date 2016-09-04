@@ -7,7 +7,6 @@ import android.support.v4.util.Pair;
 import android.transition.TransitionManager;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -16,7 +15,6 @@ import android.widget.LinearLayout;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 public class PlayerContainerView extends LinearLayout {
@@ -32,17 +30,14 @@ public class PlayerContainerView extends LinearLayout {
 
     public PlayerContainerView(Context context) {
         super(context);
-        init();
     }
 
     public PlayerContainerView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init();
     }
 
     public PlayerContainerView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
     }
 
     private void init() {
@@ -67,7 +62,7 @@ public class PlayerContainerView extends LinearLayout {
     }
 
     public void addPlayerView() {
-        PlayerChooserView view = new PlayerChooserView(getContext());
+        PlayerChooserView view = new PlayerChooserView(getContext(), mParent);
         view.setAdapter(mAdapter);
         view.setActivity(mActivity);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
@@ -130,10 +125,10 @@ public class PlayerContainerView extends LinearLayout {
         PlayerChooserView tmp;
         for (int i = 0; i < getChildCount() - 1; ++i) {
             tmp = (PlayerChooserView) getChildAt(i);
-            if (i == 0)
-                tmp.setCurrentTurn(true);
-            players.add(tmp.getPlayer());
             tmp.setEditable(false);
+            tmp.setCurrentTurn(i == 0);
+            players.add(tmp.getPlayer());
+            tmp.setPoints(0);
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
             TransitionManager.beginDelayedTransition(mParent);
@@ -141,13 +136,40 @@ public class PlayerContainerView extends LinearLayout {
         return players;
     }
 
+    public void onGameRestarted(boolean hardReset) {
+        for (int i = 0; i < getChildCount() - 1; ++i)
+            getChildAt(i).animate().translationY(0).start();
+
+        PlayerChooserView tmp;
+        for (int i = 0; i < getChildCount() - 1; ++i) {
+            tmp = (PlayerChooserView) getChildAt(i);
+            tmp.setPoints(0);
+            tmp.setEditable(true);
+            if (hardReset)
+                tmp.reset();
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+            TransitionManager.beginDelayedTransition(mParent);
+        mAddPlayerBtn.setVisibility(VISIBLE);
+    }
+
     public void onCreate(MainActivity mainActivity, ViewGroup root) {
         mActivity = mainActivity;
         mParent = root;
+        init();
         loadContactData();
     }
 
-    public void sort(QueueModel queueModel) {
+    public void onGameEnded(QueueModel queueModel) {
+        PlayerChooserView tmp;
+        for (int i = 0; i < getChildCount() - 1; ++i) {
+            tmp = (PlayerChooserView) getChildAt(i);
+            tmp.setCurrentTurn(false);
+        }
+        sort(queueModel);
+    }
+
+    private void sort(QueueModel queueModel) {
         ArrayList<Pair<Integer, Integer>> list = new ArrayList<>(getChildCount() - 1);
         for (int i = 0; i < getChildCount() - 1; ++i) {
             list.add(new Pair<>(queueModel.getPointsOfPlayer(i), i));
