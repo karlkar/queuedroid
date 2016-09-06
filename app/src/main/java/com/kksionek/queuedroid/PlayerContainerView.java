@@ -40,6 +40,10 @@ public class PlayerContainerView extends LinearLayout {
         super(context, attrs, defStyleAttr);
     }
 
+    public void shareOnFacebook(ArrayList<String> players) {
+        mFb.shareOnFacebook(mActivity, players);
+    }
+
     private void init() {
         Log.d("PLAYERCONTAINERVIEW", "init: ");
         mAdapter = new PlayerChooserAdapter(getContext());

@@ -56,7 +56,12 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
         mEndButton.setOnClickListener(mOnEndGameBtnClicked);
 
         mShareButton = (Button) findViewById(R.id.share_game_btn);
-        mShareButton.setOnClickListener(null);
+        mShareButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mPlayerContainerView.shareOnFacebook(mQueueModel.getFbPlayers());
+            }
+        });
 
         AdView adView = (AdView) findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
@@ -164,7 +169,6 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
                 TransitionManager.beginDelayedTransition(mRoot);
             mShareButton.setVisibility(View.VISIBLE);
-            mShareButton.setOnClickListener(null);
         }
     }
 

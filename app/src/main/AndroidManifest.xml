@@ -35,6 +35,10 @@
             </intent-filter>
         </activity>
 
+        <provider android:authorities="com.facebook.app.FacebookContentProvider1616015895382966"
+                  android:name="com.facebook.FacebookContentProvider"
+                  android:exported="true"/>
+
         <activity android:name="com.facebook.FacebookActivity"
                   android:configChanges=
                       "keyboard|keyboardHidden|screenLayout|screenSize|orientation"

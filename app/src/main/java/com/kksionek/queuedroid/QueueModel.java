@@ -57,4 +57,13 @@ public class QueueModel {
     public int getPointsOfPreviousPlayer() {
         return mPoints.get(mPreviousPlayerIndex);
     }
+
+    public ArrayList<String> getFbPlayers() {
+        ArrayList<String> list = new ArrayList<>();
+        for (Player player : mPlayers) {
+            if (player.isFromFacebook())
+                list.add(player.getId());
+        }
+        return list;
+    }
 }
