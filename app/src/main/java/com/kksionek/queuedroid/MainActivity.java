@@ -1,8 +1,5 @@
 package com.kksionek.queuedroid;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -26,7 +23,7 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
     public static final int REQUEST_IMAGE_CROP = 9877;
     public static final int PERMISSIONS_REQUEST_READ_CONTACTS = 2233;
 
-    private QueueModel mQueueModel = new QueueModel();
+    private final QueueModel mQueueModel = new QueueModel();
     private PlayerContainerView mPlayerContainerView;
     private RelativeLayout mRoot;
     private LinearLayout mGameModeChooser;
@@ -129,10 +126,10 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
                 TransitionManager.beginDelayedTransition(mRoot);
-            mStartButton.setText("NEXT TURN");
+            mStartButton.setText(R.string.next_turn);
             mStartButton.setOnClickListener(mOnNextTurnBtnClicked);
 
-            mEndButton.setText("END GAME");
+            mEndButton.setText(R.string.end_game);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
                 TransitionManager.beginDelayedTransition(mRoot);
             mEndButton.setVisibility(View.VISIBLE);
@@ -147,7 +144,7 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
                 TransitionManager.beginDelayedTransition(mRoot);
-            mStartButton.setText("NEW GAME");
+            mStartButton.setText(R.string.new_game);
             mStartButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -157,7 +154,7 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
                 TransitionManager.beginDelayedTransition(mRoot);
-            mEndButton.setText("ONE MORE");
+            mEndButton.setText(R.string.play_again);
             mEndButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -165,7 +162,7 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
                 }
             });
 
-            mShareButton.setText("SHARE");
+            mShareButton.setText(R.string.share);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
                 TransitionManager.beginDelayedTransition(mRoot);
             mShareButton.setVisibility(View.VISIBLE);
@@ -181,7 +178,7 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
             TransitionManager.beginDelayedTransition(mRoot);
-        mStartButton.setText("START");
+        mStartButton.setText(R.string.play);
         mStartButton.setOnClickListener(mOnStartGameBtnClicked);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)

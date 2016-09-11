@@ -4,7 +4,19 @@
         This is an ad unit ID for a banner test ad. Replace with your own banner ad unit id.
         For more information, see https://support.google.com/admob/answer/3052638
     <!- -->
-    <string name="full_screen_unit_id">ca-app-pub-9982327151344679/8784823348</string>
 
     <string name="facebook_app_id">1616706948647194</string>
+    <string name="cd_thumbnail">thumbnail</string>
+    <string name="game_mode">TRYB GRY:</string>
+    <string name="game_mode_points">PUNKTOWY</string>
+    <string name="game_mode_time">CZASOWY</string>
+    <string name="play">PLAY</string>
+    <string name="end_game">END GAME</string>
+    <string name="share">SHARE GAME</string>
+    <string name="enter_player_name">Wpisz nazwę gracza&#8230;</string>
+    <string name="zero">0</string>
+    <string name="next_turn">NEXT TURN</string>
+    <string name="new_game">NEW GAME</string>
+    <string name="play_again">ONE MORE</string>
+    <string name="add_player">DODAJ GRACZA</string>
 </resources>

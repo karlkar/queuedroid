@@ -6,7 +6,6 @@
     android:orientation="horizontal">
 
     <LinearLayout
-        android:id="@+id/playerNameLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -15,9 +14,11 @@
 
         <ImageView
             android:id="@+id/thumbnail"
+            android:contentDescription="@string/cd_thumbnail"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginLeft="5dp"
+            android:layout_marginStart="5dp"
             android:layout_gravity="center"/>
 
         <AutoCompleteTextView
@@ -26,8 +27,10 @@
             android:layout_height="wrap_content"
             android:inputType="textNoSuggestions|textPersonName"
             android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
             android:layout_marginRight="10dp"
-            android:hint="Wpisz nazwę gracza..."
+            android:layout_marginEnd="10dp"
+            android:hint="@string/enter_player_name"
             android:imeOptions="actionNext"/>
 
         <TextView
@@ -35,7 +38,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
             android:layout_marginRight="10dp"
+            android:layout_marginEnd="10dp"
             android:gravity="center_vertical"
             android:visibility="gone"/>
     </LinearLayout>
@@ -45,7 +50,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:text="0"
+        android:text="@string/zero"
         android:visibility="gone"
         android:background="@drawable/checkbox"/>
 

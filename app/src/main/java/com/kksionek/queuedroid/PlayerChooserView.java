@@ -31,7 +31,7 @@ public class PlayerChooserView extends LinearLayout {
     private final Button mPointsView;
     private final ImageView mPlayerThumbnail;
     private final ViewGroup mRoot;
-    private AutoCompleteTextView mPlayerName;
+    private final AutoCompleteTextView mPlayerName;
     private Activity mActivity;
     private boolean mWaitingForPhoto = false;
     private Player mPlayer = null;
@@ -136,7 +136,7 @@ public class PlayerChooserView extends LinearLayout {
 
     public Player getPlayer() {
         if (mPlayer == null)
-            return new Player(mPlayerName.getText().toString(), mPlayerThumbnail.getDrawable(), Player.Type.CUSTOM);
+            return new Player(mPlayerName.getText().toString(), mPlayerThumbnail.getDrawable());
         return mPlayer;
     }
 

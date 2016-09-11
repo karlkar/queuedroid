@@ -22,11 +22,11 @@ public class Player {
     private final Type mType;
     private Drawable mDrawable;
 
-    public Player(String name, Drawable drawable, Type type) {
+    public Player(String name, Drawable drawable) {
         mId = "";
         mName = name;
         mImage = null;
-        mType = type;
+        mType = Type.CUSTOM;
         mDrawable = drawable;
     }
 

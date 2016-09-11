@@ -56,7 +56,7 @@ public class PlayerContainerView extends LinearLayout {
         Log.d("PLAYERCONTAINERVIEW", "init: ");
         mAdapter = new PlayerChooserAdapter(getContext());
         mAddPlayerBtn = new Button(getContext());
-        mAddPlayerBtn.setText("DODAJ GRACZA");
+        mAddPlayerBtn.setText(R.string.add_player);
         mAddPlayerBtn.setBackgroundResource(R.drawable.btn_big);
         mAddPlayerBtn.setOnClickListener(new View.OnClickListener() {
             @Override

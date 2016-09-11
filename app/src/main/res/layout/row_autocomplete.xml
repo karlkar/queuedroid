@@ -8,9 +8,11 @@
 
     <ImageView
         android:id="@+id/thumbnail"
+        android:contentDescription="@string/cd_thumbnail"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginLeft="5dp"
+        android:layout_marginStart="5dp"
         android:layout_gravity="center"/>
 
     <TextView
@@ -18,6 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
         android:gravity="center_vertical"/>
 
 </LinearLayout>

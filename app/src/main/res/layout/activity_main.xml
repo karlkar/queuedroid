@@ -1,15 +1,15 @@
-<RelativeLayout xmlns:ads="http://schemas.android.com/apk/res-auto"
-                xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:id="@+id/root"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp"
-                android:background="@drawable/bg"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                tools:context="com.kksionek.queuedroid.MainActivity">
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="20dp"
+    android:paddingRight="20dp"
+    android:background="@drawable/bg"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    tools:context="com.kksionek.queuedroid.MainActivity">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -38,28 +38,27 @@
                 android:background="@drawable/mode_bg">
 
                 <TextView
-                    android:id="@+id/game_mode_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="TRYB GRY:"/>
+                    android:text="@string/game_mode"/>
 
                 <CheckBox
-                    android:id="@+id/point_checkbox"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:button="@drawable/checkbox"
                     android:paddingLeft="@dimen/main_activity_margin_buttons"
+                    android:paddingStart="@dimen/main_activity_margin_buttons"
                     android:layout_marginTop="@dimen/main_activity_margin_buttons"
-                    android:text="PUNKTOWY"/>
+                    android:text="@string/game_mode_points"/>
 
                 <CheckBox
-                    android:id="@+id/time_checkbox"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:button="@drawable/checkbox"
                     android:paddingLeft="@dimen/main_activity_margin_buttons"
+                    android:paddingStart="@dimen/main_activity_margin_buttons"
                     android:layout_marginTop="@dimen/main_activity_margin_buttons"
-                    android:text="CZASOWY"/>
+                    android:text="@string/game_mode_time"/>
             </LinearLayout>
 
             <com.kksionek.queuedroid.PlayerContainerView
@@ -80,7 +79,7 @@
                 android:layout_marginRight="@dimen/main_activity_margin_buttons"
                 android:layout_marginTop="@dimen/main_activity_margin_buttons"
                 android:layout_marginBottom="@dimen/main_activity_margin_buttons"
-                android:text="PLAY"/>
+                android:text="@string/play"/>
 
             <Button
                 android:id="@+id/end_game_btn"
@@ -92,7 +91,7 @@
                 android:layout_marginTop="@dimen/main_activity_margin_buttons"
                 android:layout_marginBottom="@dimen/main_activity_margin_buttons"
                 android:visibility="gone"
-                android:text="END GAME"/>
+                android:text="@string/end_game"/>
 
             <Button
                 android:id="@+id/share_game_btn"
@@ -104,7 +103,7 @@
                 android:layout_marginTop="@dimen/main_activity_margin_buttons"
                 android:layout_marginBottom="@dimen/main_activity_margin_buttons"
                 android:visibility="gone"
-                android:text="SHARE GAME"/>
+                android:text="@string/share"/>
 
         </LinearLayout>
     </ScrollView>
