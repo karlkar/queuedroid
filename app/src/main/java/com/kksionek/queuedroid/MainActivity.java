@@ -63,9 +63,9 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
             }
         });
 
-        AdView adView = (AdView) findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        adView.loadAd(adRequest);
+//        AdView adView = (AdView) findViewById(R.id.adView);
+//        AdRequest adRequest = new AdRequest.Builder().build();
+//        adView.loadAd(adRequest);
     }
 
     @Override

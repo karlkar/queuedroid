@@ -4,7 +4,7 @@
         This is an ad unit ID for a banner test ad. Replace with your own banner ad unit id.
         For more information, see https://support.google.com/admob/answer/3052638
     <!- -->
-    <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="full_screen_unit_id">ca-app-pub-9982327151344679/8784823348</string>
 
     <string name="facebook_app_id">1616706948647194</string>
 </resources>
