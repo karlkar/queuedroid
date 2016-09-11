@@ -3,6 +3,7 @@ package com.kksionek.queuedroid;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -23,6 +24,7 @@ import com.facebook.share.Sharer;
 import com.facebook.share.model.ShareOpenGraphAction;
 import com.facebook.share.model.ShareOpenGraphContent;
 import com.facebook.share.model.ShareOpenGraphObject;
+import com.facebook.share.model.SharePhoto;
 import com.facebook.share.widget.ShareDialog;
 
 import org.json.JSONArray;
@@ -59,7 +61,7 @@ public class FbController {
                         @Override
                         public void onCompleted(JSONObject object, GraphResponse response) {
                             Log.d(TAG, "onCompleted: " + object.toString());
-                            mMyProfile = Player.createFacebookFriend(object);
+                            mMyProfile = Player.createFacebookFriend(object, true);
                             adapter.add(mMyProfile);
                             requestFriends(adapter, null);
                         }
@@ -123,22 +125,30 @@ public class FbController {
         mCallbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
-    public void shareOnFacebook(@NonNull Activity activity, @NonNull ArrayList<String> list) {
+    public void shareOnFacebook(@NonNull Activity activity, @NonNull ArrayList<String> list, @Nullable Bitmap bitmap) {
 
         ShareOpenGraphObject object = new ShareOpenGraphObject.Builder()
                 .putString("og:type", "games.game")
-                .putString("og:title", "What a game!")
+                .putString("og:title", "QueueDroid")
                 .build();
 
-        ShareOpenGraphAction action = new ShareOpenGraphAction.Builder()
-                .setActionType("queuedroid-test:play")
+        SharePhoto photo = null;
+        if (bitmap != null) {
+            photo = new SharePhoto.Builder()
+                    .setBitmap(bitmap)
+                    .setUserGenerated(true)
+                    .build();
+        }
+        ShareOpenGraphAction.Builder actionBuilder = new ShareOpenGraphAction.Builder();
+        actionBuilder.setActionType("queuedroid-test:play")
                 .putObject("game", object)
-                .putStringArrayList("tags", list)
-                .build();
+                .putStringArrayList("tags", list);
+        if (photo != null)
+            actionBuilder.putPhoto("image", photo);
 
         ShareOpenGraphContent content = new ShareOpenGraphContent.Builder()
                 .setPreviewPropertyName("game")
-                .setAction(action)
+                .setAction(actionBuilder.build())
                 .build();
         ShareDialog dlg = new ShareDialog(activity);
         dlg.registerCallback(mCallbackManager, new FacebookCallback<Sharer.Result>() {

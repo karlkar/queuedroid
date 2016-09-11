@@ -2,6 +2,8 @@ package com.kksionek.queuedroid;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.os.Build;
 import android.support.v4.util.Pair;
 import android.transition.TransitionManager;
@@ -41,7 +43,13 @@ public class PlayerContainerView extends LinearLayout {
     }
 
     public void shareOnFacebook(ArrayList<String> players) {
-        mFb.shareOnFacebook(mActivity, players);
+//        measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
+        Bitmap bitmap = Bitmap.createBitmap(getMeasuredWidth(), getMeasuredHeight(),
+                Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+//        layout(0, 0, getMeasuredWidth(), getMeasuredHeight());
+        draw(canvas);
+        mFb.shareOnFacebook(mActivity, players, bitmap);
     }
 
     private void init() {
@@ -58,11 +66,12 @@ public class PlayerContainerView extends LinearLayout {
         });
         addPlayerView();
         addPlayerView();
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
-        params.setMargins(0, (int) getResources().getDimension(R.dimen.main_activity_margin_buttons), 0, 0);
-        addView(mAddPlayerBtn, params);
+//        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+//                ViewGroup.LayoutParams.MATCH_PARENT,
+//                ViewGroup.LayoutParams.WRAP_CONTENT);
+//        params.setMargins(50, 0, 50, 0);
+//        addView(mAddPlayerBtn, params);
+        addView(mAddPlayerBtn);
     }
 
     public void addPlayerView() {
@@ -72,7 +81,7 @@ public class PlayerContainerView extends LinearLayout {
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
-        params.setMargins(0, (int) getResources().getDimension(R.dimen.main_activity_margin_buttons), 0, 0);
+        params.setMargins(0, 0, 0, (int) getResources().getDimension(R.dimen.main_activity_margin_buttons));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
             TransitionManager.beginDelayedTransition(this);
         addView(view, getChildCount() - 1, params);

@@ -10,6 +10,7 @@ import org.json.JSONObject;
 public class Player {
 
     enum Type {
+        MY_FB_PROFILE,
         FACEBOOK,
         CONTACTS,
         CUSTOM
@@ -59,7 +60,11 @@ public class Player {
     }
 
     public boolean isFromFacebook() {
-        return mType == Type.FACEBOOK;
+        return mType == Type.FACEBOOK || mType == Type.MY_FB_PROFILE;
+    }
+
+    public boolean isMyFbProfile() {
+        return mType == Type.MY_FB_PROFILE;
     }
 
     public boolean isCustom() {
@@ -72,11 +77,15 @@ public class Player {
     }
 
     public static Player createFacebookFriend(@NonNull JSONObject jsonFriend) {
+        return createFacebookFriend(jsonFriend, false);
+    }
+
+    public static Player createFacebookFriend(@NonNull JSONObject jsonFriend, boolean myProfile) {
         try {
             String id = jsonFriend.getString("id");
             String name = jsonFriend.getString("name");
             String image = jsonFriend.getJSONObject("picture").getJSONObject("data").getString("url");
-            return new Player(id, name, image, Type.FACEBOOK);
+            return new Player(id, name, image, myProfile ? Type.MY_FB_PROFILE : Type.FACEBOOK);
         } catch (JSONException | NullPointerException e) {
             e.printStackTrace();
         }

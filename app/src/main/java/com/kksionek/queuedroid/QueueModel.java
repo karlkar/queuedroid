@@ -61,7 +61,7 @@ public class QueueModel {
     public ArrayList<String> getFbPlayers() {
         ArrayList<String> list = new ArrayList<>();
         for (Player player : mPlayers) {
-            if (player.isFromFacebook())
+            if (player != null && player.isFromFacebook() && !player.isMyFbProfile())
                 list.add(player.getId());
         }
         return list;
