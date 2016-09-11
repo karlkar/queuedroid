@@ -156,10 +156,7 @@ public class PlayerContainerView extends LinearLayout {
         PlayerChooserView tmp;
         for (int i = 0; i < getChildCount() - 1; ++i) {
             tmp = (PlayerChooserView) getChildAt(i);
-            tmp.setPoints(0);
-            tmp.setEditable(true);
-            if (hardReset)
-                tmp.reset();
+            tmp.reset(hardReset);
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
             TransitionManager.beginDelayedTransition(mParent);

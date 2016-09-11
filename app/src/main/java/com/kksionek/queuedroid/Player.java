@@ -17,10 +17,18 @@ public class Player {
     }
 
     private final String mId;
-    private String mName;
+    private final String mName;
     private final String mImage;
     private final Type mType;
     private Drawable mDrawable;
+
+    public Player(String name, Drawable drawable, Type type) {
+        mId = "";
+        mName = name;
+        mImage = null;
+        mType = type;
+        mDrawable = drawable;
+    }
 
     public Player(@NonNull String id, @NonNull String name, @Nullable String image, @NonNull Type type) {
         mId = id;
@@ -51,10 +59,6 @@ public class Player {
         return mDrawable;
     }
 
-    public void setName(@NonNull String name) {
-        mName = name;
-    }
-
     public void setDrawable(Drawable drawable) {
         mDrawable = drawable;
     }
@@ -65,10 +69,6 @@ public class Player {
 
     public boolean isMyFbProfile() {
         return mType == Type.MY_FB_PROFILE;
-    }
-
-    public boolean isCustom() {
-        return mType == Type.CUSTOM;
     }
 
     @Override

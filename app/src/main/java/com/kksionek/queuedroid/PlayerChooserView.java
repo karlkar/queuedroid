@@ -11,7 +11,6 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.transition.TransitionManager;
-import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -37,7 +36,7 @@ public class PlayerChooserView extends LinearLayout {
     private boolean mWaitingForPhoto = false;
     private Player mPlayer = null;
 
-    private final OnThumbClickListener mOnThumbClickListener = new OnThumbClickListener();
+    private final OnThumbnailClickListener mOnThumbClickListener = new OnThumbnailClickListener();
 
     public PlayerChooserView(Context context, ViewGroup root) {
         super(context, null);
@@ -58,12 +57,10 @@ public class PlayerChooserView extends LinearLayout {
         mPlayerName.setOnKeyListener(new OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
-                mPlayerThumbnail.setImageResource(R.drawable.ic_contact_picture);
-                if (mPlayer.isCustom())
-                    mPlayer.setName(mPlayerName.getText().toString());
-                else
-                    mPlayer = new Player("-", mPlayerName.getText().toString(), null, Player.Type.CUSTOM);
-                mPlayer.setDrawable(mPlayerThumbnail.getDrawable());
+                if (keyCode == KeyEvent.KEYCODE_DEL && mPlayer != null) {
+                    mPlayer = null;
+                    initThumbnail();
+                }
                 return false;
             }
         });
@@ -90,12 +87,13 @@ public class PlayerChooserView extends LinearLayout {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 mPlayer = (Player) parent.getItemAtPosition(position);
                 mPlayerThumbnail.setImageDrawable(mPlayer.getDrawable());
+                mPlayerThumbnail.setOnClickListener(null);
                 View nextFocus = focusSearch(FOCUS_DOWN);
                 if (nextFocus instanceof AutoCompleteTextView)
                     nextFocus.requestFocus();
                 else {
                     mPlayerName.clearFocus();
-                    InputMethodManager imm =  (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(mPlayerName.getWindowToken(), 0);
                 }
             }
@@ -121,7 +119,6 @@ public class PlayerChooserView extends LinearLayout {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
             mPlayerThumbnail.setImageBitmap(imageBitmap);
-            mPlayer.setDrawable(mPlayerThumbnail.getDrawable());
         }
         return true;
     }
@@ -134,10 +131,12 @@ public class PlayerChooserView extends LinearLayout {
         mPlayerName.setVisibility(editable ? VISIBLE : GONE);
         mStaticName.setText(mPlayerName.getText().toString());
         mStaticName.setVisibility(editable ? GONE : VISIBLE);
-        mPlayerThumbnail.setOnClickListener(editable ? mOnThumbClickListener : null);
+        mPlayerThumbnail.setOnClickListener(editable && mPlayer == null ? mOnThumbClickListener : null);
     }
 
     public Player getPlayer() {
+        if (mPlayer == null)
+            return new Player(mPlayerName.getText().toString(), mPlayerThumbnail.getDrawable(), Player.Type.CUSTOM);
         return mPlayer;
     }
 
@@ -145,11 +144,16 @@ public class PlayerChooserView extends LinearLayout {
         mStaticName.setTypeface(mStaticName.getTypeface(), current ? Typeface.BOLD : Typeface.NORMAL);
     }
 
-    public void reset() {
+    public void reset(boolean hardReset) {
+        setEditable(true);
+        mPointsView.setText("0");
         setCurrentTurn(false);
-        initThumbnail();
-        mPlayerName.setText("");
-        mStaticName.setText("");
+        if (hardReset) {
+            mPlayer = null;
+            initThumbnail();
+            mPlayerName.setText("");
+            mStaticName.setText("");
+        }
     }
 
     private void initThumbnail() {
@@ -161,10 +165,10 @@ public class PlayerChooserView extends LinearLayout {
         mPointsView.setText(String.valueOf(points));
     }
 
-    private class OnThumbClickListener implements OnClickListener {
+    private class OnThumbnailClickListener implements OnClickListener {
         @Override
         public void onClick(View v) {
-            if (mPlayerName != null && mPlayerName.getText().length() > 0) {
+            if (mPlayerName.getText().length() > 0) {
                 Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 if (takePictureIntent.resolveActivity(v.getContext().getPackageManager()) != null) {
                     mActivity.startActivityForResult(takePictureIntent, MainActivity.REQUEST_IMAGE_CAPTURE);
