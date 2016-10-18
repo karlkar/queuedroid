@@ -10,9 +10,15 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.transition.TransitionManager;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 
 import java.util.List;
 
@@ -34,6 +40,7 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
     private final View.OnClickListener mOnStartGameBtnClicked = new OnStartGameBtnClicked();
     private final View.OnClickListener mOnEndGameBtnClicked = new OnEndGameBtnClicked();
     private final View.OnClickListener mOnNextTurnBtnClicked = new OnNextTurnBtnClicked();
+    private AdView mAdView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,9 +67,36 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
             }
         });
 
-//        AdView adView = (AdView) findViewById(R.id.adView);
-//        AdRequest adRequest = new AdRequest.Builder().build();
-//        adView.loadAd(adRequest);
+        MobileAds.initialize(getApplicationContext(), "ca-app-pub-9982327151344679~7308090141");
+
+        mAdView = (AdView) findViewById(R.id.adView);
+        mAdView.setVisibility(View.GONE);
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice(getString(R.string.adMobTestDeviceS5))
+                .build();
+        mAdView.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                if (Build.VERSION.SDK_INT >= 19)
+                    TransitionManager.beginDelayedTransition(mRoot);
+                mAdView.setVisibility(View.VISIBLE);
+            }
+        });
+        mAdView.loadAd(adRequest);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mAdView != null)
+            mAdView.resume();
+    }
+
+    @Override
+    protected void onPause() {
+        if (mAdView != null)
+            mAdView.pause();
+        super.onPause();
     }
 
     @Override
