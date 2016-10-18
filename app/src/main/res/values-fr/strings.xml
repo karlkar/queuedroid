@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Queueoid</string>
+    <string name="add_player">AJOUTE JOUEUR</string>
+    <string name="end_game">FIN DU JEU</string>
+    <string name="enter_player_name">NOM DE JOUEUR</string>
+    <string name="game_mode">MODE DE JEU</string>
+    <string name="game_mode_points">POINTS</string>
+    <string name="game_mode_time">TEMPS</string>
+    <string name="new_game">NOUVEU JEU</string>
+    <string name="next_turn">PROCHAIN TOUR</string>
+    <string name="play">JEU</string>
+    <string name="play_again">REMATCH</string>
+    <string name="share">PARTAGE</string>
+</resources>

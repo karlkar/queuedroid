@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Kolejkoid</string>
+    <string name="add_player">DODAJ GRACZA</string>
+    <string name="end_game">KONIEC GRY</string>
+    <string name="enter_player_name">Nazwa gracza&#8230;</string>
+    <string name="game_mode">TRYB GRY:</string>
+    <string name="game_mode_points">PUNKTY</string>
+    <string name="game_mode_time">CZAS</string>
+    <string name="new_game">NOWA GRA</string>
+    <string name="next_turn">NASTĘPNA TURA</string>
+    <string name="play">GRAJ</string>
+    <string name="play_again">REWANŻ</string>
+    <string name="share">UDOSTĘPNIJ</string>
+</resources>

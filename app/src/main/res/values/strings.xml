@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">queuedroid</string>
+    <string name="app_name">Queueoid</string>
     <!-- -
         This is an ad unit ID for a banner test ad. Replace with your own banner ad unit id.
         For more information, see https://support.google.com/admob/answer/3052638
@@ -14,11 +14,11 @@
     <string name="game_mode_time">TIME</string>
     <string name="play">PLAY</string>
     <string name="end_game">END GAME</string>
-    <string name="share">SHARE GAME</string>
-    <string name="enter_player_name">Player's name&#8230;</string>
+    <string name="share">SHARE</string>
+    <string name="enter_player_name">Player\'s name&#8230;</string>
     <string name="zero">0</string>
     <string name="next_turn">NEXT TURN</string>
     <string name="new_game">NEW GAME</string>
-    <string name="play_again">ONE MORE</string>
+    <string name="play_again">REVANGE</string>
     <string name="add_player">ADD PLAYER</string>
 </resources>
