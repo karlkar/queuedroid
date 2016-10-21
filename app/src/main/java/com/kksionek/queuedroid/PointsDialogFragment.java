@@ -40,7 +40,7 @@ public class PointsDialogFragment extends DialogFragment {
         final EditText input = new EditText(getActivity());
         input.setInputType(InputType.TYPE_CLASS_NUMBER);
         builder.setView(input);
-        builder.setMessage("Points collected")
+        builder.setMessage(R.string.points_collected)
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         int points = Integer.parseInt(input.getText().toString());
