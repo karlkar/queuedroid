@@ -5,21 +5,28 @@
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="20dp"
-    android:paddingRight="20dp"
     android:background="@drawable/bg"
     android:focusable="true"
     android:focusableInTouchMode="true"
     tools:context="com.kksionek.queuedroid.MainActivity">
 
-    <com.google.android.gms.ads.AdView
-        android:id="@+id/adView"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/adViewBg"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        ads:adSize="BANNER"
-        ads:adUnitId="@string/banner_ad_unit_id"/>
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:gravity="center_horizontal"
+        android:background="@android:color/black">
+
+        <com.google.android.gms.ads.AdView
+            android:id="@+id/adView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            ads:adSize="BANNER"
+            ads:adUnitId="@string/banner_ad_unit_id"/>
+    </LinearLayout>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -27,9 +34,10 @@
         android:layout_marginTop="40dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:layout_marginBottom="@dimen/main_activity_margin_buttons"
+        android:layout_marginBottom="60dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
         android:layout_alignParentTop="true"
-        android:layout_above="@id/adView"
         android:background="@drawable/scroller_bg">
 
         <LinearLayout
@@ -39,7 +47,7 @@
             android:layout_marginRight="@dimen/main_activity_margin_buttons"
             android:orientation="vertical">
 
-            <LinearLayout
+<!--            <LinearLayout
                 android:id="@+id/game_mode_chooser"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -71,7 +79,7 @@
                     android:layout_marginTop="@dimen/main_activity_margin_buttons"
                     android:text="@string/game_mode_time"/>
             </LinearLayout>
-
+-->
             <com.kksionek.queuedroid.PlayerContainerView
                 android:id="@+id/button_container"
                 android:layout_width="match_parent"

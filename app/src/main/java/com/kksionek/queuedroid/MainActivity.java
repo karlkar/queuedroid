@@ -32,7 +32,7 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
     private final QueueModel mQueueModel = new QueueModel();
     private PlayerContainerView mPlayerContainerView;
     private RelativeLayout mRoot;
-    private LinearLayout mGameModeChooser;
+//    private LinearLayout mGameModeChooser;
     private Button mStartButton;
     private Button mEndButton;
     private Button mShareButton;
@@ -48,7 +48,7 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
         setContentView(R.layout.activity_main);
 
         mRoot = (RelativeLayout) findViewById(R.id.root);
-        mGameModeChooser = (LinearLayout) findViewById(R.id.game_mode_chooser);
+//        mGameModeChooser = (LinearLayout) findViewById(R.id.game_mode_chooser);
 
         mPlayerContainerView = (PlayerContainerView) findViewById(R.id.button_container);
         mPlayerContainerView.onCreate(this, mRoot);
@@ -154,9 +154,9 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
             List<Player> players = mPlayerContainerView.onGameStarted();
             mQueueModel.newGame(players);
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-                TransitionManager.beginDelayedTransition(mRoot);
-            mGameModeChooser.setVisibility(View.GONE);
+            //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+            //    TransitionManager.beginDelayedTransition(mRoot);
+            //mGameModeChooser.setVisibility(View.GONE);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
                 TransitionManager.beginDelayedTransition(mRoot);
@@ -206,9 +206,9 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
     private void restartGame(boolean hardReset) {
         mPlayerContainerView.onGameRestarted(hardReset);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-            TransitionManager.beginDelayedTransition(mRoot);
-        mGameModeChooser.setVisibility(View.VISIBLE);
+        //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+        //    TransitionManager.beginDelayedTransition(mRoot);
+        //mGameModeChooser.setVisibility(View.VISIBLE);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
             TransitionManager.beginDelayedTransition(mRoot);
