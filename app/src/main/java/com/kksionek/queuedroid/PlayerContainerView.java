@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -133,9 +134,14 @@ public class PlayerContainerView extends LinearLayout {
             mFb.onActivityResult(requestCode, resultCode, data);
     }
 
-    public List<Player> onGameStarted() {
+    public List<Player> onGameStarted() throws InvalidParameterException {
         ArrayList<Player> players = new ArrayList<>(getChildCount() - 1);
         PlayerChooserView tmp;
+        for (int i = 0; i < getChildCount() - 1; ++i) {
+            tmp = (PlayerChooserView) getChildAt(i);
+            if (tmp.getPlayer() == null)
+                throw new InvalidParameterException();
+        }
         for (int i = 0; i < getChildCount() - 1; ++i) {
             tmp = (PlayerChooserView) getChildAt(i);
             tmp.setEditable(false);

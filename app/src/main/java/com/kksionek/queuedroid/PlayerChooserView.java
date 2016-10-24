@@ -135,6 +135,8 @@ public class PlayerChooserView extends LinearLayout {
     }
 
     public Player getPlayer() {
+        if (mPlayerName.getText().toString().isEmpty())
+            return null;
         if (mPlayer == null)
             return new Player(mPlayerName.getText().toString(), mPlayerThumbnail.getDrawable());
         return mPlayer;

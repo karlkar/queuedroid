@@ -13,4 +13,5 @@
     <string name="play_again">REWANŻ</string>
     <string name="share">UDOSTĘPNIJ</string>
     <string name="points_collected">Zdobyte punkty</string>
+    <string name="add_players_toast">Najpierw dodaj graczy.</string>
 </resources>

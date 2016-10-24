@@ -13,4 +13,5 @@
     <string name="play_again">REMATCH</string>
     <string name="share">PARTAGE</string>
     <string name="points_collected">Vos points</string>
+    <string name="add_players_toast">Ajoute les joueurs.</string>
 </resources>

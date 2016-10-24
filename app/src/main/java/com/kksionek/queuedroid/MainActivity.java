@@ -9,17 +9,20 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.transition.TransitionManager;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 
+import java.security.InvalidParameterException;
 import java.util.List;
 
 public class MainActivity extends FragmentActivity implements PointsDialogFragment.PointsDialogListener {
@@ -151,23 +154,28 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
     private class OnStartGameBtnClicked implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            List<Player> players = mPlayerContainerView.onGameStarted();
-            mQueueModel.newGame(players);
+            try {
+                List<Player> players = mPlayerContainerView.onGameStarted();
+                mQueueModel.newGame(players);
 
-            //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-            //    TransitionManager.beginDelayedTransition(mRoot);
-            //mGameModeChooser.setVisibility(View.GONE);
+                //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                //    TransitionManager.beginDelayedTransition(mRoot);
+                //mGameModeChooser.setVisibility(View.GONE);
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-                TransitionManager.beginDelayedTransition(mRoot);
-            mStartButton.setText(R.string.next_turn);
-            mStartButton.setOnClickListener(mOnNextTurnBtnClicked);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                    TransitionManager.beginDelayedTransition(mRoot);
+                mStartButton.setText(R.string.next_turn);
+                mStartButton.setOnClickListener(mOnNextTurnBtnClicked);
 
-            mEndButton.setText(R.string.end_game);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-                TransitionManager.beginDelayedTransition(mRoot);
-            mEndButton.setVisibility(View.VISIBLE);
-            mEndButton.setOnClickListener(mOnEndGameBtnClicked);
+                mEndButton.setText(R.string.end_game);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                    TransitionManager.beginDelayedTransition(mRoot);
+                mEndButton.setVisibility(View.VISIBLE);
+                mEndButton.setOnClickListener(mOnEndGameBtnClicked);
+            } catch (InvalidParameterException ex) {
+                Log.d(TAG, "onClick: Game cannot be started - no players entered.");
+                Toast.makeText(MainActivity.this, R.string.add_players_toast, Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
