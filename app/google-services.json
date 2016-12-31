@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "988486025062-4iv0u5devaateoee06vj9v3hp5odum8a.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.kksionek.queuedroid",
+            "certificate_hash": "1F9779474E7E9842D263D3F48A0E10675334682F"
+          }
+        },
+        {
           "client_id": "988486025062-t9c7tm7s13ei7s1q4atc29dvnkaah5ka.apps.googleusercontent.com",
           "client_type": 3
         }
