@@ -28,103 +28,112 @@
             ads:adUnitId="@string/banner_ad_unit_id"/>
     </LinearLayout>
 
-    <ScrollView
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginBottom="60dp"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp"
         android:layout_alignParentTop="true"
-        android:background="@drawable/scroller_bg">
+        android:layout_marginBottom="30dp"
+        android:layout_above="@id/adViewBg">
 
-        <LinearLayout
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/main_activity_margin_buttons"
-            android:layout_marginRight="@dimen/main_activity_margin_buttons"
-            android:orientation="vertical">
+            android:layout_marginTop="30dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:paddingBottom="5dp"
+            android:paddingTop="5dp"
+            android:background="@drawable/scroller_bg">
 
-<!--            <LinearLayout
-                android:id="@+id/game_mode_chooser"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="@dimen/main_activity_margin_buttons"
-                android:padding="@dimen/main_activity_margin_buttons"
-                android:orientation="vertical"
-                android:background="@drawable/mode_bg">
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/main_activity_margin_buttons"
+                android:layout_marginRight="@dimen/main_activity_margin_buttons"
+                android:orientation="vertical">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/game_mode"/>
-
-                <CheckBox
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:button="@drawable/checkbox"
-                    android:paddingLeft="@dimen/main_activity_margin_buttons"
-                    android:paddingStart="@dimen/main_activity_margin_buttons"
+    <!--            <LinearLayout
+                    android:id="@+id/game_mode_chooser"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:layout_marginTop="@dimen/main_activity_margin_buttons"
-                    android:text="@string/game_mode_points"/>
+                    android:padding="@dimen/main_activity_margin_buttons"
+                    android:orientation="vertical"
+                    android:background="@drawable/mode_bg">
 
-                <CheckBox
-                    android:layout_width="wrap_content"
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/game_mode"/>
+
+                    <CheckBox
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:button="@drawable/checkbox"
+                        android:paddingLeft="@dimen/main_activity_margin_buttons"
+                        android:paddingStart="@dimen/main_activity_margin_buttons"
+                        android:layout_marginTop="@dimen/main_activity_margin_buttons"
+                        android:text="@string/game_mode_points"/>
+
+                    <CheckBox
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:button="@drawable/checkbox"
+                        android:paddingLeft="@dimen/main_activity_margin_buttons"
+                        android:paddingStart="@dimen/main_activity_margin_buttons"
+                        android:layout_marginTop="@dimen/main_activity_margin_buttons"
+                        android:text="@string/game_mode_time"/>
+                </LinearLayout>
+    -->
+                <com.kksionek.queuedroid.view.PlayerContainerView
+                    android:id="@+id/button_container"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:button="@drawable/checkbox"
-                    android:paddingLeft="@dimen/main_activity_margin_buttons"
-                    android:paddingStart="@dimen/main_activity_margin_buttons"
+                    android:padding="@dimen/main_activity_margin_buttons"
                     android:layout_marginTop="@dimen/main_activity_margin_buttons"
-                    android:text="@string/game_mode_time"/>
+                    android:background="@drawable/players_bg"
+                    android:orientation="vertical"/>
+
+                <Button
+                    android:id="@+id/start_game_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/btn_big"
+                    android:layout_marginLeft="@dimen/main_activity_margin_buttons"
+                    android:layout_marginRight="@dimen/main_activity_margin_buttons"
+                    android:layout_marginTop="@dimen/main_activity_margin_buttons"
+                    android:layout_marginBottom="@dimen/main_activity_margin_buttons"
+                    android:text="@string/play"/>
+
+                <Button
+                    android:id="@+id/end_game_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/btn_big"
+                    android:layout_marginLeft="@dimen/main_activity_margin_buttons"
+                    android:layout_marginRight="@dimen/main_activity_margin_buttons"
+                    android:layout_marginTop="@dimen/main_activity_margin_buttons"
+                    android:layout_marginBottom="@dimen/main_activity_margin_buttons"
+                    android:visibility="gone"
+                    android:text="@string/end_game"/>
+
+                <Button
+                    android:id="@+id/share_game_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/btn_big"
+                    android:layout_marginLeft="@dimen/main_activity_margin_buttons"
+                    android:layout_marginRight="@dimen/main_activity_margin_buttons"
+                    android:layout_marginTop="@dimen/main_activity_margin_buttons"
+                    android:layout_marginBottom="@dimen/main_activity_margin_buttons"
+                    android:visibility="gone"
+                    android:text="@string/share"/>
+
             </LinearLayout>
--->
-            <com.kksionek.queuedroid.view.PlayerContainerView
-                android:id="@+id/button_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="@dimen/main_activity_margin_buttons"
-                android:layout_marginTop="@dimen/main_activity_margin_buttons"
-                android:background="@drawable/players_bg"
-                android:orientation="vertical"/>
-
-            <Button
-                android:id="@+id/start_game_btn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/btn_big"
-                android:layout_marginLeft="@dimen/main_activity_margin_buttons"
-                android:layout_marginRight="@dimen/main_activity_margin_buttons"
-                android:layout_marginTop="@dimen/main_activity_margin_buttons"
-                android:layout_marginBottom="@dimen/main_activity_margin_buttons"
-                android:text="@string/play"/>
-
-            <Button
-                android:id="@+id/end_game_btn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/btn_big"
-                android:layout_marginLeft="@dimen/main_activity_margin_buttons"
-                android:layout_marginRight="@dimen/main_activity_margin_buttons"
-                android:layout_marginTop="@dimen/main_activity_margin_buttons"
-                android:layout_marginBottom="@dimen/main_activity_margin_buttons"
-                android:visibility="gone"
-                android:text="@string/end_game"/>
-
-            <Button
-                android:id="@+id/share_game_btn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/btn_big"
-                android:layout_marginLeft="@dimen/main_activity_margin_buttons"
-                android:layout_marginRight="@dimen/main_activity_margin_buttons"
-                android:layout_marginTop="@dimen/main_activity_margin_buttons"
-                android:layout_marginBottom="@dimen/main_activity_margin_buttons"
-                android:visibility="gone"
-                android:text="@string/share"/>
-
-        </LinearLayout>
-    </ScrollView>
+        </ScrollView>
+    </LinearLayout>
 
 </RelativeLayout>
