@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.os.Build;
 import android.support.v4.util.Pair;
-import android.transition.TransitionManager;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +18,8 @@ import com.kksionek.queuedroid.model.QueueModel;
 import com.kksionek.queuedroid.R;
 import com.kksionek.queuedroid.model.ContactsController;
 import com.kksionek.queuedroid.model.FbController;
+import com.kksionek.queuedroid.model.TooFewPlayersException;
+import com.kksionek.queuedroid.model.WrongPlayerException;
 
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
@@ -140,15 +141,15 @@ public class PlayerContainerView extends LinearLayout {
             mFb.onActivityResult(requestCode, resultCode, data);
     }
 
-    public List<Player> onGameStarted() throws InvalidParameterException {
+    public List<Player> onGameStarted() throws TooFewPlayersException, WrongPlayerException {
         if (getChildCount() - 1 < 2)
-            throw new InvalidParameterException();
+            throw new TooFewPlayersException();
         ArrayList<Player> players = new ArrayList<>(getChildCount() - 1);
         PlayerChooserView tmp;
         for (int i = 0; i < getChildCount() - 1; ++i) {
             tmp = (PlayerChooserView) getChildAt(i);
             if (tmp.getPlayer() == null)
-                throw new InvalidParameterException();
+                throw new WrongPlayerException();
         }
         for (int i = 0; i < getChildCount() - 1; ++i) {
             tmp = (PlayerChooserView) getChildAt(i);

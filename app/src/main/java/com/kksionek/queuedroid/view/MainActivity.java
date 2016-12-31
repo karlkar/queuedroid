@@ -22,6 +22,8 @@ import com.google.android.gms.ads.MobileAds;
 import com.kksionek.queuedroid.data.Player;
 import com.kksionek.queuedroid.model.QueueModel;
 import com.kksionek.queuedroid.R;
+import com.kksionek.queuedroid.model.TooFewPlayersException;
+import com.kksionek.queuedroid.model.WrongPlayerException;
 
 import java.security.InvalidParameterException;
 import java.util.List;
@@ -169,9 +171,12 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
                 AnimationUtils.beginDelayedTransition(mRoot);
                 mEndButton.setVisibility(View.VISIBLE);
                 mEndButton.setOnClickListener(mOnEndGameBtnClicked);
-            } catch (InvalidParameterException ex) {
-                Log.d(TAG, "onClick: Game cannot be started - no players entered.");
-                Toast.makeText(MainActivity.this, R.string.add_players_toast, Toast.LENGTH_SHORT).show();
+            } catch (TooFewPlayersException ex) {
+                Log.d(TAG, "onClick: Game cannot be started - too few players entered.");
+                Toast.makeText(MainActivity.this, R.string.activity_main_start_too_few_players_error_message, Toast.LENGTH_LONG).show();
+            } catch (WrongPlayerException ex) {
+                Log.d(TAG, "onClick: Game cannot be started - some players are inproper.");
+                Toast.makeText(MainActivity.this, R.string.activity_main_start_wrong_player_on_list_error_message, Toast.LENGTH_LONG).show();
             }
         }
     }

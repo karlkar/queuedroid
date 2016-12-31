@@ -15,4 +15,5 @@
     <string name="points_collected">Vos points</string>
     <string name="add_players_toast">Ajoute les joueurs.</string>
     <string name="activity_main_start_too_few_players_error_message">Il y a moins de 2 joueurs. Veuillez ajouter d\'autres joueurs.</string>
+    <string name="activity_main_start_wrong_player_on_list_error_message">Il y a un joueur, qui n\'a pas le nom. Veuillez corriger cela.</string>
 </resources>
