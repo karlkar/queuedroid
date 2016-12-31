@@ -1,4 +1,4 @@
-package com.kksionek.queuedroid;
+package com.kksionek.queuedroid.view;
 
 import android.content.Context;
 import android.content.Intent;
@@ -8,11 +8,17 @@ import android.os.Build;
 import android.support.v4.util.Pair;
 import android.transition.TransitionManager;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+
+import com.kksionek.queuedroid.data.Player;
+import com.kksionek.queuedroid.model.PlayerChooserAdapter;
+import com.kksionek.queuedroid.model.QueueModel;
+import com.kksionek.queuedroid.R;
+import com.kksionek.queuedroid.model.ContactsController;
+import com.kksionek.queuedroid.model.FbController;
 
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
@@ -76,8 +82,7 @@ public class PlayerContainerView extends LinearLayout {
         view.setOnRemoveListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-                    TransitionManager.beginDelayedTransition(PlayerContainerView.this);
+                AnimationUtils.beginDelayedTransition(PlayerContainerView.this);
                 removeView(view);
             }
         });
@@ -85,8 +90,7 @@ public class PlayerContainerView extends LinearLayout {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
         params.setMargins(0, 0, 0, (int) getResources().getDimension(R.dimen.main_activity_margin_buttons));
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-            TransitionManager.beginDelayedTransition(this);
+        AnimationUtils.beginDelayedTransition(this);
         addView(view, getChildCount() - 1, params);
     }
 
@@ -153,8 +157,7 @@ public class PlayerContainerView extends LinearLayout {
             players.add(tmp.getPlayer());
             tmp.setPoints(0);
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-            TransitionManager.beginDelayedTransition(mParent);
+        AnimationUtils.beginDelayedTransition(mParent);
         mAddPlayerBtn.setVisibility(View.GONE);
         return players;
     }
@@ -168,8 +171,7 @@ public class PlayerContainerView extends LinearLayout {
             tmp = (PlayerChooserView) getChildAt(i);
             tmp.reset(hardReset);
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-            TransitionManager.beginDelayedTransition(mParent);
+        AnimationUtils.beginDelayedTransition(mParent);
         mAddPlayerBtn.setVisibility(VISIBLE);
     }
 

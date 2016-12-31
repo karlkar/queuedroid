@@ -8,7 +8,7 @@
     android:background="@drawable/bg"
     android:focusable="true"
     android:focusableInTouchMode="true"
-    tools:context="com.kksionek.queuedroid.MainActivity">
+    tools:context="com.kksionek.queuedroid.view.MainActivity">
 
     <LinearLayout
         android:id="@+id/adViewBg"
@@ -80,7 +80,7 @@
                     android:text="@string/game_mode_time"/>
             </LinearLayout>
 -->
-            <com.kksionek.queuedroid.PlayerContainerView
+            <com.kksionek.queuedroid.view.PlayerContainerView
                 android:id="@+id/button_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

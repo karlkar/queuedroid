@@ -1,4 +1,4 @@
-package com.kksionek.queuedroid;
+package com.kksionek.queuedroid.view;
 
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
@@ -19,6 +19,9 @@ import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
+import com.kksionek.queuedroid.data.Player;
+import com.kksionek.queuedroid.model.QueueModel;
+import com.kksionek.queuedroid.R;
 
 import java.security.InvalidParameterException;
 import java.util.List;
@@ -78,8 +81,7 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
         mAdView.setAdListener(new AdListener() {
             @Override
             public void onAdLoaded() {
-                if (Build.VERSION.SDK_INT >= 19)
-                    TransitionManager.beginDelayedTransition(mRoot);
+                AnimationUtils.beginDelayedTransition(mRoot);
                 mAdView.setVisibility(View.VISIBLE);
             }
         });
@@ -156,18 +158,15 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
                 List<Player> players = mPlayerContainerView.onGameStarted();
                 mQueueModel.newGame(players);
 
-                //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-                //    TransitionManager.beginDelayedTransition(mRoot);
+//                AnimationUtils.beginDelayedTransition(mRoot);
                 //mGameModeChooser.setVisibility(View.GONE);
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-                    TransitionManager.beginDelayedTransition(mRoot);
+                AnimationUtils.beginDelayedTransition(mRoot);
                 mStartButton.setText(R.string.next_turn);
                 mStartButton.setOnClickListener(mOnNextTurnBtnClicked);
 
                 mEndButton.setText(R.string.end_game);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-                    TransitionManager.beginDelayedTransition(mRoot);
+                AnimationUtils.beginDelayedTransition(mRoot);
                 mEndButton.setVisibility(View.VISIBLE);
                 mEndButton.setOnClickListener(mOnEndGameBtnClicked);
             } catch (InvalidParameterException ex) {
@@ -182,8 +181,7 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
         public void onClick(View view) {
             mPlayerContainerView.onGameEnded(mQueueModel);
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-                TransitionManager.beginDelayedTransition(mRoot);
+            AnimationUtils.beginDelayedTransition(mRoot);
             mStartButton.setText(R.string.new_game);
             mStartButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -192,8 +190,7 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
                 }
             });
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-                TransitionManager.beginDelayedTransition(mRoot);
+            AnimationUtils.beginDelayedTransition(mRoot);
             mEndButton.setText(R.string.play_again);
             mEndButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -203,8 +200,7 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
             });
 
             mShareButton.setText(R.string.share);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-                TransitionManager.beginDelayedTransition(mRoot);
+            AnimationUtils.beginDelayedTransition(mRoot);
             mShareButton.setVisibility(View.VISIBLE);
         }
     }
@@ -212,21 +208,17 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
     private void restartGame(boolean hardReset) {
         mPlayerContainerView.onGameRestarted(hardReset);
 
-        //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-        //    TransitionManager.beginDelayedTransition(mRoot);
+//        AnimationUtils.beginDelayedTransition(mRoot);
         //mGameModeChooser.setVisibility(View.VISIBLE);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-            TransitionManager.beginDelayedTransition(mRoot);
+        AnimationUtils.beginDelayedTransition(mRoot);
         mStartButton.setText(R.string.play);
         mStartButton.setOnClickListener(mOnStartGameBtnClicked);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-            TransitionManager.beginDelayedTransition(mRoot);
+        AnimationUtils.beginDelayedTransition(mRoot);
         mEndButton.setVisibility(View.GONE);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-            TransitionManager.beginDelayedTransition(mRoot);
+        AnimationUtils.beginDelayedTransition(mRoot);
         mShareButton.setVisibility(View.GONE);
     }
 

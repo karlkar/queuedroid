@@ -1,4 +1,4 @@
-package com.kksionek.queuedroid;
+package com.kksionek.queuedroid.view;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -11,6 +11,8 @@ import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+
+import com.kksionek.queuedroid.R;
 
 public class PointsDialogFragment extends DialogFragment {
 

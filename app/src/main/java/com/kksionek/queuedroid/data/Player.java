@@ -1,6 +1,5 @@
-package com.kksionek.queuedroid;
+package com.kksionek.queuedroid.data;
 
-import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -9,7 +8,7 @@ import org.json.JSONObject;
 
 public class Player {
 
-    enum Type {
+    public enum Type {
         MY_FB_PROFILE,
         FACEBOOK,
         CONTACTS,
@@ -21,7 +20,7 @@ public class Player {
     private final String mImage;
     private final Type mType;
 
-    public Player(String name, Drawable drawable) {
+    public Player(String name) {
         mId = "";
         mName = name;
         mImage = null;

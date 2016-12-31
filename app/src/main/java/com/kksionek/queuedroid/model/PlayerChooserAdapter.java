@@ -1,9 +1,6 @@
-package com.kksionek.queuedroid;
+package com.kksionek.queuedroid.model;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,10 +9,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.kksionek.queuedroid.R;
+import com.kksionek.queuedroid.data.Player;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.Comparator;
 
 public class PlayerChooserAdapter extends ArrayAdapter<Player> {

@@ -1,5 +1,8 @@
 package com.kksionek.queuedroid;
 
+import com.kksionek.queuedroid.data.Player;
+import com.kksionek.queuedroid.model.QueueModel;
+
 import org.junit.Before;
 import org.junit.Test;
 

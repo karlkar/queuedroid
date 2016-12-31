@@ -1,4 +1,4 @@
-package com.kksionek.queuedroid;
+package com.kksionek.queuedroid.view;
 
 import android.app.Activity;
 import android.content.Context;
@@ -26,6 +26,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.kksionek.queuedroid.data.Player;
+import com.kksionek.queuedroid.model.PlayerChooserAdapter;
+import com.kksionek.queuedroid.R;
 
 public class PlayerChooserView extends LinearLayout {
 
@@ -136,18 +139,14 @@ public class PlayerChooserView extends LinearLayout {
 
     public void setEditable(boolean editable) {
         if (editable) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-                TransitionManager.beginDelayedTransition(mRoot);
+            AnimationUtils.beginDelayedTransition(mRoot);
             mPointsView.setBackgroundResource(R.drawable.btn_cancel);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-                TransitionManager.beginDelayedTransition(mRoot);
+            AnimationUtils.beginDelayedTransition(mRoot);
             mPointsView.setText("");
         } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-                TransitionManager.beginDelayedTransition(mRoot);
+            AnimationUtils.beginDelayedTransition(mRoot);
             mPointsView.setBackgroundResource(R.drawable.btn_uncheck);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-                TransitionManager.beginDelayedTransition(mRoot);
+            AnimationUtils.beginDelayedTransition(mRoot);
             mPointsView.setText("0");
         }
 
@@ -161,7 +160,7 @@ public class PlayerChooserView extends LinearLayout {
         if (mPlayerName.getText().toString().isEmpty())
             return null;
         if (mPlayer == null)
-            return new Player(mPlayerName.getText().toString(), mPlayerThumbnail.getDrawable());
+            return new Player(mPlayerName.getText().toString());
         return mPlayer;
     }
 

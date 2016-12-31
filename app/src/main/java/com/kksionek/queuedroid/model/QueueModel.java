@@ -1,4 +1,6 @@
-package com.kksionek.queuedroid;
+package com.kksionek.queuedroid.model;
+
+import com.kksionek.queuedroid.data.Player;
 
 import java.util.ArrayList;
 import java.util.List;

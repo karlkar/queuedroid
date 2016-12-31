@@ -1,10 +1,12 @@
-package com.kksionek.queuedroid;
+package com.kksionek.queuedroid.model;
 
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.provider.ContactsContract;
 import android.util.Log;
+
+import com.kksionek.queuedroid.data.Player;
 
 public class ContactsController {
 

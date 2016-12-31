@@ -1,4 +1,4 @@
-package com.kksionek.queuedroid;
+package com.kksionek.queuedroid.model;
 
 import android.app.Activity;
 import android.app.Application;
@@ -26,6 +26,7 @@ import com.facebook.share.model.ShareOpenGraphContent;
 import com.facebook.share.model.ShareOpenGraphObject;
 import com.facebook.share.model.SharePhoto;
 import com.facebook.share.widget.ShareDialog;
+import com.kksionek.queuedroid.data.Player;
 
 import org.json.JSONArray;
 import org.json.JSONException;
