@@ -25,6 +25,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+
 public class PlayerChooserView extends LinearLayout {
 
     private final TextView mStaticName;
@@ -35,12 +37,13 @@ public class PlayerChooserView extends LinearLayout {
     private Activity mActivity;
     private boolean mWaitingForPhoto = false;
     private Player mPlayer = null;
+    private Context mCtx;
 
     private final OnThumbnailClickListener mOnThumbClickListener = new OnThumbnailClickListener();
 
     public PlayerChooserView(Context context, ViewGroup root) {
         super(context, null);
-
+        mCtx = context;
         mRoot = root;
 
         setOrientation(LinearLayout.HORIZONTAL);
@@ -86,7 +89,10 @@ public class PlayerChooserView extends LinearLayout {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 mPlayer = (Player) parent.getItemAtPosition(position);
-                mPlayerThumbnail.setImageDrawable(mPlayer.getDrawable());
+                Glide.with(mCtx)
+                        .load(mPlayer.getImage())
+                        .placeholder(R.drawable.ic_contact_picture)
+                        .into(mPlayerThumbnail);
                 mPlayerThumbnail.setOnClickListener(null);
                 View nextFocus = focusSearch(FOCUS_DOWN);
                 if (nextFocus instanceof AutoCompleteTextView)
@@ -101,6 +107,11 @@ public class PlayerChooserView extends LinearLayout {
 
         mStaticName = (TextView) findViewById(R.id.staticText);
         mPointsView = (Button) findViewById(R.id.pointsView);
+        mPointsView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            }
+        });
     }
 
     public void setAdapter(@Nullable PlayerChooserAdapter adapter) {
@@ -124,9 +135,21 @@ public class PlayerChooserView extends LinearLayout {
     }
 
     public void setEditable(boolean editable) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-            TransitionManager.beginDelayedTransition(mRoot);
-        mPointsView.setVisibility(editable ? GONE : VISIBLE);
+        if (editable) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                TransitionManager.beginDelayedTransition(mRoot);
+            mPointsView.setBackgroundResource(R.drawable.btn_cancel);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                TransitionManager.beginDelayedTransition(mRoot);
+            mPointsView.setText("");
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                TransitionManager.beginDelayedTransition(mRoot);
+            mPointsView.setBackgroundResource(R.drawable.btn_uncheck);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                TransitionManager.beginDelayedTransition(mRoot);
+            mPointsView.setText("0");
+        }
 
         mPlayerName.setVisibility(editable ? VISIBLE : GONE);
         mStaticName.setText(mPlayerName.getText().toString());
@@ -148,7 +171,6 @@ public class PlayerChooserView extends LinearLayout {
 
     public void reset(boolean hardReset) {
         setEditable(true);
-        mPointsView.setText("0");
         setCurrentTurn(false);
         if (hardReset) {
             mPlayer = null;
@@ -165,6 +187,10 @@ public class PlayerChooserView extends LinearLayout {
 
     public void setPoints(int points) {
         mPointsView.setText(String.valueOf(points));
+    }
+
+    public void setOnRemoveListener(OnClickListener onRemoveListener) {
+        mPointsView.setOnClickListener(onRemoveListener);
     }
 
     private class OnThumbnailClickListener implements OnClickListener {

@@ -3,8 +3,8 @@
     <string name="app_name">Queueoid</string>
     <string name="add_player">AJOUTE JOUEUR</string>
     <string name="end_game">FIN DU JEU</string>
-    <string name="enter_player_name">NOM DE JOUEUR</string>
-    <string name="game_mode">MODE DE JEU</string>
+    <string name="enter_player_name">Nom de joueur&#8230;</string>
+    <string name="game_mode">MODE DE JEU:</string>
     <string name="game_mode_points">POINTS</string>
     <string name="game_mode_time">TEMPS</string>
     <string name="new_game">NOUVEU JEU</string>
@@ -14,4 +14,5 @@
     <string name="share">PARTAGE</string>
     <string name="points_collected">Vos points</string>
     <string name="add_players_toast">Ajoute les joueurs.</string>
+    <string name="activity_main_start_too_few_players_error_message">Il y a moins de 2 joueurs. Veuillez ajouter d\'autres joueurs.</string>
 </resources>

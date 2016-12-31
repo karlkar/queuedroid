@@ -20,14 +20,12 @@ public class Player {
     private final String mName;
     private final String mImage;
     private final Type mType;
-    private Drawable mDrawable;
 
     public Player(String name, Drawable drawable) {
         mId = "";
         mName = name;
         mImage = null;
         mType = Type.CUSTOM;
-        mDrawable = drawable;
     }
 
     public Player(@NonNull String id, @NonNull String name, @Nullable String image, @NonNull Type type) {
@@ -35,7 +33,6 @@ public class Player {
         mName = name;
         mImage = image;
         mType = type;
-        mDrawable = null;
     }
 
     @Override
@@ -53,14 +50,6 @@ public class Player {
 
     public String getImage() {
         return mImage;
-    }
-
-    public Drawable getDrawable() {
-        return mDrawable;
-    }
-
-    public void setDrawable(Drawable drawable) {
-        mDrawable = drawable;
     }
 
     public boolean isFromFacebook() {

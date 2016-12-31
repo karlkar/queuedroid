@@ -14,4 +14,5 @@
     <string name="share">UDOSTĘPNIJ</string>
     <string name="points_collected">Zdobyte punkty</string>
     <string name="add_players_toast">Najpierw dodaj graczy.</string>
+    <string name="activity_main_start_too_few_players_error_message">Do rozpoczęcia gry potrzeba przynajmniej 2 graczy.</string>
 </resources>

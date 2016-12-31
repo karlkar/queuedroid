@@ -16,11 +16,11 @@
     <string name="end_game">END GAME</string>
     <string name="share">SHARE</string>
     <string name="enter_player_name">Player\'s name&#8230;</string>
-    <string name="zero">0</string>
     <string name="next_turn">NEXT TURN</string>
     <string name="new_game">NEW GAME</string>
     <string name="play_again">REVANGE</string>
     <string name="add_player">ADD PLAYER</string>
     <string name="points_collected">Points collected</string>
     <string name="add_players_toast">Please add some players.</string>
+    <string name="activity_main_start_too_few_players_error_message">At least 2 players are needed to start a game.</string>
 </resources>

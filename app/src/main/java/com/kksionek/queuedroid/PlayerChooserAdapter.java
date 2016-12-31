@@ -11,6 +11,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -18,11 +20,8 @@ import java.util.Comparator;
 
 public class PlayerChooserAdapter extends ArrayAdapter<Player> {
 
-    private final Context mCtx;
-
     public PlayerChooserAdapter(Context context) {
         super(context, R.layout.row_autocomplete);
-        mCtx = context;
     }
 
     @Override
@@ -50,7 +49,7 @@ public class PlayerChooserAdapter extends ArrayAdapter<Player> {
     public View getView(int position, View convertView, ViewGroup parent) {
         PlayerViewHolder holder;
         if (convertView == null) {
-            convertView = ((LayoutInflater)mCtx.getSystemService(Context.LAYOUT_INFLATER_SERVICE))
+            convertView = LayoutInflater.from(getContext())
                     .inflate(R.layout.row_autocomplete, parent, false);
             holder = new PlayerViewHolder();
             holder.image = (ImageView) convertView.findViewById(R.id.thumbnail);
@@ -59,25 +58,13 @@ public class PlayerChooserAdapter extends ArrayAdapter<Player> {
         } else
             holder = (PlayerViewHolder) convertView.getTag();
 
-        holder.position = position;
         Player player = getItem(position);
         holder.text.setText(player.getName());
 
-        Drawable drawable = player.getDrawable();
-        if (drawable == null) {
-            if (player.getImage() == null) {
-                holder.image.setImageResource(R.drawable.ic_contact_picture);
-                player.setDrawable(holder.image.getDrawable());
-            } else if (player.getImage().startsWith("content")) {
-                holder.image.setImageURI(Uri.parse(player.getImage()));
-                player.setDrawable(holder.image.getDrawable());
-            } else {
-                holder.image.setImageResource(R.drawable.ic_contact_picture);
-                ThumbnailLoader loader = new ThumbnailLoader(holder, position, player);
-                loader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-            }
-        } else
-            holder.image.setImageDrawable(drawable);
+        Glide.with(getContext())
+                .load(player.getImage())
+                .placeholder(R.drawable.ic_contact_picture)
+                .into(holder.image);
 
         return convertView;
     }
@@ -85,40 +72,5 @@ public class PlayerChooserAdapter extends ArrayAdapter<Player> {
     static class PlayerViewHolder {
         ImageView image;
         TextView text;
-        int position;
-    }
-
-    private class ThumbnailLoader extends AsyncTask<Void, Void, Drawable> {
-
-        private final PlayerViewHolder mViewHolder;
-        private final int mPosition;
-        private final Player mPlayer;
-
-        public ThumbnailLoader(PlayerViewHolder viewHolder, int position, Player player) {
-            mViewHolder = viewHolder;
-            mPosition = position;
-            mPlayer = player;
-        }
-
-        @Override
-        protected Drawable doInBackground(Void... params) {
-            try {
-                InputStream is = (InputStream) new URL(mPlayer.getImage()).getContent();
-                Drawable d = Drawable.createFromStream(is, null);
-                is.close();
-                return d;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Drawable drawable) {
-            super.onPostExecute(drawable);
-            mPlayer.setDrawable(drawable);
-            if (mPosition == mViewHolder.position)
-                mViewHolder.image.setImageDrawable(drawable);
-        }
     }
 }

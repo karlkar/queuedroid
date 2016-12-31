@@ -54,7 +54,6 @@ public class PlayerContainerView extends LinearLayout {
     }
 
     private void init() {
-        Log.d("PLAYERCONTAINERVIEW", "init: ");
         mAdapter = new PlayerChooserAdapter(getContext());
         mAddPlayerBtn = new Button(getContext());
         mAddPlayerBtn.setText(R.string.add_player);
@@ -67,18 +66,21 @@ public class PlayerContainerView extends LinearLayout {
         });
         addPlayerView();
         addPlayerView();
-//        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-//                ViewGroup.LayoutParams.MATCH_PARENT,
-//                ViewGroup.LayoutParams.WRAP_CONTENT);
-//        params.setMargins(50, 0, 50, 0);
-//        addView(mAddPlayerBtn, params);
         addView(mAddPlayerBtn);
     }
 
     public void addPlayerView() {
-        PlayerChooserView view = new PlayerChooserView(getContext(), mParent);
+        final PlayerChooserView view = new PlayerChooserView(getContext(), mParent);
         view.setAdapter(mAdapter);
         view.setActivity(mActivity);
+        view.setOnRemoveListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                    TransitionManager.beginDelayedTransition(PlayerContainerView.this);
+                removeView(view);
+            }
+        });
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -135,6 +137,8 @@ public class PlayerContainerView extends LinearLayout {
     }
 
     public List<Player> onGameStarted() throws InvalidParameterException {
+        if (getChildCount() - 1 < 2)
+            throw new InvalidParameterException();
         ArrayList<Player> players = new ArrayList<>(getChildCount() - 1);
         PlayerChooserView tmp;
         for (int i = 0; i < getChildCount() - 1; ++i) {
@@ -182,18 +186,18 @@ public class PlayerContainerView extends LinearLayout {
             tmp = (PlayerChooserView) getChildAt(i);
             tmp.setCurrentTurn(false);
         }
-        sort(queueModel);
+        sortPlayersByCount(queueModel);
     }
 
-    private void sort(QueueModel queueModel) {
-        ArrayList<Pair<Integer, Integer>> list = new ArrayList<>(getChildCount() - 1);
-        for (int i = 0; i < getChildCount() - 1; ++i) {
+    private void sortPlayersByCount(QueueModel queueModel) {
+        ArrayList<Pair<Integer, Integer>> list = new ArrayList<>(queueModel.getPlayersCount());
+        for (int i = 0; i < queueModel.getPlayersCount(); ++i) {
             list.add(new Pair<>(queueModel.getPointsOfPlayer(i), i));
         }
         Collections.sort(list, new Comparator<Pair<Integer, Integer>>() {
             @Override
-            public int compare(Pair<Integer, Integer> t1, Pair<Integer, Integer> t2) {
-                return t2.first.compareTo(t1.first);
+            public int compare(Pair<Integer, Integer> left, Pair<Integer, Integer> right) {
+                return right.first.compareTo(left.first);
             }
         });
         for (int i = 0; i < getChildCount() - 1; ++i) {
