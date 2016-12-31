@@ -83,7 +83,7 @@ public class PlayerContainerView extends LinearLayout {
         view.setOnRemoveListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                AnimationUtils.beginDelayedTransition(PlayerContainerView.this);
+                AnimationUtils.beginDelayedTransition(mParent);
                 removeView(view);
             }
         });
