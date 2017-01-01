@@ -76,6 +76,7 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
         mAdView.setVisibility(View.GONE);
         AdRequest adRequest = new AdRequest.Builder()
                 .addTestDevice(getString(R.string.adMobTestDeviceS5))
+                .addTestDevice(getString(R.string.adMobTestDeviceS7))
                 .build();
         mAdView.setAdListener(new AdListener() {
             @Override
