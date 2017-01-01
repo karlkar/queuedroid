@@ -36,7 +36,6 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
     private final QueueModel mQueueModel = new QueueModel();
     private PlayerContainerView mPlayerContainerView;
     private RelativeLayout mRoot;
-//    private LinearLayout mGameModeChooser;
     private Button mStartButton;
     private Button mEndButton;
     private Button mShareButton;
@@ -53,7 +52,6 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
         setContentView(R.layout.activity_main);
 
         mRoot = (RelativeLayout) findViewById(R.id.root);
-//        mGameModeChooser = (LinearLayout) findViewById(R.id.game_mode_chooser);
 
         mPlayerContainerView = (PlayerContainerView) findViewById(R.id.button_container);
         mPlayerContainerView.onCreate(this, mRoot);
@@ -162,9 +160,6 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
                 List<Player> players = mPlayerContainerView.onGameStarted();
                 mQueueModel.newGame(players);
 
-//                AnimationUtils.beginDelayedTransition(mRoot);
-                //mGameModeChooser.setVisibility(View.GONE);
-
                 AnimationUtils.beginDelayedTransition(mRoot);
                 mKeyboardView.setVisibility(View.VISIBLE);
 
@@ -220,9 +215,6 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
 
     private void restartGame(boolean hardReset) {
         mPlayerContainerView.onGameRestarted(hardReset);
-
-//        AnimationUtils.beginDelayedTransition(mRoot);
-        //mGameModeChooser.setVisibility(View.VISIBLE);
 
         AnimationUtils.beginDelayedTransition(mRoot);
         mStartButton.setText(R.string.play);

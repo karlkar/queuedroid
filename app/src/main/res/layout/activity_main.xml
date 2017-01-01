@@ -37,39 +37,6 @@
                 android:layout_marginRight="@dimen/main_activity_players_margin"
                 android:orientation="vertical">
 
-    <!--            <LinearLayout
-                    android:id="@+id/game_mode_chooser"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="@dimen/main_activity_margin_buttons"
-                    android:padding="@dimen/main_activity_margin_buttons"
-                    android:orientation="vertical"
-                    android:background="@drawable/mode_bg">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/game_mode"/>
-
-                    <CheckBox
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:button="@drawable/checkbox"
-                        android:paddingLeft="@dimen/main_activity_margin_buttons"
-                        android:paddingStart="@dimen/main_activity_margin_buttons"
-                        android:layout_marginTop="@dimen/main_activity_margin_buttons"
-                        android:text="@string/game_mode_points"/>
-
-                    <CheckBox
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:button="@drawable/checkbox"
-                        android:paddingLeft="@dimen/main_activity_margin_buttons"
-                        android:paddingStart="@dimen/main_activity_margin_buttons"
-                        android:layout_marginTop="@dimen/main_activity_margin_buttons"
-                        android:text="@string/game_mode_time"/>
-                </LinearLayout>
-    -->
                 <com.kksionek.queuedroid.view.PlayerContainerView
                     android:id="@+id/button_container"
                     android:layout_width="match_parent"
