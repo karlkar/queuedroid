@@ -230,8 +230,14 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
     private class OnNextTurnBtnClicked implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            PointsDialogFragment dialog = new PointsDialogFragment();
-            dialog.show(getSupportFragmentManager(), "PointsDialogFragment");
+            if (false) {
+                PointsDialogFragment dialog = new PointsDialogFragment();
+                dialog.show(getSupportFragmentManager(), "PointsDialogFragment");
+            } else {
+                mQueueModel.nextTurn(mKeyboardView.getPoints());
+                mKeyboardView.clearPoints();
+                mPlayerContainerView.nextTurn(mQueueModel.getPointsOfPreviousPlayer(), mQueueModel.getCurrentPlayerIndex());
+            }
         }
     }
 }

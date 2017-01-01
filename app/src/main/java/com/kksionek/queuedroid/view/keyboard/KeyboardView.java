@@ -26,15 +26,14 @@ public class KeyboardView extends LinearLayout {
 
     public KeyboardView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        LayoutInflater.from(getContext()).inflate(
-                R.layout.keyboard, this);
+        LayoutInflater.from(getContext()).inflate(R.layout.keyboard, this);
 
         mCurPointsTextView = (TextView) findViewById(R.id.cur_points);
         mClearButton = (Button) findViewById(R.id.clear_button);
         mClearButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mCurPointsTextView.setText("0");
+                clearPoints();
             }
         });
         mBackspaceButton = (Button) findViewById(R.id.backspace_button);
@@ -43,7 +42,7 @@ public class KeyboardView extends LinearLayout {
             public void onClick(View v) {
                 CharSequence text = mCurPointsTextView.getText();
                 if (text.length() == 1)
-                    mCurPointsTextView.setText("0");
+                    clearPoints();
                 else
                     mCurPointsTextView.setText(text.subSequence(0, text.length() - 1));
             }
@@ -55,6 +54,14 @@ public class KeyboardView extends LinearLayout {
         mButtonRecylerView.setAdapter(keyboardViewAdapter);
         mButtonRecylerView.setLayoutManager(new GridLayoutManager(getContext(), 5, GridLayoutManager.VERTICAL, false));
         mButtonRecylerView.addItemDecoration(new SpacesItemDecoration(getContext(), R.dimen.keyboard_item_gap_size));
+    }
+
+    public int getPoints() {
+        return Integer.valueOf(mCurPointsTextView.getText().toString());
+    }
+
+    public void clearPoints() {
+        mCurPointsTextView.setText("0");
     }
 
     class KeyboardListener implements OnKeyboardItemClickListener {
