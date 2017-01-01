@@ -21,7 +21,7 @@
         android:background="@android:color/black">
 
         <com.google.android.gms.ads.AdView
-            android:id="@+id/adView"
+            android:id="@+id/ad_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             ads:adSize="BANNER"
@@ -33,6 +33,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
         android:layout_marginBottom="30dp"
         android:layout_above="@id/adViewBg">
 
@@ -40,8 +42,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
             android:paddingLeft="20dp"
             android:paddingRight="20dp"
             android:paddingBottom="5dp"
@@ -134,6 +134,12 @@
 
             </LinearLayout>
         </ScrollView>
+
+        <com.kksionek.queuedroid.view.keyboard.KeyboardView
+            android:id="@+id/keyboard_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
     </LinearLayout>
 
 </RelativeLayout>

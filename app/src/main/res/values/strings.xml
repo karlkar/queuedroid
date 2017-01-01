@@ -24,4 +24,5 @@
     <string name="add_players_toast">Please add some players.</string>
     <string name="activity_main_start_too_few_players_error_message">At least 2 players are needed to start a game.</string>
     <string name="activity_main_start_wrong_player_on_list_error_message">There\'s a player with empty name. Please fix that.</string>
+    <string name="char_backspace">⌫</string>
 </resources>

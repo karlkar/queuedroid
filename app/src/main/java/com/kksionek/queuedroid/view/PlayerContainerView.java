@@ -21,7 +21,6 @@ import com.kksionek.queuedroid.model.FbController;
 import com.kksionek.queuedroid.model.TooFewPlayersException;
 import com.kksionek.queuedroid.model.WrongPlayerException;
 
-import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
