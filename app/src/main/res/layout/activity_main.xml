@@ -11,32 +11,14 @@
     tools:context="com.kksionek.queuedroid.view.MainActivity">
 
     <LinearLayout
-        android:id="@+id/adViewBg"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:gravity="center_horizontal"
-        android:background="@android:color/black">
-
-        <com.google.android.gms.ads.AdView
-            android:id="@+id/ad_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            ads:adSize="BANNER"
-            ads:adUnitId="@string/banner_ad_unit_id"/>
-    </LinearLayout>
-
-    <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:layout_marginBottom="30dp"
-        android:layout_above="@id/adViewBg">
+        android:layout_marginBottom="5dp"
+        android:layout_above="@+id/keyboard_view">
 
         <ScrollView
             android:layout_width="match_parent"
@@ -134,12 +116,36 @@
 
             </LinearLayout>
         </ScrollView>
+    </LinearLayout>
 
-        <com.kksionek.queuedroid.view.keyboard.KeyboardView
-            android:id="@+id/keyboard_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+    <!-- TODO: Make keepScreenOn customizable via settings -->
+    <com.kksionek.queuedroid.view.keyboard.KeyboardView
+        android:id="@+id/keyboard_view"
+        android:visibility="gone"
+        android:keepScreenOn="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="5dp"
+        android:layout_above="@+id/ad_view_bg"/>
 
+    <LinearLayout
+        android:id="@+id/ad_view_bg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:gravity="center_horizontal"
+        android:background="@android:color/black">
+
+        <com.google.android.gms.ads.AdView
+            android:id="@+id/ad_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            ads:adSize="BANNER"
+            ads:adUnitId="@string/banner_ad_unit_id"/>
     </LinearLayout>
 
 </RelativeLayout>

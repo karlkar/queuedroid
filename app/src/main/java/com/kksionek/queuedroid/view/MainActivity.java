@@ -22,6 +22,7 @@ import com.kksionek.queuedroid.model.QueueModel;
 import com.kksionek.queuedroid.R;
 import com.kksionek.queuedroid.model.TooFewPlayersException;
 import com.kksionek.queuedroid.model.WrongPlayerException;
+import com.kksionek.queuedroid.view.keyboard.KeyboardView;
 
 import java.util.List;
 
@@ -44,6 +45,7 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
     private final View.OnClickListener mOnEndGameBtnClicked = new OnEndGameBtnClicked();
     private final View.OnClickListener mOnNextTurnBtnClicked = new OnNextTurnBtnClicked();
     private AdView mAdView;
+    private KeyboardView mKeyboardView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +71,8 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
                 mPlayerContainerView.shareOnFacebook(mQueueModel.getFbPlayers());
             }
         });
+
+        mKeyboardView = (KeyboardView) findViewById(R.id.keyboard_view);
 
         MobileAds.initialize(getApplicationContext(), "ca-app-pub-9982327151344679~7308090141");
 
@@ -162,6 +166,9 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
                 //mGameModeChooser.setVisibility(View.GONE);
 
                 AnimationUtils.beginDelayedTransition(mRoot);
+                mKeyboardView.setVisibility(View.VISIBLE);
+
+                AnimationUtils.beginDelayedTransition(mRoot);
                 mStartButton.setText(R.string.next_turn);
                 mStartButton.setOnClickListener(mOnNextTurnBtnClicked);
 
@@ -183,6 +190,9 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
         @Override
         public void onClick(View view) {
             mPlayerContainerView.onGameEnded(mQueueModel);
+
+            AnimationUtils.beginDelayedTransition(mRoot);
+            mKeyboardView.setVisibility(View.GONE);
 
             AnimationUtils.beginDelayedTransition(mRoot);
             mStartButton.setText(R.string.new_game);
