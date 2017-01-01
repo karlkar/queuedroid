@@ -8,6 +8,7 @@
     android:background="@drawable/bg"
     android:focusable="true"
     android:focusableInTouchMode="true"
+    android:paddingTop="10dp"
     tools:context="com.kksionek.queuedroid.view.MainActivity">
 
     <LinearLayout
@@ -23,30 +24,20 @@
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
             android:paddingBottom="5dp"
             android:paddingTop="5dp"
             android:background="@drawable/scroller_bg">
 
-            <LinearLayout
+            <com.kksionek.queuedroid.view.PlayerContainerView
+                android:id="@+id/button_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/main_activity_players_margin"
-                android:layout_marginRight="@dimen/main_activity_players_margin"
-                android:orientation="vertical">
+                android:padding="@dimen/main_activity_players_margin"
+                android:background="@drawable/players_bg"
+                android:orientation="vertical"/>
 
-                <com.kksionek.queuedroid.view.PlayerContainerView
-                    android:id="@+id/button_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="@dimen/main_activity_players_margin"
-                    android:layout_marginTop="@dimen/main_activity_players_margin"
-                    android:background="@drawable/players_bg"
-                    android:orientation="vertical"/>
-
-            </LinearLayout>
         </ScrollView>
     </LinearLayout>
 
