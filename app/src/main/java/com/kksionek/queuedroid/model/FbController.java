@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -17,14 +18,18 @@ import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.HttpMethod;
+import com.facebook.LoggingBehavior;
 import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.share.Sharer;
+import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.model.ShareMediaContent;
 import com.facebook.share.model.ShareOpenGraphAction;
 import com.facebook.share.model.ShareOpenGraphContent;
 import com.facebook.share.model.ShareOpenGraphObject;
 import com.facebook.share.model.SharePhoto;
+import com.facebook.share.model.SharePhotoContent;
 import com.facebook.share.widget.ShareDialog;
 import com.kksionek.queuedroid.data.Player;
 
@@ -83,7 +88,6 @@ public class FbController {
                     Log.e(TAG, "onError: Facebook login error. Should try again...");
                 }
             });
-
             mLoginManager.logInWithReadPermissions(activity, Arrays.asList("user_friends"));
         } else {
             requestFriends(adapter, null);
@@ -126,48 +130,21 @@ public class FbController {
         mCallbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
-    public void shareOnFacebook(@NonNull Activity activity, @NonNull ArrayList<String> list, @Nullable Bitmap bitmap) {
-
-        ShareOpenGraphObject object = new ShareOpenGraphObject.Builder()
-                .putString("og:type", "games.game")
-                .putString("og:title", "QueueDroid")
-                .build();
-
-        SharePhoto photo = null;
-        if (bitmap != null) {
-            photo = new SharePhoto.Builder()
+    public void shareOnFacebook(@NonNull Activity activity, @NonNull ArrayList<String> list, @NonNull Bitmap bitmap) {
+        if (ShareDialog.canShow(SharePhotoContent.class)) {
+            SharePhoto photo = new SharePhoto.Builder()
+                    .setCaption("What a game! Powered by Queuedroid app.")
                     .setBitmap(bitmap)
                     .setUserGenerated(true)
                     .build();
+
+            SharePhotoContent sharePhotoContent = new SharePhotoContent.Builder()
+                    .addPhoto(photo)
+                    .setPeopleIds(list)
+                    .build();
+
+            ShareDialog shareDialog = new ShareDialog(activity);
+            shareDialog.show(sharePhotoContent);
         }
-        ShareOpenGraphAction.Builder actionBuilder = new ShareOpenGraphAction.Builder();
-        actionBuilder.setActionType("queuedroid-test:play")
-                .putObject("game", object)
-                .putStringArrayList("tags", list);
-        if (photo != null)
-            actionBuilder.putPhoto("image", photo);
-
-        ShareOpenGraphContent content = new ShareOpenGraphContent.Builder()
-                .setPreviewPropertyName("game")
-                .setAction(actionBuilder.build())
-                .build();
-        ShareDialog dlg = new ShareDialog(activity);
-        dlg.registerCallback(mCallbackManager, new FacebookCallback<Sharer.Result>() {
-            @Override
-            public void onSuccess(Sharer.Result result) {
-                Log.d(TAG, "onSuccess: SUCCESS");
-            }
-
-            @Override
-            public void onCancel() {
-                Log.d(TAG, "onCancel: CANCEL");
-            }
-
-            @Override
-            public void onError(FacebookException error) {
-                Log.d(TAG, "onError: " + error.toString());
-            }
-        });
-        dlg.show(content);
     }
 }
