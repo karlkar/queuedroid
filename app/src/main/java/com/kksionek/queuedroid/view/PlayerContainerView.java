@@ -32,12 +32,7 @@ public class PlayerContainerView extends LinearLayout {
     private Button mAddPlayerBtn;
     private MainActivity mActivity;
     private ViewGroup mParent;
-    private PlayerChooserAdapter mAdapter;
-    private FbController mFb = null;
-    private ContactsController mContactsController = null;
-
-    private boolean mContactsLoaded = false;
-    private boolean mFacebookLoaded = false;
+    private PlayerChooserAdapter mAdapter = null;
 
     public PlayerContainerView(Context context) {
         super(context);
@@ -51,18 +46,15 @@ public class PlayerContainerView extends LinearLayout {
         super(context, attrs, defStyleAttr);
     }
 
-    public void shareOnFacebook(ArrayList<String> players) {
-//        measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
+    public Bitmap getRankBitmap() {
         Bitmap bitmap = Bitmap.createBitmap(getMeasuredWidth(), getMeasuredHeight(),
                 Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
-//        layout(0, 0, getMeasuredWidth(), getMeasuredHeight());
         draw(canvas);
-        mFb.shareOnFacebook(mActivity, players, bitmap);
+        return bitmap;
     }
 
     private void init() {
-        mAdapter = new PlayerChooserAdapter(getContext());
         mAddPlayerBtn = new Button(getContext());
         mAddPlayerBtn.setText(R.string.view_player_chooser_button_add_player);
         mAddPlayerBtn.setBackgroundResource(R.drawable.btn_big);
@@ -101,34 +93,6 @@ public class PlayerContainerView extends LinearLayout {
         ((PlayerChooserView)getChildAt(mCurrentPlayer)).setPoints(points);
         mCurrentPlayer = curPlayer;
         ((PlayerChooserView)getChildAt(mCurrentPlayer)).setCurrentTurn(true);
-    }
-
-    private void loadContactData() {
-        loadPlayersFromContacts();
-        loadPlayersFromFacebook();
-    }
-
-    private void loadPlayersFromContacts() {
-        if (Settings.isContactsEnabled(getContext())) {
-            if (mContactsController == null)
-                mContactsController = new ContactsController();
-            mContactsController.loadContacts(mActivity, mAdapter);
-            mContactsLoaded = true;
-        }
-    }
-
-    private void loadPlayersFromFacebook() {
-        if (Settings.isFacebookEnabled(getContext())) {
-            if (mFb == null)
-                mFb = FbController.getInstance();
-            mFb.getFriendData(mActivity, mAdapter);
-            mFacebookLoaded = true;
-        }
-    }
-
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (Settings.isFacebookEnabled(getContext()))
-            mFb.onActivityResult(requestCode, resultCode, data);
     }
 
     public List<Player> onGameStarted() throws TooFewPlayersException, WrongPlayerException {
@@ -170,7 +134,6 @@ public class PlayerContainerView extends LinearLayout {
         mActivity = mainActivity;
         mParent = root;
         init();
-        loadContactData();
     }
 
     public void onGameEnded(QueueModel queueModel) {
@@ -199,11 +162,12 @@ public class PlayerContainerView extends LinearLayout {
         }
     }
 
-    public void usePlayers(boolean contactsEnabled, boolean facebookEnabled) {
-        if (!mContactsLoaded && contactsEnabled)
-            loadPlayersFromContacts();
-
-        if (!mFacebookLoaded && facebookEnabled)
-            loadPlayersFromFacebook();
+    public void setAdapter(PlayerChooserAdapter playerChooserAdapter) {
+        mAdapter = playerChooserAdapter;
+        PlayerChooserView tmp;
+        for (int i = 0; i < getChildCount() - 1; ++i) {
+            tmp = (PlayerChooserView) getChildAt(i);
+            tmp.setAdapter(mAdapter);
+        }
     }
 }

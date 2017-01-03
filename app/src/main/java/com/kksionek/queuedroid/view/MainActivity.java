@@ -2,10 +2,9 @@ package com.kksionek.queuedroid.view;
 
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
-import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
@@ -18,6 +17,8 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import com.kksionek.queuedroid.data.Player;
+import com.kksionek.queuedroid.model.FbController;
+import com.kksionek.queuedroid.model.PlayerChooserAdapter;
 import com.kksionek.queuedroid.model.QueueModel;
 import com.kksionek.queuedroid.R;
 import com.kksionek.queuedroid.model.Settings;
@@ -53,6 +54,7 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
     private final View.OnClickListener mOnNextTurnBtnClicked = new OnNextTurnBtnClicked();
     private AdView mAdView;
     private KeyboardView mKeyboardView;
+    private PlayerChooserAdapter mPlayerChooserAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +64,8 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
         mRoot = (RelativeLayout) findViewById(R.id.root);
 
         mPlayerContainerView = (PlayerContainerView) findViewById(R.id.button_container);
+        mPlayerChooserAdapter = new PlayerChooserAdapter(this);
+        mPlayerContainerView.setAdapter(mPlayerChooserAdapter);
         mPlayerContainerView.onCreate(this, mRoot);
 
         mFirstButton = (Button) findViewById(R.id.first_btn);
@@ -77,7 +81,10 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
         mThirdButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mPlayerContainerView.shareOnFacebook(mQueueModel.getFbPlayers());
+                FbController.getInstance().shareOnFacebook(
+                        MainActivity.this,
+                        mQueueModel.getFbPlayers(),
+                        mPlayerContainerView.getRankBitmap());
             }
         });
 
@@ -106,10 +113,31 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
         super.onResume();
         if (mKeyboardView != null)
             mKeyboardView.setColumnCount(Settings.getKeyboardColumnsCount(this));
-        if (mPlayerContainerView != null)
-            mPlayerContainerView.usePlayers(
-                    Settings.isContactsEnabled(this),
-                    Settings.isFacebookEnabled(this));
+        FbController fbController = FbController.getInstance();
+        if (fbController.isLogged()) {
+            if (mPlayerChooserAdapter != null)
+                mPlayerChooserAdapter.reloadDataset(
+                        Settings.isContactsEnabled(this),
+                        Settings.isFacebookEnabled(this));
+        } else {
+            fbController.logIn(this, new FbController.FacebookLoginListener() {
+                @Override
+                public void onLogged() {
+                    if (mPlayerChooserAdapter != null)
+                        mPlayerChooserAdapter.reloadDataset(
+                                Settings.isContactsEnabled(MainActivity.this),
+                                Settings.isFacebookEnabled(MainActivity.this));
+                }
+
+                @Override
+                public void onCancel() {
+                }
+
+                @Override
+                public void onError() {
+                }
+            });
+        }
         if (mAdView != null)
             mAdView.resume();
     }
@@ -132,7 +160,7 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
             return;
         }
         super.onActivityResult(requestCode, resultCode, data);
-        mPlayerContainerView.onActivityResult(requestCode, resultCode, data);
+        FbController.getInstance().onActivityResult(requestCode, resultCode, data);
     }
 
     private boolean performCrop(Uri data) {

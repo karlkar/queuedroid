@@ -1,6 +1,8 @@
 package com.kksionek.queuedroid.model;
 
 import android.content.Context;
+import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +17,12 @@ import com.kksionek.queuedroid.data.Player;
 import java.util.Comparator;
 
 public class PlayerChooserAdapter extends ArrayAdapter<Player> {
+
+    private FbController mFb = null;
+    private ContactsController mContactsController = null;
+
+    private boolean mContactsLoaded = false;
+    private boolean mFacebookLoaded = false;
 
     public PlayerChooserAdapter(Context context) {
         super(context, R.layout.row_autocomplete);
@@ -63,6 +71,36 @@ public class PlayerChooserAdapter extends ArrayAdapter<Player> {
                 .into(holder.image);
 
         return convertView;
+    }
+
+    private void loadPlayersFromContacts() {
+        if (mContactsController == null)
+            mContactsController = new ContactsController();
+        mContactsController.loadContacts(getContext(), this);
+    }
+
+    private void loadPlayersFromFacebook() {
+        if (mFb == null)
+            mFb = FbController.getInstance();
+        if (mFb.isLogged())
+            mFb.getFriendData(this);
+    }
+
+    public void reloadDataset(boolean contactsEnabled, boolean facebookEnabled) {
+        if (mContactsLoaded == contactsEnabled && mFacebookLoaded == facebookEnabled)
+            return;
+
+        //TODO: Fix issues with dynamic changing of sources
+        clear();
+        if (contactsEnabled) {
+            loadPlayersFromContacts();
+        }
+        if (facebookEnabled) {
+            loadPlayersFromFacebook();
+        }
+
+        mFacebookLoaded = facebookEnabled;
+        mContactsLoaded = contactsEnabled;
     }
 
     static class PlayerViewHolder {

@@ -36,10 +36,9 @@ public class FbController {
 
     private static final String TAG = "FbController";
 
-    private AccessToken mAccessToken = null;
     private Player mMyProfile = null;
-    private final LoginManager mLoginManager;
-    private final CallbackManager mCallbackManager;
+    private LoginManager mLoginManager = null;
+    private CallbackManager mCallbackManager = null;
 
     public interface FacebookLoginListener {
         void onLogged();
@@ -54,8 +53,6 @@ public class FbController {
     }
 
     private FbController() {
-        mLoginManager = LoginManager.getInstance();
-        mCallbackManager = CallbackManager.Factory.create();
     }
 
     public boolean isLogged() {
@@ -63,22 +60,13 @@ public class FbController {
     }
 
     public void logIn(@NonNull Activity activity, final FacebookLoginListener listener) {
+        mLoginManager = LoginManager.getInstance();
+        mCallbackManager = CallbackManager.Factory.create();
         mLoginManager.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
                 Log.d(TAG, "onSuccess: Facebook logged in");
-                mAccessToken = loginResult.getAccessToken();
-                GraphRequest req = GraphRequest.newMeRequest(mAccessToken, new GraphRequest.GraphJSONObjectCallback() {
-                    @Override
-                    public void onCompleted(JSONObject object, GraphResponse response) {
-                        Log.d(TAG, "onCompleted: " + object.toString());
-                        mMyProfile = Player.createFacebookFriend(object, true);
-                    }
-                });
-                Bundle parameters = new Bundle();
-                parameters.putString("fields", "id,name,picture");
-                req.setParameters(parameters);
-                req.executeAsync();
+                getMyProfile(null);
                 listener.onLogged();
             }
 
@@ -97,28 +85,33 @@ public class FbController {
         mLoginManager.logInWithReadPermissions(activity, Arrays.asList("user_friends"));
     }
 
-    public void getFriendData(@NonNull Activity activity, @NonNull final PlayerChooserAdapter adapter) {
-        if (mAccessToken == null) {
-            logIn(activity, new FacebookLoginListener() {
-                @Override
-                public void onLogged() {
-                    requestFriends(adapter, null);
-                }
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (mCallbackManager != null)
+            mCallbackManager.onActivityResult(requestCode, resultCode, data);
+    }
 
-                @Override
-                public void onCancel() {
-                }
+    public void getMyProfile(@Nullable final PlayerChooserAdapter adapter) {
+        GraphRequest req = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
+            @Override
+            public void onCompleted(JSONObject object, GraphResponse response) {
+                Log.d(TAG, "onCompleted: " + object.toString());
+                mMyProfile = Player.createFacebookFriend(object, true);
+                if (adapter != null)
+                    adapter.add(mMyProfile);
+            }
+        });
+        Bundle parameters = new Bundle();
+        parameters.putString("fields", "id,name,picture");
+        req.setParameters(parameters);
+        req.executeAsync();
+    }
 
-                @Override
-                public void onError() {
-                }
-            });
-        } else
-            requestFriends(adapter, null);
+    public void getFriendData(@NonNull final PlayerChooserAdapter adapter) {
+        requestFriends(adapter, null);
     }
 
     private void requestFriends(@NonNull final PlayerChooserAdapter adapter, @Nullable String nextToken) {
-        GraphRequest req = new GraphRequest(mAccessToken, "/me/taggable_friends", null, HttpMethod.GET, new GraphRequest.Callback() {
+        GraphRequest req = new GraphRequest(AccessToken.getCurrentAccessToken(), "/me/taggable_friends", null, HttpMethod.GET, new GraphRequest.Callback() {
             @Override
             public void onCompleted(GraphResponse response) {
                 Log.d(TAG, "onCompleted: response = " + response.toString());
@@ -134,8 +127,12 @@ public class FbController {
                         if (!response.getJSONObject().isNull("paging")) {
                             String token = response.getJSONObject().getJSONObject("paging").getJSONObject("cursors").getString("after");
                             requestFriends(adapter, token);
-                        } else
-                            adapter.add(mMyProfile);
+                        } else {
+                            if (mMyProfile != null)
+                                adapter.add(mMyProfile);
+                            else
+                                getMyProfile(adapter);
+                        }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -148,10 +145,6 @@ public class FbController {
             req.setParameters(parameters);
         }
         req.executeAsync();
-    }
-
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        mCallbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
     public void shareOnFacebook(@NonNull Activity activity, @NonNull ArrayList<String> list, @NonNull Bitmap bitmap) {
