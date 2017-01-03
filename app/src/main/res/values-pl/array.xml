@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="activity_settings_keyboard_columns">
+        <item>3 kolumny</item>
+        <item>4 kolumny</item>
+        <item>5 kolumn</item>
+        <item>6 kolumn</item>
+        <item>7 kolumn</item>
+        <item>8 kolumn</item>
+        <item>9 kolumn</item>
+        <item>10 kolumn</item>
+    </string-array>
+</resources>

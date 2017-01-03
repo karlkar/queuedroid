@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.kksionek.queuedroid.R;
+import com.kksionek.queuedroid.model.Settings;
 import com.kksionek.queuedroid.model.keyboard.KeyboardViewAdapter;
 
 public class KeyboardView extends LinearLayout {
@@ -23,6 +25,7 @@ public class KeyboardView extends LinearLayout {
     private final Button mClearButton;
     private final Button mBackspaceButton;
     private final RecyclerView mButtonRecylerView;
+    private int mColsNum;
 
     public KeyboardView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -52,8 +55,26 @@ public class KeyboardView extends LinearLayout {
         KeyboardViewAdapter keyboardViewAdapter = new KeyboardViewAdapter(getContext());
         keyboardViewAdapter.setOnKeyboardItemClickListener(new KeyboardListener());
         mButtonRecylerView.setAdapter(keyboardViewAdapter);
-        mButtonRecylerView.setLayoutManager(new GridLayoutManager(getContext(), 5, GridLayoutManager.VERTICAL, false));
-        mButtonRecylerView.addItemDecoration(new SpacesItemDecoration(getContext(), R.dimen.keyboard_item_gap_size));
+        mColsNum = Settings.getKeyboardColumnsCount(getContext());
+        mButtonRecylerView.setLayoutManager(
+                new GridLayoutManager(
+                        getContext(),
+                        mColsNum,
+                        GridLayoutManager.VERTICAL,
+                        false));
+        mButtonRecylerView.addItemDecoration(
+                new SpacesItemDecoration(getContext(), R.dimen.keyboard_item_gap_size));
+    }
+
+    public void setColumnCount(int columnCount) {
+        if (mColsNum != columnCount) {
+            mColsNum = columnCount;
+            mButtonRecylerView.setLayoutManager(new GridLayoutManager(
+                    getContext(),
+                    mColsNum,
+                    GridLayoutManager.VERTICAL,
+                    false));
+        }
     }
 
     public int getPoints() {
@@ -73,7 +94,7 @@ public class KeyboardView extends LinearLayout {
             else if (text.length() < MAX_LENGTH)
                 mCurPointsTextView.setText(text + String.valueOf(position));
             else
-                Toast.makeText(getContext(), "Not allowed number.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), R.string.view_keyboard_too_long_input_message, Toast.LENGTH_SHORT).show();
         }
     }
 }

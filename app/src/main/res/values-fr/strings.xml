@@ -18,4 +18,24 @@
     <string name="checkbox_alert_dialog_do_not_show_again">"Ne plus me montrer ce. "</string>
     <string name="checkbox_alert_dialog_message">Pour attribuer des points au joueur, vous devez d\'abord saisir des points. Voulez-vous affecter 0 point au joueur actuel?</string>
     <string name="checkbox_alert_dialog_title">Êtes-vous sûr?</string>
+    <string name="activity_main_button_settings">Paramètres</string>
+    <string name="activity_settings_pref_category_accounts">Comptes</string>
+    <string name="activity_settings_pref_category_general">Général</string>
+    <string name="activity_settings_pref_category_keyboard">Clavier</string>
+    <string name="activity_settings_pref_keep_screen_on">Gardez l\'écran allumé</string>
+    <string name="activity_settings_pref_keep_screen_on_summary_off">L\'écran ne sera pas conservé pendant le jeu</string>
+    <string name="activity_settings_pref_keep_screen_on_summary_on">L\'écran sera maintenu pendant le jeu</string>
+    <string name="activity_settings_pref_keyboard_columns">Colonnes de clavier</string>
+    <string name="activity_settings_pref_share_caption">Partager caption</string>
+    <string name="activity_settings_pref_share_caption_default">Quel match! Propulsé par l\'application Queuedroid.</string>
+    <string name="activity_settings_pref_use_contacts">Utiliser les contacts</string>
+    <string name="activity_settings_pref_use_contacts_summary_off">L\'application n\'utilisera pas Contacts</string>
+    <string name="activity_settings_pref_use_facebook">Utiliser Facebook</string>
+    <string name="activity_settings_pref_use_contacts_summary_on">L\'application utilisera Contacts</string>
+    <string name="activity_settings_pref_use_facebook_summary_off">L\'application n\'utilisera pas Facebook</string>
+    <string name="activity_settings_pref_use_facebook_summary_on">Application utilisera Facebook</string>
+    <string name="activity_settings_pref_use_keyboard">Utiliser le clavier intégré</string>
+    <string name="activity_settings_pref_use_keyboard_summary_off">Le clavier intégré à l\'application ne sera pas utilisé</string>
+    <string name="activity_settings_pref_use_keyboard_summary_on">Le clavier intégré à l\'application sera utilisé</string>
+    <string name="view_keyboard_too_long_input_message">Numéro non autorisé.</string>
 </resources>

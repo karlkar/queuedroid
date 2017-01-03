@@ -2,6 +2,6 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="main_activity_players_margin">5dp</dimen>
     <dimen name="main_activity_control_buttons_margin">2dp</dimen>
-    <dimen name="keyboard_item_gap_size">5dp</dimen>
-    <dimen name="keyboard_control_buttons_padding">30dp</dimen> <!-- 6 * keyboard_item_gap_size -->
+    <dimen name="keyboard_item_gap_size">1dp</dimen>
+    <dimen name="keyboard_control_buttons_padding">6dp</dimen> <!-- 6 * keyboard_item_gap_size -->
 </resources>

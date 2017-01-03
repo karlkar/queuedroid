@@ -37,53 +37,84 @@ public class FbController {
     private static final String TAG = "FbController";
 
     private AccessToken mAccessToken = null;
+    private Player mMyProfile = null;
     private final LoginManager mLoginManager;
     private final CallbackManager mCallbackManager;
-    private Player mMyProfile;
 
-    public FbController(Application app) {
-        FacebookSdk.sdkInitialize(app.getApplicationContext());
-        AppEventsLogger.activateApp(app);
+    public interface FacebookLoginListener {
+        void onLogged();
+        void onCancel();
+        void onError();
+    }
+
+    private static FbController sInstance = new FbController();
+
+    public static FbController getInstance() {
+        return sInstance;
+    }
+
+    private FbController() {
         mLoginManager = LoginManager.getInstance();
         mCallbackManager = CallbackManager.Factory.create();
     }
 
+    public boolean isLogged() {
+        return AccessToken.getCurrentAccessToken() != null;
+    }
+
+    public void logIn(@NonNull Activity activity, final FacebookLoginListener listener) {
+        mLoginManager.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                Log.d(TAG, "onSuccess: Facebook logged in");
+                mAccessToken = loginResult.getAccessToken();
+                GraphRequest req = GraphRequest.newMeRequest(mAccessToken, new GraphRequest.GraphJSONObjectCallback() {
+                    @Override
+                    public void onCompleted(JSONObject object, GraphResponse response) {
+                        Log.d(TAG, "onCompleted: " + object.toString());
+                        mMyProfile = Player.createFacebookFriend(object, true);
+                    }
+                });
+                Bundle parameters = new Bundle();
+                parameters.putString("fields", "id,name,picture");
+                req.setParameters(parameters);
+                req.executeAsync();
+                listener.onLogged();
+            }
+
+            @Override
+            public void onCancel() {
+                Log.d(TAG, "onCancel: Facebook login cancelled");
+                listener.onCancel();
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                Log.e(TAG, "onError: Facebook login error. Should try again...");
+                listener.onError();
+            }
+        });
+        mLoginManager.logInWithReadPermissions(activity, Arrays.asList("user_friends"));
+    }
+
     public void getFriendData(@NonNull Activity activity, @NonNull final PlayerChooserAdapter adapter) {
         if (mAccessToken == null) {
-            mLoginManager.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
+            logIn(activity, new FacebookLoginListener() {
                 @Override
-                public void onSuccess(LoginResult loginResult) {
-                    Log.d(TAG, "onSuccess: Facebook logged in");
-                    mAccessToken = loginResult.getAccessToken();
-                    GraphRequest req = GraphRequest.newMeRequest(mAccessToken, new GraphRequest.GraphJSONObjectCallback() {
-                        @Override
-                        public void onCompleted(JSONObject object, GraphResponse response) {
-                            Log.d(TAG, "onCompleted: " + object.toString());
-                            mMyProfile = Player.createFacebookFriend(object, true);
-                            adapter.add(mMyProfile);
-                            requestFriends(adapter, null);
-                        }
-                    });
-                    Bundle parameters = new Bundle();
-                    parameters.putString("fields", "id,name,picture");
-                    req.setParameters(parameters);
-                    req.executeAsync();
+                public void onLogged() {
+                    requestFriends(adapter, null);
                 }
 
                 @Override
                 public void onCancel() {
-                    Log.d(TAG, "onCancel: Facebook login cancelled");
                 }
 
                 @Override
-                public void onError(FacebookException error) {
-                    Log.e(TAG, "onError: Facebook login error. Should try again...");
+                public void onError() {
                 }
             });
-            mLoginManager.logInWithReadPermissions(activity, Arrays.asList("user_friends"));
-        } else {
+        } else
             requestFriends(adapter, null);
-        }
     }
 
     private void requestFriends(@NonNull final PlayerChooserAdapter adapter, @Nullable String nextToken) {
@@ -103,7 +134,8 @@ public class FbController {
                         if (!response.getJSONObject().isNull("paging")) {
                             String token = response.getJSONObject().getJSONObject("paging").getJSONObject("cursors").getString("after");
                             requestFriends(adapter, token);
-                        }
+                        } else
+                            adapter.add(mMyProfile);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -125,7 +157,7 @@ public class FbController {
     public void shareOnFacebook(@NonNull Activity activity, @NonNull ArrayList<String> list, @NonNull Bitmap bitmap) {
         if (ShareDialog.canShow(SharePhotoContent.class)) {
             SharePhoto photo = new SharePhoto.Builder()
-                    .setCaption("What a game! Powered by Queuedroid app.")
+                    .setCaption(Settings.getFacebookCaptionString(activity))
                     .setBitmap(bitmap)
                     .setUserGenerated(true)
                     .build();

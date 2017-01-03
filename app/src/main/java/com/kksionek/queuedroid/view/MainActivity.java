@@ -37,11 +37,18 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
     private final QueueModel mQueueModel = new QueueModel();
     private PlayerContainerView mPlayerContainerView;
     private RelativeLayout mRoot;
-    private Button mStartButton;
-    private Button mEndButton;
-    private Button mShareButton;
+    private Button mFirstButton;
+    private Button mSecondButton;
+    private Button mThirdButton;
 
     private final View.OnClickListener mOnStartGameBtnClicked = new OnStartGameBtnClicked();
+    private final View.OnClickListener mOnSettingsBtnClicked = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+            startActivity(intent);
+        }
+    };
     private final View.OnClickListener mOnEndGameBtnClicked = new OnEndGameBtnClicked();
     private final View.OnClickListener mOnNextTurnBtnClicked = new OnNextTurnBtnClicked();
     private AdView mAdView;
@@ -57,14 +64,17 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
         mPlayerContainerView = (PlayerContainerView) findViewById(R.id.button_container);
         mPlayerContainerView.onCreate(this, mRoot);
 
-        mStartButton = (Button) findViewById(R.id.start_game_btn);
-        mStartButton.setOnClickListener(mOnStartGameBtnClicked);
+        mFirstButton = (Button) findViewById(R.id.first_btn);
+        mFirstButton.setText(R.string.activity_main_button_play);
+        mFirstButton.setOnClickListener(mOnStartGameBtnClicked);
 
-        mEndButton = (Button) findViewById(R.id.end_game_btn);
-        mEndButton.setOnClickListener(mOnEndGameBtnClicked);
+        mSecondButton = (Button) findViewById(R.id.second_btn);
+        mSecondButton.setText(R.string.activity_main_button_settings);
+        mSecondButton.setOnClickListener(mOnSettingsBtnClicked);
 
-        mShareButton = (Button) findViewById(R.id.share_game_btn);
-        mShareButton.setOnClickListener(new View.OnClickListener() {
+        mThirdButton = (Button) findViewById(R.id.third_btn);
+        mThirdButton.setText(R.string.activity_main_button_share);
+        mThirdButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mPlayerContainerView.shareOnFacebook(mQueueModel.getFbPlayers());
@@ -94,6 +104,12 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
     @Override
     protected void onResume() {
         super.onResume();
+        if (mKeyboardView != null)
+            mKeyboardView.setColumnCount(Settings.getKeyboardColumnsCount(this));
+        if (mPlayerContainerView != null)
+            mPlayerContainerView.usePlayers(
+                    Settings.isContactsEnabled(this),
+                    Settings.isFacebookEnabled(this));
         if (mAdView != null)
             mAdView.resume();
     }
@@ -103,11 +119,6 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
         if (mAdView != null)
             mAdView.pause();
         super.onPause();
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        mPlayerContainerView.onContactsPermission(requestCode == PERMISSIONS_REQUEST_READ_CONTACTS && grantResults[0] == PackageManager.PERMISSION_GRANTED);
     }
 
     @Override
@@ -142,7 +153,8 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
 
     private void setImageData(Intent data) {
         for (int i = 0; i < mPlayerContainerView.getChildCount() - 1; ++i) {
-            PlayerChooserView playerChooserView = (PlayerChooserView) mPlayerContainerView.getChildAt(i);
+            PlayerChooserView playerChooserView = (PlayerChooserView) mPlayerContainerView
+                    .getChildAt(i);
             if (playerChooserView.onPhotoCreated(data))
                 return;
         }
@@ -151,7 +163,8 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
     @Override
     public void onDialogPositiveClick(int points) {
         mQueueModel.nextTurn(points);
-        mPlayerContainerView.nextTurn(mQueueModel.getPointsOfPreviousPlayer(), mQueueModel.getCurrentPlayerIndex());
+        mPlayerContainerView.nextTurn(mQueueModel.getPointsOfPreviousPlayer(), mQueueModel
+                .getCurrentPlayerIndex());
     }
 
     private class OnStartGameBtnClicked implements View.OnClickListener {
@@ -162,22 +175,29 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
                 mQueueModel.newGame(players);
 
                 AnimationUtils.beginDelayedTransition(mRoot);
-                mKeyboardView.setVisibility(View.VISIBLE);
+                mKeyboardView.setVisibility(Settings.shouldUseInAppKeyboard(MainActivity.this) ?
+                        View.VISIBLE : View.GONE);
+                mKeyboardView.setKeepScreenOn(Settings.isKeepOnScreen(MainActivity.this));
 
                 AnimationUtils.beginDelayedTransition(mRoot);
-                mStartButton.setText(R.string.activity_main_button_next_turn);
-                mStartButton.setOnClickListener(mOnNextTurnBtnClicked);
+                mFirstButton.setText(R.string.activity_main_button_next_turn);
+                mFirstButton.setOnClickListener(mOnNextTurnBtnClicked);
 
-                mEndButton.setText(R.string.activity_main_button_end_game);
                 AnimationUtils.beginDelayedTransition(mRoot);
-                mEndButton.setVisibility(View.VISIBLE);
-                mEndButton.setOnClickListener(mOnEndGameBtnClicked);
+                mSecondButton.setText(R.string.activity_main_button_end_game);
+                mSecondButton.setOnClickListener(mOnEndGameBtnClicked);
             } catch (TooFewPlayersException ex) {
                 Log.d(TAG, "onClick: Game cannot be started - too few players entered.");
-                Toast.makeText(MainActivity.this, R.string.activity_main_start_too_few_players_error_message, Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this,
+                        R.string.activity_main_start_too_few_players_error_message,
+                        Toast.LENGTH_LONG)
+                        .show();
             } catch (WrongPlayerException ex) {
                 Log.d(TAG, "onClick: Game cannot be started - some players are inproper.");
-                Toast.makeText(MainActivity.this, R.string.activity_main_start_wrong_player_on_list_error_message, Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this,
+                        R.string.activity_main_start_wrong_player_on_list_error_message,
+                        Toast.LENGTH_LONG)
+                        .show();
             }
         }
     }
@@ -191,8 +211,8 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
             mKeyboardView.setVisibility(View.GONE);
 
             AnimationUtils.beginDelayedTransition(mRoot);
-            mStartButton.setText(R.string.activity_main_button_new_game);
-            mStartButton.setOnClickListener(new View.OnClickListener() {
+            mFirstButton.setText(R.string.activity_main_button_new_game);
+            mFirstButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     restartGame(true);
@@ -200,17 +220,17 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
             });
 
             AnimationUtils.beginDelayedTransition(mRoot);
-            mEndButton.setText(R.string.activity_main_button_play_again);
-            mEndButton.setOnClickListener(new View.OnClickListener() {
+            mSecondButton.setText(R.string.activity_main_button_play_again);
+            mSecondButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     restartGame(false);
                 }
             });
 
-            mShareButton.setText(R.string.activity_main_button_share);
+            mThirdButton.setText(R.string.activity_main_button_share);
             AnimationUtils.beginDelayedTransition(mRoot);
-            mShareButton.setVisibility(View.VISIBLE);
+            mThirdButton.setVisibility(View.VISIBLE);
         }
     }
 
@@ -218,23 +238,21 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
         mPlayerContainerView.onGameRestarted(hardReset);
 
         AnimationUtils.beginDelayedTransition(mRoot);
-        mStartButton.setText(R.string.activity_main_button_play);
-        mStartButton.setOnClickListener(mOnStartGameBtnClicked);
+        mFirstButton.setText(R.string.activity_main_button_play);
+        mFirstButton.setOnClickListener(mOnStartGameBtnClicked);
 
         AnimationUtils.beginDelayedTransition(mRoot);
-        mEndButton.setVisibility(View.GONE);
+        mSecondButton.setText(R.string.activity_main_button_settings);
+        mSecondButton.setOnClickListener(mOnSettingsBtnClicked);
 
         AnimationUtils.beginDelayedTransition(mRoot);
-        mShareButton.setVisibility(View.GONE);
+        mThirdButton.setVisibility(View.GONE);
     }
 
     private class OnNextTurnBtnClicked implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            if (false) {
-                PointsDialogFragment dialog = new PointsDialogFragment();
-                dialog.show(getSupportFragmentManager(), "PointsDialogFragment");
-            } else {
+            if (Settings.shouldUseInAppKeyboard(MainActivity.this)) {
                 int pointsCollected = mKeyboardView.getPoints();
                 if (pointsCollected == 0
                         && Settings.isShowNoPointsConfirmationDialog(MainActivity.this)) {
@@ -252,6 +270,9 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
                     return;
                 }
                 assignPointsAndNextTurn(pointsCollected);
+            } else {
+                PointsDialogFragment dialog = new PointsDialogFragment();
+                dialog.show(getSupportFragmentManager(), "PointsDialogFragment");
             }
         }
     }

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="activity_settings_keyboard_columns">
+        <item>3 columns</item>
+        <item>4 columns</item>
+        <item>5 columns</item>
+        <item>6 columns</item>
+        <item>7 columns</item>
+        <item>8 columns</item>
+        <item>9 columns</item>
+        <item>10 columns</item>
+    </string-array>
+
+    <string-array name="activity_settings_keyboard_columns_values">
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+    </string-array>
+</resources>

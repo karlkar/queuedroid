@@ -22,6 +22,7 @@
     <string name="activity_main_button_next_turn">NEXT TURN</string>
     <string name="activity_main_button_new_game">NEW GAME</string>
     <string name="activity_main_button_play_again">REVENGE</string>
+    <string name="activity_main_button_settings">SETTINGS</string>
 
     <string name="activity_main_start_too_few_players_error_message">At least 2 players are needed to start a game.</string>
     <string name="activity_main_start_wrong_player_on_list_error_message">There\'s a player with empty name. Please fix that.</string>
@@ -31,8 +32,30 @@
 
     <string name="view_keyboard_points_collected">Points collected</string>
     <string name="view_keyboard_char_backspace">⌫</string>
+    <string name="view_keyboard_too_long_input_message">Not allowed number.</string>
 
     <string name="checkbox_alert_dialog_title">Are you sure?</string>
     <string name="checkbox_alert_dialog_message">In order to assign points to player, you have to input points first.\nDo you want to assign 0 points to current player?</string>
     <string name="checkbox_alert_dialog_do_not_show_again">Do not show again.</string>
+
+    <string name="activity_settings_pref_category_general">General</string>
+    <string name="activity_settings_pref_keep_screen_on">Keep screen on</string>
+    <string name="activity_settings_pref_keep_screen_on_summary_on">Screen will be kept on during game</string>
+    <string name="activity_settings_pref_keep_screen_on_summary_off">Screen won\'t be kept on during game</string>
+
+    <string name="activity_settings_pref_category_accounts">Accounts</string>
+    <string name="activity_settings_pref_use_facebook">Use Facebook</string>
+    <string name="activity_settings_pref_use_facebook_summary_on">Application will use Facebook</string>
+    <string name="activity_settings_pref_use_facebook_summary_off">Application won\'t use Facebook</string>
+    <string name="activity_settings_pref_use_contacts">Use Contacts</string>
+    <string name="activity_settings_pref_use_contacts_summary_on">Application will use Contacts</string>
+    <string name="activity_settings_pref_use_contacts_summary_off">Application won\'t use Contacts</string>
+    <string name="activity_settings_pref_share_caption">Share caption</string>
+    <string name="activity_settings_pref_share_caption_default">What a game! Powered by Queuedroid app.</string>
+
+    <string name="activity_settings_pref_category_keyboard">Keyboard</string>
+    <string name="activity_settings_pref_use_keyboard">Use in-app keyboard</string>
+    <string name="activity_settings_pref_use_keyboard_summary_on">In-app keyboard will be used</string>
+    <string name="activity_settings_pref_use_keyboard_summary_off">In-app keyboard won\'t be used</string>
+    <string name="activity_settings_pref_keyboard_columns">Keyboard columns</string>
 </resources>

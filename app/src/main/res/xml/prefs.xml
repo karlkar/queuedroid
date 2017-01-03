@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        android:title="@string/activity_settings_pref_category_general">
+
+        <SwitchPreferenceCompat
+            android:key="PREF_KEEP_SCREEN_ON"
+            android:title="@string/activity_settings_pref_keep_screen_on"
+            android:summaryOn="@string/activity_settings_pref_keep_screen_on_summary_on"
+            android:summaryOff="@string/activity_settings_pref_keep_screen_on_summary_off"
+            android:defaultValue="true"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/activity_settings_pref_category_accounts">
+
+        <SwitchPreferenceCompat
+            app:key="PREF_USE_FACEBOOK"
+            android:title="@string/activity_settings_pref_use_facebook"
+            android:summaryOn="@string/activity_settings_pref_use_facebook_summary_on"
+            android:summaryOff="@string/activity_settings_pref_use_facebook_summary_off"
+            android:defaultValue="false"/>
+
+        <SwitchPreferenceCompat
+            app:key="PREF_USE_CONTACTS"
+            android:title="@string/activity_settings_pref_use_contacts"
+            android:summaryOn="@string/activity_settings_pref_use_contacts_summary_on"
+            android:summaryOff="@string/activity_settings_pref_use_contacts_summary_off"
+            android:defaultValue="false"/>
+
+        <EditTextPreference
+            android:key="PREF_SHARE_CAPTION"
+            android:title="@string/activity_settings_pref_share_caption"
+            android:defaultValue="@string/activity_settings_pref_share_caption_default"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/activity_settings_pref_category_keyboard">
+
+        <SwitchPreferenceCompat
+            android:key="PREF_USE_BUILT_IN_KEYBOARD"
+            android:title="@string/activity_settings_pref_use_keyboard"
+            android:summaryOn="@string/activity_settings_pref_use_keyboard_summary_on"
+            android:summaryOff="@string/activity_settings_pref_use_keyboard_summary_off"
+            android:defaultValue="true"/>
+
+        <ListPreference
+            android:key="PREF_KEYBOARD_COLUMNS"
+            android:title="@string/activity_settings_pref_keyboard_columns"
+            android:entries="@array/activity_settings_keyboard_columns"
+            android:entryValues="@array/activity_settings_keyboard_columns_values"
+            android:defaultValue="5"/>
+    </PreferenceCategory>
+</PreferenceScreen>

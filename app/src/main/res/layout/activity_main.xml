@@ -41,11 +41,9 @@
         </ScrollView>
     </LinearLayout>
 
-    <!-- TODO: Make keepScreenOn customizable via settings -->
     <com.kksionek.queuedroid.view.keyboard.KeyboardView
         android:id="@+id/keyboard_view"
         android:visibility="gone"
-        android:keepScreenOn="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="20dp"
@@ -62,30 +60,27 @@
         android:orientation="vertical">
 
         <Button
-            android:id="@+id/start_game_btn"
+            android:id="@+id/first_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/btn_big"
             android:layout_marginLeft="@dimen/main_activity_players_margin"
             android:layout_marginRight="@dimen/main_activity_players_margin"
             android:layout_marginTop="@dimen/main_activity_control_buttons_margin"
-            android:layout_marginBottom="@dimen/main_activity_control_buttons_margin"
-            android:text="@string/activity_main_button_play"/>
+            android:layout_marginBottom="@dimen/main_activity_control_buttons_margin"/>
 
         <Button
-            android:id="@+id/end_game_btn"
+            android:id="@+id/second_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/btn_big"
             android:layout_marginLeft="@dimen/main_activity_players_margin"
             android:layout_marginRight="@dimen/main_activity_players_margin"
             android:layout_marginTop="@dimen/main_activity_control_buttons_margin"
-            android:layout_marginBottom="@dimen/main_activity_control_buttons_margin"
-            android:visibility="gone"
-            android:text="@string/activity_main_button_end_game"/>
+            android:layout_marginBottom="@dimen/main_activity_control_buttons_margin"/>
 
         <Button
-            android:id="@+id/share_game_btn"
+            android:id="@+id/third_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/btn_big"
@@ -93,8 +88,7 @@
             android:layout_marginRight="@dimen/main_activity_players_margin"
             android:layout_marginTop="@dimen/main_activity_control_buttons_margin"
             android:layout_marginBottom="@dimen/main_activity_control_buttons_margin"
-            android:visibility="gone"
-            android:text="@string/activity_main_button_share"/>
+            android:visibility="gone"/>
     </LinearLayout>
 
     <LinearLayout

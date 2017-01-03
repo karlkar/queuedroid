@@ -18,6 +18,7 @@ import com.kksionek.queuedroid.model.QueueModel;
 import com.kksionek.queuedroid.R;
 import com.kksionek.queuedroid.model.ContactsController;
 import com.kksionek.queuedroid.model.FbController;
+import com.kksionek.queuedroid.model.Settings;
 import com.kksionek.queuedroid.model.TooFewPlayersException;
 import com.kksionek.queuedroid.model.WrongPlayerException;
 
@@ -34,8 +35,9 @@ public class PlayerContainerView extends LinearLayout {
     private PlayerChooserAdapter mAdapter;
     private FbController mFb = null;
     private ContactsController mContactsController = null;
-    private boolean mFbEnabled = true;
-    private boolean mContactsEnabled = false;
+
+    private boolean mContactsLoaded = false;
+    private boolean mFacebookLoaded = false;
 
     public PlayerContainerView(Context context) {
         super(context);
@@ -102,41 +104,30 @@ public class PlayerContainerView extends LinearLayout {
     }
 
     private void loadContactData() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-            mActivity.requestPermissions(new String[]{android.Manifest.permission.READ_CONTACTS}, MainActivity.PERMISSIONS_REQUEST_READ_CONTACTS);
-        else
-            mContactsEnabled = true;
-
         loadPlayersFromContacts();
         loadPlayersFromFacebook();
     }
 
     private void loadPlayersFromContacts() {
-        if (mContactsEnabled) {
+        if (Settings.isContactsEnabled(getContext())) {
             if (mContactsController == null)
                 mContactsController = new ContactsController();
             mContactsController.loadContacts(mActivity, mAdapter);
+            mContactsLoaded = true;
         }
     }
 
     private void loadPlayersFromFacebook() {
-        if (mFbEnabled) {
+        if (Settings.isFacebookEnabled(getContext())) {
             if (mFb == null)
-                mFb = new FbController(mActivity.getApplication());
+                mFb = FbController.getInstance();
             mFb.getFriendData(mActivity, mAdapter);
+            mFacebookLoaded = true;
         }
     }
 
-    public void onContactsPermission(boolean permitted) {
-        if (permitted) {
-            mContactsEnabled = true;
-            loadPlayersFromContacts();
-        } else
-            mContactsEnabled = false;
-    }
-
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (mFbEnabled)
+        if (Settings.isFacebookEnabled(getContext()))
             mFb.onActivityResult(requestCode, resultCode, data);
     }
 
@@ -206,5 +197,13 @@ public class PlayerContainerView extends LinearLayout {
             getChildAt(list.get(i).second).animate().translationY(getChildAt(i).getBottom()
                     - getChildAt(list.get(i).second).getBottom()).start();
         }
+    }
+
+    public void usePlayers(boolean contactsEnabled, boolean facebookEnabled) {
+        if (!mContactsLoaded && contactsEnabled)
+            loadPlayersFromContacts();
+
+        if (!mFacebookLoaded && facebookEnabled)
+            loadPlayersFromFacebook();
     }
 }

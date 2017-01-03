@@ -18,4 +18,24 @@
     <string name="checkbox_alert_dialog_do_not_show_again">Nie pokazuj więcej.</string>
     <string name="checkbox_alert_dialog_title">Jesteś pewien?</string>
     <string name="checkbox_alert_dialog_message">Żeby przypisać graczowi punkty, musisz najpierw wpisać punkty.\nCzy chcesz przypisać 0 punktów aktualnemu graczowi?</string>
+    <string name="activity_main_button_settings">Ustawienia</string>
+    <string name="activity_settings_pref_category_accounts">Konta</string>
+    <string name="activity_settings_pref_category_general">Ogólne</string>
+    <string name="activity_settings_pref_category_keyboard">Klawiatura</string>
+    <string name="activity_settings_pref_keep_screen_on">Wyłącz wygaszanie ekranu</string>
+    <string name="activity_settings_pref_keep_screen_on_summary_off">Ekran będzie wygaszany podczas gry</string>
+    <string name="activity_settings_pref_keep_screen_on_summary_on">Ekran nie będzie wygaszany podczas gry</string>
+    <string name="activity_settings_pref_keyboard_columns">Liczba kolumn w klawiaturze</string>
+    <string name="activity_settings_pref_share_caption">Podpis przy udostępnianiu</string>
+    <string name="activity_settings_pref_share_caption_default">Co za gra! Dzięki za pomoc Queuedroid!</string>
+    <string name="activity_settings_pref_use_contacts">Użyj kontaktów</string>
+    <string name="activity_settings_pref_use_contacts_summary_off">Aplikacja nie użyje kontaktów</string>
+    <string name="activity_settings_pref_use_contacts_summary_on">Aplikacja użyje kontaktów</string>
+    <string name="activity_settings_pref_use_facebook">Użyj Facebooka</string>
+    <string name="activity_settings_pref_use_facebook_summary_off">Aplikacja nie użyje Facebooka</string>
+    <string name="activity_settings_pref_use_facebook_summary_on">Aplikacja użyje Facebooka</string>
+    <string name="activity_settings_pref_use_keyboard">Nie używaj systemowej klawiatury</string>
+    <string name="activity_settings_pref_use_keyboard_summary_off">Klawiatura systemowa będzie użyta</string>
+    <string name="activity_settings_pref_use_keyboard_summary_on">Klawiatura systemowa nie będzie użyta</string>
+    <string name="view_keyboard_too_long_input_message">Niepoprawny numer.</string>
 </resources>
