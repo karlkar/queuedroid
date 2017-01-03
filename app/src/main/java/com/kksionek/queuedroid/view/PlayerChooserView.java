@@ -50,9 +50,7 @@ public class PlayerChooserView extends LinearLayout {
         setOrientation(LinearLayout.HORIZONTAL);
         setGravity(Gravity.CENTER_VERTICAL);
 
-        LayoutInflater inflater = (LayoutInflater) context
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        inflater.inflate(R.layout.player_chooser_view, this, true);
+        LayoutInflater.from(mCtx).inflate(R.layout.player_chooser_view, this, true);
 
         mPlayerThumbnail = (ImageView) findViewById(R.id.thumbnail);
         initThumbnail();

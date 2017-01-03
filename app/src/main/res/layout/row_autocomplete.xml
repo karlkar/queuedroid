@@ -6,14 +6,29 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp">
 
-    <ImageView
-        android:id="@+id/thumbnail"
-        android:contentDescription="@string/cd_thumbnail"
+    <RelativeLayout
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_marginLeft="5dp"
-        android:layout_marginStart="5dp"
-        android:layout_gravity="center"/>
+        android:layout_gravity="center">
+
+        <ImageView
+            android:id="@+id/thumbnail"
+            android:contentDescription="@string/cd_thumbnail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="5dp"
+            android:layout_marginStart="5dp"/>
+
+        <ImageView
+            android:id="@+id/mini_fb"
+            android:layout_alignRight="@id/thumbnail"
+            android:layout_alignBottom="@id/thumbnail"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:visibility="gone"
+            android:src="@drawable/fb"/>
+
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/text"

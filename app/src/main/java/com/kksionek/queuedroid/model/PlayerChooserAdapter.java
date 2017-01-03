@@ -70,6 +70,7 @@ public class PlayerChooserAdapter extends ArrayAdapter<Player> {
                     .inflate(R.layout.row_autocomplete, parent, false);
             holder = new PlayerViewHolder();
             holder.image = (ImageView) convertView.findViewById(R.id.thumbnail);
+            holder.imageThumb = (ImageView) convertView.findViewById(R.id.mini_fb);
             holder.text = (TextView) convertView.findViewById(R.id.text);
             convertView.setTag(holder);
         } else
@@ -82,6 +83,8 @@ public class PlayerChooserAdapter extends ArrayAdapter<Player> {
                 .load(player.getImage())
                 .placeholder(R.drawable.ic_contact_picture)
                 .into(holder.image);
+
+        holder.imageThumb.setVisibility(player.isFromFacebook() ? View.VISIBLE : View.GONE);
 
         return convertView;
     }
@@ -117,6 +120,7 @@ public class PlayerChooserAdapter extends ArrayAdapter<Player> {
 
     static class PlayerViewHolder {
         ImageView image;
+        ImageView imageThumb;
         TextView text;
     }
 }
