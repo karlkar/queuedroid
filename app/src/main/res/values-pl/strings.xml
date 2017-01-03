@@ -16,4 +16,7 @@
     <string name="add_players_toast">Najpierw dodaj graczy.</string>
     <string name="activity_main_start_too_few_players_error_message">Do rozpoczęcia gry potrzeba przynajmniej 2 graczy.</string>
     <string name="activity_main_start_wrong_player_on_list_error_message">Na liście jest gracz bez imienia. Proszę, napraw to.</string>
+    <string name="checkbox_alert_dialog_do_not_show_again">Nie pokazuj więcej.</string>
+    <string name="checkbox_alert_dialog_title">Jesteś pewien?</string>
+    <string name="checkbox_alert_dialog_message">Żeby przypisać graczowi punkty, musisz najpierw wpisać punkty.\nCzy chcesz przypisać 0 punktów aktualnemu graczowi?</string>
 </resources>

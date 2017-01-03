@@ -20,6 +20,7 @@ import com.google.android.gms.ads.MobileAds;
 import com.kksionek.queuedroid.data.Player;
 import com.kksionek.queuedroid.model.QueueModel;
 import com.kksionek.queuedroid.R;
+import com.kksionek.queuedroid.model.Settings;
 import com.kksionek.queuedroid.model.TooFewPlayersException;
 import com.kksionek.queuedroid.model.WrongPlayerException;
 import com.kksionek.queuedroid.view.keyboard.KeyboardView;
@@ -234,10 +235,32 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
                 PointsDialogFragment dialog = new PointsDialogFragment();
                 dialog.show(getSupportFragmentManager(), "PointsDialogFragment");
             } else {
-                mQueueModel.nextTurn(mKeyboardView.getPoints());
-                mKeyboardView.clearPoints();
-                mPlayerContainerView.nextTurn(mQueueModel.getPointsOfPreviousPlayer(), mQueueModel.getCurrentPlayerIndex());
+                int pointsCollected = mKeyboardView.getPoints();
+                if (pointsCollected == 0
+                        && Settings.isShowNoPointsConfirmationDialog(MainActivity.this)) {
+                    CheckboxAlertDialog dialog = new CheckboxAlertDialog();
+                    dialog.show(MainActivity.this,
+                            R.string.checkbox_alert_dialog_title,
+                            R.string.checkbox_alert_dialog_message,
+                            new CheckboxAlertDialog.OnDialogClosedListener() {
+                                @Override
+                                public void onDialogClosed(boolean result) {
+                                    if (result)
+                                        assignPointsAndNextTurn(0);
+                                }
+                            });
+                    return;
+                }
+                assignPointsAndNextTurn(pointsCollected);
             }
         }
+    }
+
+    private void assignPointsAndNextTurn(int points) {
+        mQueueModel.nextTurn(points);
+        mKeyboardView.clearPoints();
+        mPlayerContainerView.nextTurn(
+                mQueueModel.getPointsOfPreviousPlayer(),
+                mQueueModel.getCurrentPlayerIndex());
     }
 }
