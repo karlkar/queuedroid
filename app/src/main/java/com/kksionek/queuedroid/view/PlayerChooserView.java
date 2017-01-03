@@ -1,5 +1,6 @@
 package com.kksionek.queuedroid.view;
 
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -35,6 +36,7 @@ public class PlayerChooserView extends LinearLayout {
     private final ImageView mPlayerThumbnail;
     private final ViewGroup mRoot;
     private final AutoCompleteTextView mPlayerName;
+    private boolean mWasCurrent = false;
     private Activity mActivity;
     private boolean mWaitingForPhoto = false;
     private Player mPlayer = null;
@@ -161,7 +163,33 @@ public class PlayerChooserView extends LinearLayout {
     }
 
     public void setCurrentTurn(boolean current) {
-        mStaticName.setTypeface(mStaticName.getTypeface(), current ? Typeface.BOLD : Typeface.NORMAL);
+        if (mWasCurrent || current) {
+            float startSize = 15;
+            float endSize = 30;
+
+            if (mWasCurrent) {
+                startSize = 30;
+                endSize = 15;
+            }
+
+            int animationDuration = 600;
+
+            ValueAnimator animator = ValueAnimator.ofFloat(startSize, endSize);
+            animator.setDuration(animationDuration);
+
+            animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                    float animatedValue = (float) valueAnimator.getAnimatedValue();
+                    mStaticName.setTextSize(animatedValue);
+                }
+            });
+
+            animator.start();
+
+//            mStaticName.setTypeface(mStaticName.getTypeface(), current ? Typeface.BOLD : Typeface.NORMAL);
+            mWasCurrent = current;
+        }
     }
 
     public void reset(boolean hardReset) {
