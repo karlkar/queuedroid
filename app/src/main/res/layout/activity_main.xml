@@ -70,7 +70,7 @@
             android:layout_marginRight="@dimen/main_activity_players_margin"
             android:layout_marginTop="@dimen/main_activity_control_buttons_margin"
             android:layout_marginBottom="@dimen/main_activity_control_buttons_margin"
-            android:text="@string/play"/>
+            android:text="@string/activity_main_button_play"/>
 
         <Button
             android:id="@+id/end_game_btn"
@@ -82,7 +82,7 @@
             android:layout_marginTop="@dimen/main_activity_control_buttons_margin"
             android:layout_marginBottom="@dimen/main_activity_control_buttons_margin"
             android:visibility="gone"
-            android:text="@string/end_game"/>
+            android:text="@string/activity_main_button_end_game"/>
 
         <Button
             android:id="@+id/share_game_btn"
@@ -94,7 +94,7 @@
             android:layout_marginTop="@dimen/main_activity_control_buttons_margin"
             android:layout_marginBottom="@dimen/main_activity_control_buttons_margin"
             android:visibility="gone"
-            android:text="@string/share"/>
+            android:text="@string/activity_main_button_share"/>
     </LinearLayout>
 
     <LinearLayout

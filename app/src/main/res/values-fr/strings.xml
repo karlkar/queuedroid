@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Queueoid</string>
-    <string name="add_player">AJOUTE JOUEUR</string>
-    <string name="end_game">FIN DU JEU</string>
-    <string name="enter_player_name">Nom de joueur&#8230;</string>
-    <string name="game_mode">MODE DE JEU:</string>
-    <string name="game_mode_points">POINTS</string>
-    <string name="game_mode_time">TEMPS</string>
-    <string name="new_game">NOUVEU JEU</string>
-    <string name="next_turn">PROCHAIN TOUR</string>
-    <string name="play">JEU</string>
-    <string name="play_again">REMATCH</string>
-    <string name="share">PARTAGE</string>
-    <string name="points_collected">Vos points</string>
-    <string name="add_players_toast">Ajoute les joueurs.</string>
+    <string name="view_player_chooser_button_add_player">AJOUTE JOUEUR</string>
+    <string name="activity_main_button_end_game">FIN DU JEU</string>
+    <string name="view_player_chooser_name_hint">Nom de joueur&#8230;</string>
+    <string name="activity_main_text_game_mode">MODE DE JEU:</string>
+    <string name="activity_main_text_game_mode_points">POINTS</string>
+    <string name="activity_main_text_game_mode_time">TEMPS</string>
+    <string name="activity_main_button_new_game">NOUVEU JEU</string>
+    <string name="activity_main_button_next_turn">PROCHAIN TOUR</string>
+    <string name="activity_main_button_play">JEU</string>
+    <string name="activity_main_button_play_again">REMATCH</string>
+    <string name="activity_main_button_share">PARTAGE</string>
+    <string name="view_keyboard_points_collected">Vos points</string>
     <string name="activity_main_start_too_few_players_error_message">Il y a moins de 2 joueurs. Veuillez ajouter d\'autres joueurs.</string>
     <string name="activity_main_start_wrong_player_on_list_error_message">Il y a un joueur, qui n\'a pas le nom. Veuillez corriger cela.</string>
     <string name="checkbox_alert_dialog_do_not_show_again">"Ne plus me montrer ce. "</string>

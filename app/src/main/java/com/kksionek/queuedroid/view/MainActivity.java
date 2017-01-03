@@ -165,10 +165,10 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
                 mKeyboardView.setVisibility(View.VISIBLE);
 
                 AnimationUtils.beginDelayedTransition(mRoot);
-                mStartButton.setText(R.string.next_turn);
+                mStartButton.setText(R.string.activity_main_button_next_turn);
                 mStartButton.setOnClickListener(mOnNextTurnBtnClicked);
 
-                mEndButton.setText(R.string.end_game);
+                mEndButton.setText(R.string.activity_main_button_end_game);
                 AnimationUtils.beginDelayedTransition(mRoot);
                 mEndButton.setVisibility(View.VISIBLE);
                 mEndButton.setOnClickListener(mOnEndGameBtnClicked);
@@ -191,7 +191,7 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
             mKeyboardView.setVisibility(View.GONE);
 
             AnimationUtils.beginDelayedTransition(mRoot);
-            mStartButton.setText(R.string.new_game);
+            mStartButton.setText(R.string.activity_main_button_new_game);
             mStartButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -200,7 +200,7 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
             });
 
             AnimationUtils.beginDelayedTransition(mRoot);
-            mEndButton.setText(R.string.play_again);
+            mEndButton.setText(R.string.activity_main_button_play_again);
             mEndButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -208,7 +208,7 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
                 }
             });
 
-            mShareButton.setText(R.string.share);
+            mShareButton.setText(R.string.activity_main_button_share);
             AnimationUtils.beginDelayedTransition(mRoot);
             mShareButton.setVisibility(View.VISIBLE);
         }
@@ -218,7 +218,7 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
         mPlayerContainerView.onGameRestarted(hardReset);
 
         AnimationUtils.beginDelayedTransition(mRoot);
-        mStartButton.setText(R.string.play);
+        mStartButton.setText(R.string.activity_main_button_play);
         mStartButton.setOnClickListener(mOnStartGameBtnClicked);
 
         AnimationUtils.beginDelayedTransition(mRoot);

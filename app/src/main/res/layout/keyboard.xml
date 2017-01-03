@@ -65,6 +65,6 @@
             android:layout_marginRight="@dimen/keyboard_item_gap_size"
             android:background="@drawable/btn_small"
             android:layout_weight="1"
-            android:text="@string/char_backspace"/>
+            android:text="@string/view_keyboard_char_backspace"/>
     </LinearLayout>
 </LinearLayout>

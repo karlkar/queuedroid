@@ -9,24 +9,30 @@
     <string name="adMobTestDeviceS7">3795279CABB4FAC75E5F23A086CC9C9F</string>
 
     <string name="facebook_app_id">1616706948647194</string>
+
     <string name="cd_thumbnail">thumbnail</string>
-    <string name="game_mode">GAME MODE:</string>
-    <string name="game_mode_points">POINTS</string>
-    <string name="game_mode_time">TIME</string>
-    <string name="play">PLAY</string>
-    <string name="end_game">END GAME</string>
-    <string name="share">SHARE</string>
-    <string name="enter_player_name">Player\'s name&#8230;</string>
-    <string name="next_turn">NEXT TURN</string>
-    <string name="new_game">NEW GAME</string>
-    <string name="play_again">REVANGE</string>
-    <string name="add_player">ADD PLAYER</string>
-    <string name="points_collected">Points collected</string>
-    <string name="add_players_toast">Please add some players.</string>
+
+    <string name="activity_main_text_game_mode">GAME MODE:</string>
+    <string name="activity_main_text_game_mode_points">POINTS</string>
+    <string name="activity_main_text_game_mode_time">TIME</string>
+
+    <string name="activity_main_button_play">PLAY</string>
+    <string name="activity_main_button_end_game">END GAME</string>
+    <string name="activity_main_button_share">SHARE</string>
+    <string name="activity_main_button_next_turn">NEXT TURN</string>
+    <string name="activity_main_button_new_game">NEW GAME</string>
+    <string name="activity_main_button_play_again">REVENGE</string>
+
     <string name="activity_main_start_too_few_players_error_message">At least 2 players are needed to start a game.</string>
     <string name="activity_main_start_wrong_player_on_list_error_message">There\'s a player with empty name. Please fix that.</string>
+
+    <string name="view_player_chooser_name_hint">Player\'s name&#8230;</string>
+    <string name="view_player_chooser_button_add_player">ADD PLAYER</string>
+
+    <string name="view_keyboard_points_collected">Points collected</string>
+    <string name="view_keyboard_char_backspace">⌫</string>
+
     <string name="checkbox_alert_dialog_title">Are you sure?</string>
     <string name="checkbox_alert_dialog_message">In order to assign points to player, you have to input points first.\nDo you want to assign 0 points to current player?</string>
     <string name="checkbox_alert_dialog_do_not_show_again">Do not show again.</string>
-    <string name="char_backspace">⌫</string>
 </resources>

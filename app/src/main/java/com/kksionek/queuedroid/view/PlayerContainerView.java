@@ -62,7 +62,7 @@ public class PlayerContainerView extends LinearLayout {
     private void init() {
         mAdapter = new PlayerChooserAdapter(getContext());
         mAddPlayerBtn = new Button(getContext());
-        mAddPlayerBtn.setText(R.string.add_player);
+        mAddPlayerBtn.setText(R.string.view_player_chooser_button_add_player);
         mAddPlayerBtn.setBackgroundResource(R.drawable.btn_big);
         mAddPlayerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
