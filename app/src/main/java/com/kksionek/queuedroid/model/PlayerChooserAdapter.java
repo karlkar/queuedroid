@@ -14,6 +14,8 @@ import com.bumptech.glide.Glide;
 import com.kksionek.queuedroid.R;
 import com.kksionek.queuedroid.data.Player;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 
 public class PlayerChooserAdapter extends ArrayAdapter<Player> {
@@ -24,22 +26,27 @@ public class PlayerChooserAdapter extends ArrayAdapter<Player> {
     private boolean mContactsLoaded = false;
     private boolean mFacebookLoaded = false;
 
+    private ArrayList<Player> mList = new ArrayList<>();
+
     public PlayerChooserAdapter(Context context) {
         super(context, R.layout.row_autocomplete);
     }
 
     @Override
     public void add(Player object) {
-        if (getPosition(object) == -1)
+        if (!mList.contains(object)) {
+            mList.add(object);
             super.add(object);
-        else {
+        } else {
             if (object.isFromFacebook()) {
-                remove(object);
+                mList.remove(object);
+                super.remove(object);
+                mList.add(object);
                 super.add(object);
-            } else {
+            } else
                 return;
-            }
         }
+
         sort(new Comparator<Player>() {
             @Override
             public int compare(Player lhs, Player rhs) {
@@ -47,6 +54,12 @@ public class PlayerChooserAdapter extends ArrayAdapter<Player> {
             }
         });
         notifyDataSetChanged();
+    }
+
+    @Override
+    public void clear() {
+        mList.clear();
+        super.clear();
     }
 
     @Override
@@ -90,7 +103,6 @@ public class PlayerChooserAdapter extends ArrayAdapter<Player> {
         if (mContactsLoaded == contactsEnabled && mFacebookLoaded == facebookEnabled)
             return;
 
-        //TODO: Fix issues with dynamic changing of sources
         clear();
         if (contactsEnabled) {
             loadPlayersFromContacts();
