@@ -11,11 +11,9 @@ import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.preference.SwitchPreferenceCompat;
-import android.util.Log;
 
 import com.kksionek.queuedroid.R;
 import com.kksionek.queuedroid.model.FbController;
-import com.kksionek.queuedroid.model.Settings;
 
 import static com.kksionek.queuedroid.model.Settings.PREF_KEYBOARD_COLUMNS;
 import static com.kksionek.queuedroid.model.Settings.PREF_SHARE_CAPTION;
@@ -85,9 +83,11 @@ public class SettingsActivity extends AppCompatActivity {
                         @Override
                         public boolean onPreferenceChange(Preference preference, Object newValue) {
                             boolean value = (boolean) newValue;
-                            FbController fbController = FbController.getInstance();
-                            if (value && !fbController.isLogged()) {
-                                fbController.logIn(
+
+                            if (value && !FbController.isInitilized())
+                                FbController.initialize(getActivity().getApplication());
+                            if (value && !FbController.isLogged()) {
+                                FbController.getInstance().logIn(
                                         getActivity(),
                                         new FbController.FacebookLoginListener() {
                                     @Override

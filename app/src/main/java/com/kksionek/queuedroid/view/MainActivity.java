@@ -113,30 +113,32 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
         super.onResume();
         if (mKeyboardView != null)
             mKeyboardView.setColumnCount(Settings.getKeyboardColumnsCount(this));
-        FbController fbController = FbController.getInstance();
-        if (fbController.isLogged()) {
-            if (mPlayerChooserAdapter != null)
-                mPlayerChooserAdapter.reloadDataset(
-                        Settings.isContactsEnabled(this),
-                        Settings.isFacebookEnabled(this));
-        } else {
-            fbController.logIn(this, new FbController.FacebookLoginListener() {
-                @Override
-                public void onLogged() {
-                    if (mPlayerChooserAdapter != null)
-                        mPlayerChooserAdapter.reloadDataset(
-                                Settings.isContactsEnabled(MainActivity.this),
-                                Settings.isFacebookEnabled(MainActivity.this));
-                }
 
-                @Override
-                public void onCancel() {
-                }
+        if (FbController.isInitilized()) {
+            if (FbController.isLogged()) {
+                if (mPlayerChooserAdapter != null)
+                    mPlayerChooserAdapter.reloadDataset(
+                            Settings.isContactsEnabled(this),
+                            Settings.isFacebookEnabled(this));
+            } else {
+                FbController.getInstance().logIn(this, new FbController.FacebookLoginListener() {
+                    @Override
+                    public void onLogged() {
+                        if (mPlayerChooserAdapter != null)
+                            mPlayerChooserAdapter.reloadDataset(
+                                    Settings.isContactsEnabled(MainActivity.this),
+                                    Settings.isFacebookEnabled(MainActivity.this));
+                    }
 
-                @Override
-                public void onError() {
-                }
-            });
+                    @Override
+                    public void onCancel() {
+                    }
+
+                    @Override
+                    public void onError() {
+                    }
+                });
+            }
         }
         if (mAdView != null)
             mAdView.resume();

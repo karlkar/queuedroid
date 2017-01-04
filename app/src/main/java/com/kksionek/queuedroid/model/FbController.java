@@ -55,7 +55,18 @@ public class FbController {
     private FbController() {
     }
 
-    public boolean isLogged() {
+    public static boolean isInitilized() {
+        return FacebookSdk.isInitialized();
+    }
+
+    public static void initialize(Application application) {
+        if (!FacebookSdk.isInitialized()) {
+            FacebookSdk.sdkInitialize(application.getApplicationContext());
+            AppEventsLogger.activateApp(application);
+        }
+    }
+
+    public static boolean isLogged() {
         return AccessToken.getCurrentAccessToken() != null;
     }
 
