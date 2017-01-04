@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Queueoid</string>
+    <string name="app_name">QueueDroid</string>
     <string name="view_player_chooser_button_add_player">AJOUTE JOUEUR</string>
     <string name="activity_main_button_end_game">FIN DU JEU</string>
     <string name="view_player_chooser_name_hint">Nom de joueur&#8230;</string>

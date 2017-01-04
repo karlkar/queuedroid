@@ -1,16 +1,16 @@
 <resources>
-    <string name="app_name">Queueoid</string>
+    <string name="app_name">QueueDroid</string>
     <!-- -
         This is an ad unit ID for a banner test ad. Replace with your own banner ad unit id.
         For more information, see https://support.google.com/admob/answer/3052638
     <!- -->
-    <string name="banner_ad_unit_id">ca-app-pub-9982327151344679/8944869745</string>
-    <string name="adMobTestDeviceS5">F0E0DF548AD32B9C9DF78977B9079AD2</string>
-    <string name="adMobTestDeviceS7">3795279CABB4FAC75E5F23A086CC9C9F</string>
+    <string name="banner_ad_unit_id" translatable="false">ca-app-pub-9982327151344679/8944869745</string>
+    <string name="adMobTestDeviceS5" translatable="false">F0E0DF548AD32B9C9DF78977B9079AD2</string>
+    <string name="adMobTestDeviceS7" translatable="false">3795279CABB4FAC75E5F23A086CC9C9F</string>
 
-    <string name="facebook_app_id">1616706948647194</string>
+    <string name="facebook_app_id" translatable="false">1616706948647194</string>
 
-    <string name="cd_thumbnail">thumbnail</string>
+    <string name="cd_thumbnail" translatable="false">thumbnail</string>
 
     <string name="activity_main_text_game_mode">GAME MODE:</string>
     <string name="activity_main_text_game_mode_points">POINTS</string>
@@ -31,7 +31,7 @@
     <string name="view_player_chooser_button_add_player">ADD PLAYER</string>
 
     <string name="view_keyboard_points_collected">Points collected</string>
-    <string name="view_keyboard_char_backspace">⌫</string>
+    <string name="view_keyboard_char_backspace" translatable="false">⌫</string>
     <string name="view_keyboard_too_long_input_message">Not allowed number.</string>
 
     <string name="checkbox_alert_dialog_title">Are you sure?</string>
