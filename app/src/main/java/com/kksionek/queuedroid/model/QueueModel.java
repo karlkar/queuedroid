@@ -3,11 +3,13 @@ package com.kksionek.queuedroid.model;
 import com.kksionek.queuedroid.data.Player;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class QueueModel {
     private final List<Player> mPlayers = new ArrayList<>();
     private final List<Integer> mPoints = new ArrayList<>();
+    private final HashMap<Player, List<Integer>> mHistory = new HashMap<>();
     private int mPreviousPlayerIndex = 0;
     private int mCurrentPlayerIndex = 0;
 
@@ -25,7 +27,9 @@ public class QueueModel {
 
     public void nextTurn(int points) {
         mPreviousPlayerIndex = mCurrentPlayerIndex;
-        mPoints.set(mCurrentPlayerIndex, mPoints.get(mCurrentPlayerIndex) + points);
+        int curPoints = mPoints.get(mCurrentPlayerIndex) + points;
+        mPoints.set(mCurrentPlayerIndex, curPoints);
+        mHistory.get(mPlayers.get(mCurrentPlayerIndex)).add(curPoints);
         mCurrentPlayerIndex = ++mCurrentPlayerIndex % mPlayers.size();
     }
 
@@ -34,6 +38,10 @@ public class QueueModel {
     }
 
     public void newGame() {
+        mHistory.clear();
+        for (Player player : mPlayers)
+            mHistory.put(player, new ArrayList<Integer>());
+
         for (int i = 0; i < mPoints.size(); ++i)
             mPoints.set(i, 0);
     }
@@ -41,15 +49,18 @@ public class QueueModel {
     public void newGame(List<Player> players) {
         mPlayers.clear();
         mPoints.clear();
+        mHistory.clear();
         for (Player player : players) {
             mPlayers.add(player);
             mPoints.add(0);
+            mHistory.put(player, new ArrayList<Integer>());
         }
     }
 
     public void resetScoreboard() {
         mPlayers.clear();
         mPoints.clear();
+        mHistory.clear();
     }
 
     public int getPointsOfPlayer(int index) {
@@ -67,5 +78,9 @@ public class QueueModel {
                 list.add(player.getId());
         }
         return list;
+    }
+
+    public HashMap<Player, List<Integer>> getHistory() {
+        return mHistory;
     }
 }

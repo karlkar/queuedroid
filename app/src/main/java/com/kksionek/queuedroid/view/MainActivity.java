@@ -3,15 +3,27 @@ package com.kksionek.queuedroid.view;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.LimitLine;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.listener.ChartTouchListener;
+import com.github.mikephil.charting.listener.OnChartGestureListener;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -26,6 +38,8 @@ import com.kksionek.queuedroid.model.TooFewPlayersException;
 import com.kksionek.queuedroid.model.WrongPlayerException;
 import com.kksionek.queuedroid.view.keyboard.KeyboardView;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends FragmentActivity implements PointsDialogFragment.PointsDialogListener {
@@ -41,6 +55,8 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
     private Button mFirstButton;
     private Button mSecondButton;
     private Button mThirdButton;
+
+    private LineChart mLineChart;
 
     private final View.OnClickListener mOnStartGameBtnClicked = new OnStartGameBtnClicked();
     private final View.OnClickListener mOnSettingsBtnClicked = new View.OnClickListener() {
@@ -106,6 +122,105 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
             }
         });
         mAdView.loadAd(adRequest);
+
+        mLineChart = (LineChart) findViewById(R.id.lineChart);
+        mLineChart.setOnChartGestureListener(new OnChartGestureListener() {
+            @Override
+            public void onChartGestureStart(MotionEvent me, ChartTouchListener.ChartGesture lastPerformedGesture) {
+
+            }
+
+            @Override
+            public void onChartGestureEnd(MotionEvent me, ChartTouchListener.ChartGesture lastPerformedGesture) {
+
+            }
+
+            @Override
+            public void onChartLongPressed(MotionEvent me) {
+
+            }
+
+            @Override
+            public void onChartDoubleTapped(MotionEvent me) {
+
+            }
+
+            @Override
+            public void onChartSingleTapped(MotionEvent me) {
+
+            }
+
+            @Override
+            public void onChartFling(MotionEvent me1, MotionEvent me2, float velocityX, float velocityY) {
+
+            }
+
+            @Override
+            public void onChartScale(MotionEvent me, float scaleX, float scaleY) {
+
+            }
+
+            @Override
+            public void onChartTranslate(MotionEvent me, float dX, float dY) {
+
+            }
+        });
+        mLineChart.setDrawGridBackground(false);
+
+        // no description text
+        mLineChart.getDescription().setEnabled(false);
+
+        // enable touch gestures
+        mLineChart.setTouchEnabled(true);
+
+        // enable scaling and dragging
+        mLineChart.setDragEnabled(true);
+        mLineChart.setScaleEnabled(true);
+        // mChart.setScaleXEnabled(true);
+        // mChart.setScaleYEnabled(true);
+
+        // if disabled, scaling can be done on x- and y-axis separately
+        mLineChart.setPinchZoom(true);
+
+        // set an alternative background color
+        // mChart.setBackgroundColor(Color.GRAY);
+
+        XAxis xAxis = mLineChart.getXAxis();
+        xAxis.enableGridDashedLine(10f, 10f, 0f);
+        //xAxis.setValueFormatter(new MyCustomXAxisValueFormatter());
+        //xAxis.addLimitLine(llXAxis); // add x-axis limit line
+
+        YAxis leftAxis = mLineChart.getAxisLeft();
+        leftAxis.removeAllLimitLines(); // reset all limit lines to avoid overlapping lines
+        leftAxis.setAxisMaximum(200f);
+        leftAxis.setAxisMinimum(0f);
+        //leftAxis.setYOffset(20f);
+        leftAxis.enableGridDashedLine(10f, 10f, 0f);
+        leftAxis.setDrawZeroLine(false);
+
+        // limit lines are drawn behind data (and not on top)
+        leftAxis.setDrawLimitLinesBehindData(true);
+
+        mLineChart.getAxisRight().setEnabled(false);
+
+        //mChart.getViewPortHandler().setMaximumScaleY(2f);
+        //mChart.getViewPortHandler().setMaximumScaleX(2f);
+
+//        mChart.setVisibleXRange(20);
+//        mChart.setVisibleYRange(20f, AxisDependency.LEFT);
+//        mChart.centerViewTo(20, 50, AxisDependency.LEFT);
+
+        mLineChart.animateX(2500);
+        //mChart.invalidate();
+
+//        // get the legend (only possible after setting data)
+//        Legend l = mLineChart.getLegend();
+//
+//        // modify the legend ...
+//        l.setForm(Legend.LegendForm.LINE);
+
+        // // dont forget to refresh the drawing
+        // mChart.invalidate();
     }
 
     @Override
@@ -234,6 +349,26 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
         @Override
         public void onClick(View view) {
             mPlayerContainerView.onGameEnded(mQueueModel);
+
+            HashMap<Player, List<Integer>> history = mQueueModel.getHistory();
+            LineData lineData = new LineData();
+            for (Player player : history.keySet()) {
+                ArrayList<Entry> entries = new ArrayList<>();
+                List<Integer> points = history.get(player);
+                for (int i = 0; i < points.size(); ++i) {
+                    entries.add(new Entry(i, points.get(i)));
+                }
+                lineData.addDataSet(new LineDataSet(entries, player.getName()));
+            }
+            mLineChart.setData(lineData);
+                    // get the legend (only possible after setting data)
+            Legend l = mLineChart.getLegend();
+
+            // modify the legend ...
+            l.setForm(Legend.LegendForm.LINE);
+
+            // dont forget to refresh the drawing
+            mLineChart.invalidate();
 
             AnimationUtils.beginDelayedTransition(mRoot);
             mKeyboardView.setVisibility(View.GONE);
