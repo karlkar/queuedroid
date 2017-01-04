@@ -20,7 +20,6 @@ import java.util.Comparator;
 
 public class PlayerChooserAdapter extends ArrayAdapter<Player> {
 
-    private FbController mFb = null;
     private ContactsController mContactsController = null;
 
     private boolean mContactsLoaded = false;
@@ -96,10 +95,8 @@ public class PlayerChooserAdapter extends ArrayAdapter<Player> {
     }
 
     private void loadPlayersFromFacebook() {
-        if (mFb == null)
-            mFb = FbController.getInstance();
-        if (mFb.isLogged())
-            mFb.getFriendData(this);
+        if (FbController.isLogged())
+            FbController.getInstance().getFriendData(this);
     }
 
     public void reloadDataset(boolean contactsEnabled, boolean facebookEnabled) {
