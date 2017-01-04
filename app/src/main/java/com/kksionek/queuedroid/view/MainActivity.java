@@ -192,9 +192,7 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
 
     @Override
     public void onDialogPositiveClick(int points) {
-        mQueueModel.nextTurn(points);
-        mPlayerContainerView.nextTurn(mQueueModel.getPointsOfPreviousPlayer(), mQueueModel
-                .getCurrentPlayerIndex());
+        assignPointsAndNextTurn(points);
     }
 
     private class OnStartGameBtnClicked implements View.OnClickListener {

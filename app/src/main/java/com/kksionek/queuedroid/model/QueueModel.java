@@ -39,6 +39,8 @@ public class QueueModel {
     }
 
     public void newGame(List<Player> players) {
+        mPreviousPlayerIndex = 0;
+        mCurrentPlayerIndex = 0;
         mPlayers.clear();
         mPoints.clear();
         for (Player player : players) {

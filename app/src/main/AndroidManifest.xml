@@ -47,11 +47,6 @@
             android:authorities="com.facebook.app.FacebookContentProvider1616706948647194"
             android:exported="true" />
 
-        <!-- Include the AdActivity configChanges and theme. -->
-        <activity
-            android:name="com.google.android.gms.ads.AdActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
-            android:theme="@android:style/Theme.Translucent" />
         <activity android:name=".view.SettingsActivity"></activity>
     </application>
 

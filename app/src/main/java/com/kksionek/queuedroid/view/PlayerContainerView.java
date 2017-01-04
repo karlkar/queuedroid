@@ -114,6 +114,7 @@ public class PlayerContainerView extends LinearLayout {
         }
         AnimationUtils.beginDelayedTransition(mParent);
         mAddPlayerBtn.setVisibility(View.GONE);
+        mCurrentPlayer = 0;
         return players;
     }
 
