@@ -35,17 +35,9 @@
             </intent-filter>
         </activity>
 
-        <!-- Main app -->
-        <!-- <provider android:authorities="com.facebook.app.FacebookContentProvider1616015895382966" -->
-        <!-- android:name="com.facebook.FacebookContentProvider" -->
-        <!-- android:exported="true"/> -->
-
-
-        <!-- Test app -->
-        <provider
-            android:name="com.facebook.FacebookContentProvider"
-            android:authorities="com.facebook.app.FacebookContentProvider1616706948647194"
-            android:exported="true" />
+         <provider android:authorities="com.facebook.app.FacebookContentProvider1616015895382966"
+         android:name="com.facebook.FacebookContentProvider"
+         android:exported="true"/>
 
         <activity android:name=".view.SettingsActivity"></activity>
     </application>
