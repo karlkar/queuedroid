@@ -158,7 +158,7 @@ public class FbController {
         req.executeAsync();
     }
 
-    public void shareOnFacebook(@NonNull Activity activity, @NonNull ArrayList<String> list, @NonNull Bitmap bitmap) {
+    public static void shareOnFacebook(@NonNull Activity activity, @NonNull ArrayList<String> list, @NonNull Bitmap bitmap) {
         if (ShareDialog.canShow(SharePhotoContent.class)) {
             SharePhoto photo = new SharePhoto.Builder()
                     .setCaption(Settings.getFacebookCaptionString(activity))

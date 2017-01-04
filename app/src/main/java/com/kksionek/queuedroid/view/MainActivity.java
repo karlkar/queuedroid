@@ -26,7 +26,12 @@ import com.kksionek.queuedroid.model.TooFewPlayersException;
 import com.kksionek.queuedroid.model.WrongPlayerException;
 import com.kksionek.queuedroid.view.keyboard.KeyboardView;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.List;
+
+import static android.content.Intent.ACTION_SEND;
+import static java.security.AccessController.getContext;
 
 public class MainActivity extends FragmentActivity implements PointsDialogFragment.PointsDialogListener {
 
@@ -81,10 +86,30 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
         mThirdButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FbController.getInstance().shareOnFacebook(
-                        MainActivity.this,
-                        mQueueModel.getFbPlayers(),
-                        mPlayerContainerView.getRankBitmap());
+                if (Settings.isFacebookEnabled(getBaseContext())
+                        && FbController.isInitilized()
+                        && FbController.isLogged()) {
+                    FbController.shareOnFacebook(
+                            MainActivity.this,
+                            mQueueModel.getFbPlayers(),
+                            mPlayerContainerView.getRankBitmap());
+                } else {
+                    try {
+                        File file = new File(getCacheDir(), "SHARE.png");
+                        FileOutputStream fOut = new FileOutputStream(file);
+                        mPlayerContainerView.getRankBitmap().compress(Bitmap.CompressFormat.PNG, 100, fOut);
+                        fOut.flush();
+                        fOut.close();
+                        file.setReadable(true, false);
+                        final Intent intent = new Intent(ACTION_SEND);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
+                        intent.setType("image/png");
+                        startActivity(Intent.createChooser(intent, ""));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         });
 
