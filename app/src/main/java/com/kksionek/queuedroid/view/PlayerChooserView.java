@@ -35,7 +35,6 @@ public class PlayerChooserView extends LinearLayout {
     private final TextView mStaticName;
     private final Button mPointsView;
     private final ImageView mPlayerThumbnail;
-    private final ViewGroup mRoot;
     private final AutoCompleteTextView mPlayerName;
     private boolean mWasCurrent = false;
     private Activity mActivity;
@@ -48,7 +47,6 @@ public class PlayerChooserView extends LinearLayout {
     public PlayerChooserView(Context context, ViewGroup root) {
         super(context, null);
         mCtx = context;
-        mRoot = root;
 
         setOrientation(LinearLayout.HORIZONTAL);
         setGravity(Gravity.CENTER_VERTICAL);
