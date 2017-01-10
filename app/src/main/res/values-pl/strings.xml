@@ -27,7 +27,6 @@
     <string name="activity_settings_pref_keep_screen_on_summary_on">Ekran nie będzie wygaszany podczas gry</string>
     <string name="activity_settings_pref_keyboard_columns">Liczba kolumn w klawiaturze</string>
     <string name="activity_settings_pref_share_caption">Podpis przy udostępnianiu</string>
-    <string name="activity_settings_pref_share_caption_default">Co za gra! Dzięki za pomoc Queuedroid!</string>
     <string name="activity_settings_pref_use_contacts">Użyj kontaktów</string>
     <string name="activity_settings_pref_use_contacts_summary_off">Aplikacja nie użyje kontaktów</string>
     <string name="activity_settings_pref_use_contacts_summary_on">Aplikacja użyje kontaktów</string>

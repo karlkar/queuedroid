@@ -27,7 +27,6 @@
     <string name="activity_settings_pref_keep_screen_on_summary_on">L\'écran sera maintenu pendant le jeu</string>
     <string name="activity_settings_pref_keyboard_columns">Colonnes de clavier</string>
     <string name="activity_settings_pref_share_caption">Partager caption</string>
-    <string name="activity_settings_pref_share_caption_default">Quel match! Propulsé par l\'application Queuedroid.</string>
     <string name="activity_settings_pref_use_contacts">Utiliser les contacts</string>
     <string name="activity_settings_pref_use_contacts_summary_off">L\'application n\'utilisera pas Contacts</string>
     <string name="activity_settings_pref_use_facebook">Utiliser Facebook</string>

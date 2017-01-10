@@ -30,11 +30,6 @@
             android:summaryOff="@string/activity_settings_pref_use_contacts_summary_off"
             android:defaultValue="false"/>
 
-        <EditTextPreference
-            android:key="PREF_SHARE_CAPTION"
-            android:title="@string/activity_settings_pref_share_caption"
-            android:defaultValue="@string/activity_settings_pref_share_caption_default"/>
-
     </PreferenceCategory>
 
     <PreferenceCategory

@@ -16,7 +16,6 @@ import com.kksionek.queuedroid.R;
 import com.kksionek.queuedroid.model.FbController;
 
 import static com.kksionek.queuedroid.model.Settings.PREF_KEYBOARD_COLUMNS;
-import static com.kksionek.queuedroid.model.Settings.PREF_SHARE_CAPTION;
 import static com.kksionek.queuedroid.model.Settings.PREF_USE_CONTACTS;
 import static com.kksionek.queuedroid.model.Settings.PREF_USE_FACEBOOK;
 import static com.kksionek.queuedroid.view.MainActivity.PERMISSIONS_REQUEST_READ_CONTACTS;
@@ -65,18 +64,6 @@ public class SettingsActivity extends AppCompatActivity {
                     return true;
                 }
             });
-
-            Preference prefShareCaption = findPreference(PREF_SHARE_CAPTION);
-            prefShareCaption
-                    .setSummary(mSharedPreferences.getString(PREF_SHARE_CAPTION, ""));
-            prefShareCaption
-                    .setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                        @Override
-                        public boolean onPreferenceChange(Preference preference, Object newValue) {
-                            preference.setSummary((String)newValue);
-                            return true;
-                        }
-                    });
 
             findPreference(PREF_USE_FACEBOOK)
                     .setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {

@@ -161,7 +161,6 @@ public class FbController {
     public static void shareOnFacebook(@NonNull Activity activity, @NonNull ArrayList<String> list, @NonNull Bitmap bitmap) {
         if (ShareDialog.canShow(SharePhotoContent.class)) {
             SharePhoto photo = new SharePhoto.Builder()
-                    .setCaption(Settings.getFacebookCaptionString(activity))
                     .setBitmap(bitmap)
                     .setUserGenerated(true)
                     .build();

@@ -50,8 +50,6 @@
     <string name="activity_settings_pref_use_contacts">Use Contacts</string>
     <string name="activity_settings_pref_use_contacts_summary_on">Application will use Contacts</string>
     <string name="activity_settings_pref_use_contacts_summary_off">Application won\'t use Contacts</string>
-    <string name="activity_settings_pref_share_caption">Share caption</string>
-    <string name="activity_settings_pref_share_caption_default">What a game! Powered by Queuedroid app.</string>
 
     <string name="activity_settings_pref_category_keyboard">Keyboard</string>
     <string name="activity_settings_pref_use_keyboard">Use in-app keyboard</string>

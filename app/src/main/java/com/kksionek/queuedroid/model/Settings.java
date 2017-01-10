@@ -11,7 +11,6 @@ public class Settings {
             "PREF_SHOW_NO_POINTS_CONFIRMATION_DIALOG";
     public static final String PREF_KEEP_SCREEN_ON = "PREF_KEEP_SCREEN_ON";
     public static final String PREF_KEYBOARD_COLUMNS = "PREF_KEYBOARD_COLUMNS";
-    public static final String PREF_SHARE_CAPTION = "PREF_SHARE_CAPTION";
     public static final String PREF_USE_FACEBOOK = "PREF_USE_FACEBOOK";
     public static final String PREF_USE_CONTACTS = "PREF_USE_CONTACTS";
     public static final String PREF_USE_BUILT_IN_KEYBOARD = "PREF_USE_BUILT_IN_KEYBOARD";
@@ -52,10 +51,6 @@ public class Settings {
 
     public static boolean isFacebookEnabled(Context context) {
         return getBoolean(context, PREF_USE_FACEBOOK, false);
-    }
-
-    public static String getFacebookCaptionString(Context context) {
-        return getString(context, PREF_SHARE_CAPTION, "What a game! Powered by Queuedroid app.");
     }
 
     public static boolean shouldUseInAppKeyboard(Context context) {
