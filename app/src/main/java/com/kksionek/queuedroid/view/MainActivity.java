@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.transition.TransitionManager;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
@@ -31,7 +32,6 @@ import java.io.FileOutputStream;
 import java.util.List;
 
 import static android.content.Intent.ACTION_SEND;
-import static java.security.AccessController.getContext;
 
 public class MainActivity extends FragmentActivity implements PointsDialogFragment.PointsDialogListener {
 
@@ -126,7 +126,7 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
         mAdView.setAdListener(new AdListener() {
             @Override
             public void onAdLoaded() {
-                AnimationUtils.beginDelayedTransition(mRoot);
+                TransitionManager.beginDelayedTransition(mRoot);
                 mAdView.setVisibility(View.VISIBLE);
             }
         });
@@ -227,16 +227,13 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
                 List<Player> players = mPlayerContainerView.onGameStarted();
                 mQueueModel.newGame(players);
 
-                AnimationUtils.beginDelayedTransition(mRoot);
                 mKeyboardView.setVisibility(Settings.shouldUseInAppKeyboard(MainActivity.this) ?
                         View.VISIBLE : View.GONE);
                 mKeyboardView.setKeepScreenOn(Settings.isKeepOnScreen(MainActivity.this));
 
-                AnimationUtils.beginDelayedTransition(mRoot);
                 mFirstButton.setText(R.string.activity_main_button_next_turn);
                 mFirstButton.setOnClickListener(mOnNextTurnBtnClicked);
 
-                AnimationUtils.beginDelayedTransition(mRoot);
                 mSecondButton.setText(R.string.activity_main_button_end_game);
                 mSecondButton.setOnClickListener(mOnEndGameBtnClicked);
             } catch (TooFewPlayersException ex) {
@@ -260,10 +257,8 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
         public void onClick(View view) {
             mPlayerContainerView.onGameEnded(mQueueModel);
 
-            AnimationUtils.beginDelayedTransition(mRoot);
             mKeyboardView.setVisibility(View.GONE);
 
-            AnimationUtils.beginDelayedTransition(mRoot);
             mFirstButton.setText(R.string.activity_main_button_new_game);
             mFirstButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -272,7 +267,6 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
                 }
             });
 
-            AnimationUtils.beginDelayedTransition(mRoot);
             mSecondButton.setText(R.string.activity_main_button_play_again);
             mSecondButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -282,7 +276,6 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
             });
 
             mThirdButton.setText(R.string.activity_main_button_share);
-            AnimationUtils.beginDelayedTransition(mRoot);
             mThirdButton.setVisibility(View.VISIBLE);
         }
     }
@@ -290,15 +283,12 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
     private void restartGame(boolean hardReset) {
         mPlayerContainerView.onGameRestarted(hardReset);
 
-        AnimationUtils.beginDelayedTransition(mRoot);
         mFirstButton.setText(R.string.activity_main_button_play);
         mFirstButton.setOnClickListener(mOnStartGameBtnClicked);
 
-        AnimationUtils.beginDelayedTransition(mRoot);
         mSecondButton.setText(R.string.activity_main_button_settings);
         mSecondButton.setOnClickListener(mOnSettingsBtnClicked);
 
-        AnimationUtils.beginDelayedTransition(mRoot);
         mThirdButton.setVisibility(View.GONE);
     }
 

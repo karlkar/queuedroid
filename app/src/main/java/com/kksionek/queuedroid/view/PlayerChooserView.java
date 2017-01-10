@@ -5,11 +5,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Typeface;
+import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.transition.TransitionManager;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -108,11 +109,7 @@ public class PlayerChooserView extends LinearLayout {
 
         mStaticName = (TextView) findViewById(R.id.staticText);
         mPointsView = (Button) findViewById(R.id.pointsView);
-        mPointsView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            }
-        });
+        mPointsView.setOnClickListener(null);
     }
 
     public void setAdapter(@Nullable PlayerChooserAdapter adapter) {
@@ -136,16 +133,19 @@ public class PlayerChooserView extends LinearLayout {
     }
 
     public void setEditable(boolean editable) {
+        TransitionDrawable transitionDrawable = (TransitionDrawable) mPointsView.getBackground();
+        int duration = getResources().getInteger(android.R.integer.config_shortAnimTime);
         if (editable) {
-            AnimationUtils.beginDelayedTransition(mRoot);
-            mPointsView.setBackgroundResource(R.drawable.btn_cancel);
-            AnimationUtils.beginDelayedTransition(mRoot);
+            transitionDrawable.reverseTransition(duration);
             mPointsView.setText("");
         } else {
-            AnimationUtils.beginDelayedTransition(mRoot);
-            mPointsView.setBackgroundResource(R.drawable.btn_uncheck);
-            AnimationUtils.beginDelayedTransition(mRoot);
-            mPointsView.setText("0");
+            transitionDrawable.startTransition(duration);
+            mPointsView.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mPointsView.setText("0");
+                }
+            }, duration);
         }
 
         mPlayerName.setVisibility(editable ? VISIBLE : GONE);

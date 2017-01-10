@@ -1,10 +1,9 @@
 package com.kksionek.queuedroid.view;
 
+import android.animation.LayoutTransition;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.os.Build;
 import android.support.v4.util.Pair;
 import android.util.AttributeSet;
 import android.view.View;
@@ -16,9 +15,6 @@ import com.kksionek.queuedroid.data.Player;
 import com.kksionek.queuedroid.model.PlayerChooserAdapter;
 import com.kksionek.queuedroid.model.QueueModel;
 import com.kksionek.queuedroid.R;
-import com.kksionek.queuedroid.model.ContactsController;
-import com.kksionek.queuedroid.model.FbController;
-import com.kksionek.queuedroid.model.Settings;
 import com.kksionek.queuedroid.model.TooFewPlayersException;
 import com.kksionek.queuedroid.model.WrongPlayerException;
 
@@ -55,6 +51,7 @@ public class PlayerContainerView extends LinearLayout {
     }
 
     private void init() {
+        setLayoutTransition(new LayoutTransition());
         mAddPlayerBtn = new Button(getContext());
         mAddPlayerBtn.setText(R.string.view_player_chooser_button_add_player);
         mAddPlayerBtn.setBackgroundResource(R.drawable.btn_big);
@@ -76,7 +73,6 @@ public class PlayerContainerView extends LinearLayout {
         view.setOnRemoveListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                AnimationUtils.beginDelayedTransition(mParent);
                 removeView(view);
             }
         });
@@ -84,7 +80,6 @@ public class PlayerContainerView extends LinearLayout {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
         params.setMargins(0, 0, 0, (int) getResources().getDimension(R.dimen.main_activity_players_margin));
-        AnimationUtils.beginDelayedTransition(this);
         addView(view, getChildCount() - 1, params);
     }
 
@@ -112,7 +107,6 @@ public class PlayerContainerView extends LinearLayout {
             players.add(tmp.getPlayer());
             tmp.setPoints(0);
         }
-        AnimationUtils.beginDelayedTransition(mParent);
         mAddPlayerBtn.setVisibility(View.GONE);
         mCurrentPlayer = 0;
         return players;
@@ -127,7 +121,6 @@ public class PlayerContainerView extends LinearLayout {
             tmp = (PlayerChooserView) getChildAt(i);
             tmp.reset(hardReset);
         }
-        AnimationUtils.beginDelayedTransition(mParent);
         mAddPlayerBtn.setVisibility(VISIBLE);
     }
 
