@@ -55,7 +55,10 @@ public class KeyboardView extends LinearLayout {
         KeyboardViewAdapter keyboardViewAdapter = new KeyboardViewAdapter(getContext());
         keyboardViewAdapter.setOnKeyboardItemClickListener(new KeyboardListener());
         mButtonRecylerView.setAdapter(keyboardViewAdapter);
-        mColsNum = Settings.getKeyboardColumnsCount(getContext());
+        if (isInEditMode())
+            mColsNum = 5;
+        else
+            mColsNum = Settings.getKeyboardColumnsCount(getContext());
         mButtonRecylerView.setLayoutManager(
                 new GridLayoutManager(
                         getContext(),
