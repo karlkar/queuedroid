@@ -26,20 +26,22 @@ import java.util.List;
 public class PlayerContainerView extends LinearLayout {
     private int mCurrentPlayer = 0;
     private Button mAddPlayerBtn;
-    private MainActivity mActivity;
-    private ViewGroup mParent;
+    private PlayerChooserView.PlayerChooserViewActionListener mListener;
     private PlayerChooserAdapter mAdapter = null;
 
     public PlayerContainerView(Context context) {
         super(context);
+        init();
     }
 
     public PlayerContainerView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        init();
     }
 
     public PlayerContainerView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        init();
     }
 
     public Bitmap getRankBitmap() {
@@ -67,12 +69,12 @@ public class PlayerContainerView extends LinearLayout {
     }
 
     public void addPlayerView() {
-        final PlayerChooserView view = new PlayerChooserView(getContext(), mParent);
+        final PlayerChooserView view = new PlayerChooserView(getContext());
         view.setAdapter(mAdapter);
-        view.setActivity(mActivity);
-        view.setOnRemoveListener(new OnClickListener() {
+        view.setPlayerChooserViewActionListener(mListener);
+        view.setOnRemoveListener(new PlayerChooserView.OnRemoveListener() {
             @Override
-            public void onClick(View v) {
+            public void onRemoveClicked() {
                 removeView(view);
             }
         });
@@ -124,10 +126,14 @@ public class PlayerContainerView extends LinearLayout {
         mAddPlayerBtn.setVisibility(VISIBLE);
     }
 
-    public void onCreate(MainActivity mainActivity, ViewGroup root) {
-        mActivity = mainActivity;
-        mParent = root;
-        init();
+    public void setPlayerChooserViewActionListener(
+            PlayerChooserView.PlayerChooserViewActionListener playerChooserViewActionListener) {
+        mListener = playerChooserViewActionListener;
+        PlayerChooserView tmp;
+        for (int i = 0; i < getChildCount() - 1; ++i) {
+            tmp = (PlayerChooserView) getChildAt(i);
+            tmp.setPlayerChooserViewActionListener(playerChooserViewActionListener);
+        }
     }
 
     public void onGameEnded(QueueModel queueModel) {

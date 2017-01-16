@@ -1,7 +1,6 @@
 package com.kksionek.queuedroid.view;
 
 import android.animation.ValueAnimator;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -10,12 +9,10 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.transition.TransitionManager;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -29,22 +26,38 @@ import com.bumptech.glide.Glide;
 import com.kksionek.queuedroid.data.Player;
 import com.kksionek.queuedroid.model.PlayerChooserAdapter;
 import com.kksionek.queuedroid.R;
+import com.kksionek.queuedroid.model.Settings;
 
 public class PlayerChooserView extends LinearLayout {
+
+    public interface PlayerChooserViewActionListener {
+        void onPictureRequested(Intent takePictureIntent);
+        void onPointsRequested();
+    }
+
+    public interface OnRemoveListener {
+        void onRemoveClicked();
+    }
+
+    private Context mCtx;
+
+    private PlayerChooserViewActionListener mPlayerChooserViewActionListener;
 
     private final TextView mStaticName;
     private final Button mPointsView;
     private final ImageView mPlayerThumbnail;
     private final AutoCompleteTextView mPlayerName;
-    private boolean mWasCurrent = false;
-    private Activity mActivity;
+
+    private boolean mIsCurrent = false;
     private boolean mWaitingForPhoto = false;
     private Player mPlayer = null;
-    private Context mCtx;
+    private boolean mEditable = true;
 
     private final OnThumbnailClickListener mOnThumbClickListener = new OnThumbnailClickListener();
+    private OnClickListener mOnRemoveClickListener = null;
+    private OnClickListener mOnPointsClickListener = null;
 
-    public PlayerChooserView(Context context, ViewGroup root) {
+    public PlayerChooserView(Context context) {
         super(context, null);
         mCtx = context;
 
@@ -107,15 +120,38 @@ public class PlayerChooserView extends LinearLayout {
 
         mStaticName = (TextView) findViewById(R.id.staticText);
         mPointsView = (Button) findViewById(R.id.pointsView);
-        mPointsView.setOnClickListener(null);
     }
 
     public void setAdapter(@Nullable PlayerChooserAdapter adapter) {
         mPlayerName.setAdapter(adapter);
     }
 
-    public void setActivity(@NonNull Activity activity) {
-        mActivity = activity;
+    public void setPlayerChooserViewActionListener(
+            @NonNull PlayerChooserViewActionListener playerChooserViewActionListener) {
+        mPlayerChooserViewActionListener = playerChooserViewActionListener;
+        mOnPointsClickListener = new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!mIsCurrent)
+                    return;
+                if (!Settings.shouldUseInAppKeyboard(getContext())) {
+                    mPlayerChooserViewActionListener.onPointsRequested();
+                }
+            }
+        };
+        if (!mEditable)
+            mPointsView.setOnClickListener(mOnPointsClickListener);
+    }
+
+    public void setOnRemoveListener(final OnRemoveListener onRemoveListener) {
+        mOnRemoveClickListener = new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onRemoveListener.onRemoveClicked();
+            }
+        };
+        if (mEditable)
+            mPointsView.setOnClickListener(mOnRemoveClickListener);
     }
 
     public boolean onPhotoCreated(@Nullable Intent data) {
@@ -131,6 +167,7 @@ public class PlayerChooserView extends LinearLayout {
     }
 
     public void setEditable(boolean editable) {
+        mEditable = editable;
         TransitionDrawable transitionDrawable = (TransitionDrawable) mPointsView.getBackground();
         int duration = getResources().getInteger(android.R.integer.config_shortAnimTime);
         if (editable) {
@@ -150,6 +187,10 @@ public class PlayerChooserView extends LinearLayout {
         mStaticName.setText(mPlayerName.getText().toString());
         mStaticName.setVisibility(editable ? GONE : VISIBLE);
         mPlayerThumbnail.setOnClickListener(editable && mPlayer == null ? mOnThumbClickListener : null);
+        if (editable)
+            mPointsView.setOnClickListener(mOnRemoveClickListener);
+        else
+            mPointsView.setOnClickListener(mOnPointsClickListener);
     }
 
     public Player getPlayer() {
@@ -161,11 +202,11 @@ public class PlayerChooserView extends LinearLayout {
     }
 
     public void setCurrentTurn(boolean current) {
-        if (mWasCurrent || current) {
+        if (mIsCurrent || current) {
             float startSize = 15;
             float endSize = 30;
 
-            if (mWasCurrent) {
+            if (mIsCurrent) {
                 startSize = 30;
                 endSize = 15;
             }
@@ -186,7 +227,7 @@ public class PlayerChooserView extends LinearLayout {
             animator.start();
 
 //            mStaticName.setTypeface(mStaticName.getTypeface(), current ? Typeface.BOLD : Typeface.NORMAL);
-            mWasCurrent = current;
+            mIsCurrent = current;
         }
     }
 
@@ -210,17 +251,13 @@ public class PlayerChooserView extends LinearLayout {
         mPointsView.setText(String.valueOf(points));
     }
 
-    public void setOnRemoveListener(OnClickListener onRemoveListener) {
-        mPointsView.setOnClickListener(onRemoveListener);
-    }
-
     private class OnThumbnailClickListener implements OnClickListener {
         @Override
         public void onClick(View v) {
             if (mPlayerName.getText().length() > 0) {
                 Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 if (takePictureIntent.resolveActivity(v.getContext().getPackageManager()) != null) {
-                    mActivity.startActivityForResult(takePictureIntent, MainActivity.REQUEST_IMAGE_CAPTURE);
+                    mPlayerChooserViewActionListener.onPictureRequested(takePictureIntent);
                     mWaitingForPhoto = true;
                 }
             }

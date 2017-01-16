@@ -33,7 +33,8 @@ import java.util.List;
 
 import static android.content.Intent.ACTION_SEND;
 
-public class MainActivity extends FragmentActivity implements PointsDialogFragment.PointsDialogListener {
+public class MainActivity extends FragmentActivity implements PointsDialogFragment.PointsDialogListener,
+        PlayerChooserView.PlayerChooserViewActionListener {
 
     public static final String TAG = "MAINACTIVITY";
     public static final int REQUEST_IMAGE_CAPTURE = 9876;
@@ -42,7 +43,6 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
 
     private final QueueModel mQueueModel = new QueueModel();
     private PlayerContainerView mPlayerContainerView;
-    private RelativeLayout mRoot;
     private Button mFirstButton;
     private Button mSecondButton;
     private Button mThirdButton;
@@ -66,12 +66,12 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mRoot = (RelativeLayout) findViewById(R.id.root);
+        final RelativeLayout rootView = (RelativeLayout) findViewById(R.id.root);
 
         mPlayerContainerView = (PlayerContainerView) findViewById(R.id.button_container);
         mPlayerChooserAdapter = new PlayerChooserAdapter(this);
         mPlayerContainerView.setAdapter(mPlayerChooserAdapter);
-        mPlayerContainerView.onCreate(this, mRoot);
+        mPlayerContainerView.setPlayerChooserViewActionListener(this);
 
         mFirstButton = (Button) findViewById(R.id.first_btn);
         mFirstButton.setText(R.string.activity_main_button_play);
@@ -126,7 +126,7 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
         mAdView.setAdListener(new AdListener() {
             @Override
             public void onAdLoaded() {
-                TransitionManager.beginDelayedTransition(mRoot);
+                TransitionManager.beginDelayedTransition(rootView);
                 mAdView.setVisibility(View.VISIBLE);
             }
         });
@@ -218,6 +218,17 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
     @Override
     public void onDialogPositiveClick(int points) {
         assignPointsAndNextTurn(points);
+    }
+
+    @Override
+    public void onPictureRequested(Intent takePictureIntent) {
+        startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+    }
+
+    @Override
+    public void onPointsRequested() {
+        PointsDialogFragment dialog = new PointsDialogFragment();
+        dialog.show(getSupportFragmentManager(), "PointsDialogFragment");
     }
 
     private class OnStartGameBtnClicked implements View.OnClickListener {
@@ -314,8 +325,7 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
                 }
                 assignPointsAndNextTurn(pointsCollected);
             } else {
-                PointsDialogFragment dialog = new PointsDialogFragment();
-                dialog.show(getSupportFragmentManager(), "PointsDialogFragment");
+                onPointsRequested();
             }
         }
     }
