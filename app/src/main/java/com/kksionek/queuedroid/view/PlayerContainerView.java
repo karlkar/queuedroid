@@ -81,7 +81,7 @@ public class PlayerContainerView extends LinearLayout {
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
-        params.setMargins(0, 0, 0, (int) getResources().getDimension(R.dimen.main_activity_players_margin));
+        params.setMargins(0, 0, 0, (int) getResources().getDimension(R.dimen.buttons_space));
         addView(view, getChildCount() - 1, params);
     }
 
