@@ -30,6 +30,9 @@ import com.kksionek.queuedroid.view.keyboard.KeyboardView;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static android.content.Intent.ACTION_SEND;
 
@@ -60,6 +63,7 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
     private AdView mAdView;
     private KeyboardView mKeyboardView;
     private PlayerChooserAdapter mPlayerChooserAdapter;
+    private AtomicInteger mBackCounter = new AtomicInteger(0);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -177,6 +181,20 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
     }
 
     @Override
+    public void onBackPressed() {
+        if (mBackCounter.incrementAndGet() < 2) {
+            Toast.makeText(getBaseContext(), R.string.activity_main_on_back_pressed, Toast.LENGTH_SHORT).show();
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    mBackCounter.set(0);
+                }
+            }, 2000);
+        } else
+            super.onBackPressed();
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE) {
             if (resultCode != RESULT_OK || !performCrop(data.getData()))
@@ -240,7 +258,7 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
 
                 mKeyboardView.setVisibility(Settings.shouldUseInAppKeyboard(MainActivity.this) ?
                         View.VISIBLE : View.GONE);
-                mKeyboardView.setKeepScreenOn(Settings.isKeepOnScreen(MainActivity.this));
+                mPlayerContainerView.setKeepScreenOn(Settings.isKeepOnScreen(MainActivity.this));
 
                 mFirstButton.setText(R.string.activity_main_button_next_turn);
                 mFirstButton.setOnClickListener(mOnNextTurnBtnClicked);

@@ -37,4 +37,6 @@
     <string name="activity_settings_pref_use_keyboard_summary_off">Le clavier intégré à l\'application ne sera pas utilisé</string>
     <string name="activity_settings_pref_use_keyboard_summary_on">Le clavier intégré à l\'application sera utilisé</string>
     <string name="view_keyboard_too_long_input_message">Numéro non autorisé.</string>
+    <string name="activity_main_on_back_pressed">Appuyez une nouvelle fois pour quitter.</string>
+    <string name="view_keyboard_input_points_toast">Entrer les points d\'abord</string>
 </resources>

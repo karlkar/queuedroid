@@ -37,4 +37,6 @@
     <string name="activity_settings_pref_use_keyboard_summary_off">Klawiatura systemowa będzie użyta</string>
     <string name="activity_settings_pref_use_keyboard_summary_on">Klawiatura systemowa nie będzie użyta</string>
     <string name="view_keyboard_too_long_input_message">Niepoprawny numer.</string>
+    <string name="view_keyboard_input_points_toast">Wprowadź punkty</string>
+    <string name="activity_main_on_back_pressed">Wciśnij wstecz jeszcze raz, aby wyjść.</string>
 </resources>
