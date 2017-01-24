@@ -9,6 +9,7 @@ import android.support.transition.TransitionManager;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -70,7 +71,7 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final RelativeLayout rootView = (RelativeLayout) findViewById(R.id.root);
+        final ViewGroup rootView = (ViewGroup) findViewById(R.id.root);
 
         mPlayerContainerView = (PlayerContainerView) findViewById(R.id.button_container);
         mPlayerChooserAdapter = new PlayerChooserAdapter(this);

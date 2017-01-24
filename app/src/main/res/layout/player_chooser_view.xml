@@ -31,7 +31,7 @@
             android:layout_marginRight="10dp"
             android:layout_marginEnd="10dp"
             android:hint="@string/view_player_chooser_name_hint"
-            android:imeOptions="actionNext"/>
+            android:imeOptions="actionNext|flagNoFullscreen"/>
 
         <TextView
             android:id="@+id/staticText"
