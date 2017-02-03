@@ -1,6 +1,5 @@
 package com.kksionek.queuedroid.view;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
@@ -29,14 +28,15 @@ public class PointsDialogFragment extends DialogFragment {
     private PointsDialogListener mListener = null;
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
         try {
-            mListener = (PointsDialogListener) activity;
+            mListener = (PointsDialogListener) context;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement PointsDialogListener");
+            throw new ClassCastException(
+                    context.getClass().getSimpleName() + " must implement PointsDialogListener");
         }
-        mInputMethodManager = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+        mInputMethodManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
     }
 
     @NonNull
@@ -45,7 +45,7 @@ public class PointsDialogFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         final EditText input = new EditText(getActivity());
         input.setInputType(InputType.TYPE_CLASS_NUMBER);
-        input.setLines(1);
+        input.setMaxLines(1);
         input.setImeOptions(EditorInfo.IME_ACTION_DONE);
         builder.setView(input);
         builder.setMessage(R.string.view_keyboard_points_collected)
