@@ -7,7 +7,7 @@ import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.transition.TransitionManager;
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -37,8 +37,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static android.content.Intent.ACTION_SEND;
 
-public class MainActivity extends FragmentActivity implements PointsDialogFragment.PointsDialogListener,
-        PlayerChooserView.PlayerChooserViewActionListener {
+public class MainActivity extends AppCompatActivity implements PointsDialogFragment.PointsDialogListener {
 
     private static final String TAG = "MainActivity";
     public static final int REQUEST_IMAGE_CAPTURE = 9876;
@@ -249,15 +248,14 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
         assignPointsAndNextTurn(points);
     }
 
-    @Override
-    public void onPictureRequested(Intent takePictureIntent) {
-        startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-    }
+//    @Override
+//    public void onPictureRequested(Intent takePictureIntent) {
+//        startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+//    }
 
-    @Override
-    public void onPointsRequested() {
+    public void requestPoints() {
         PointsDialogFragment dialog = new PointsDialogFragment();
-        dialog.show(getSupportFragmentManager(), "PointsDialogFragment");
+        dialog.show(getFragmentManager(), "PointsDialogFragment");
     }
 
     private class OnStartGameBtnClicked implements View.OnClickListener {
@@ -350,7 +348,7 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
                 }
                 assignPointsAndNextTurn(pointsCollected);
             } else {
-                onPointsRequested();
+                requestPoints();
             }
         }
     }

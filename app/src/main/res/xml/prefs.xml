@@ -5,7 +5,7 @@
     <PreferenceCategory
         android:title="@string/activity_settings_pref_category_general">
 
-        <SwitchPreferenceCompat
+        <SwitchPreference
             android:key="PREF_KEEP_SCREEN_ON"
             android:title="@string/activity_settings_pref_keep_screen_on"
             android:summaryOn="@string/activity_settings_pref_keep_screen_on_summary_on"
@@ -16,15 +16,15 @@
     <PreferenceCategory
         android:title="@string/activity_settings_pref_category_accounts">
 
-        <SwitchPreferenceCompat
-            app:key="PREF_USE_FACEBOOK"
+        <SwitchPreference
+            android:key="PREF_USE_FACEBOOK"
             android:title="@string/activity_settings_pref_use_facebook"
             android:summaryOn="@string/activity_settings_pref_use_facebook_summary_on"
             android:summaryOff="@string/activity_settings_pref_use_facebook_summary_off"
             android:defaultValue="false"/>
 
-        <SwitchPreferenceCompat
-            app:key="PREF_USE_CONTACTS"
+        <SwitchPreference
+            android:key="PREF_USE_CONTACTS"
             android:title="@string/activity_settings_pref_use_contacts"
             android:summaryOn="@string/activity_settings_pref_use_contacts_summary_on"
             android:summaryOff="@string/activity_settings_pref_use_contacts_summary_off"
@@ -35,7 +35,7 @@
     <PreferenceCategory
         android:title="@string/activity_settings_pref_category_keyboard">
 
-        <SwitchPreferenceCompat
+        <SwitchPreference
             android:key="PREF_USE_BUILT_IN_KEYBOARD"
             android:title="@string/activity_settings_pref_use_keyboard"
             android:summaryOn="@string/activity_settings_pref_use_keyboard_summary_on"

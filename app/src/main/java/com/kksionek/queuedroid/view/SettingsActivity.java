@@ -1,16 +1,21 @@
 package com.kksionek.queuedroid.view;
 
+import android.Manifest;
+import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Bundle;
+import android.preference.Preference;
+import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
+import android.preference.SwitchPreference;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.support.v7.preference.Preference;
-import android.support.v7.preference.PreferenceFragmentCompat;
-import android.support.v7.preference.PreferenceManager;
-import android.support.v7.preference.SwitchPreferenceCompat;
+import android.view.View;
+import android.widget.ListView;
 
 import com.kksionek.queuedroid.R;
 import com.kksionek.queuedroid.model.FbController;
@@ -27,8 +32,14 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mSettingsFragment = new SettingsFragment();
-        getSupportFragmentManager().beginTransaction().replace(android.R.id.content, mSettingsFragment).commit();
+        if (savedInstanceState == null) {
+            mSettingsFragment = new SettingsFragment();
+            getFragmentManager()
+                    .beginTransaction()
+                    .replace(android.R.id.content, mSettingsFragment, "SETTINGS")
+                    .commit();
+        } else
+            mSettingsFragment = (SettingsFragment) getFragmentManager().findFragmentByTag("SETTINGS");
     }
 
     @Override
@@ -44,15 +55,24 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
-    public static class SettingsFragment extends PreferenceFragmentCompat {
+    public static class SettingsFragment extends PreferenceFragment {
 
         private SharedPreferences mSharedPreferences;
 
         @Override
-        public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.prefs);
+            mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        }
 
-            mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        @Override
+        public void onActivityCreated(Bundle savedInstanceState) {
+            super.onActivityCreated(savedInstanceState);
+
+            View rootView = getView();
+            ListView list = (ListView) rootView.findViewById(android.R.id.list);
+            list.setDivider(null);
 
             Preference prefKeyboardColumns = findPreference(PREF_KEYBOARD_COLUMNS);
             prefKeyboardColumns
@@ -60,7 +80,7 @@ public class SettingsActivity extends AppCompatActivity {
             prefKeyboardColumns.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    preference.setSummary((String)newValue);
+                    preference.setSummary((String) newValue);
                     return true;
                 }
             });
@@ -77,39 +97,45 @@ public class SettingsActivity extends AppCompatActivity {
                                 FbController.getInstance().logIn(
                                         getActivity(),
                                         new FbController.FacebookLoginListener() {
-                                    @Override
-                                    public void onLogged() {
-                                    }
+                                            @Override
+                                            public void onLogged() {
+                                            }
 
-                                    @Override
-                                    public void onCancel() {
-                                        ((SwitchPreferenceCompat)findPreference(PREF_USE_FACEBOOK))
-                                                .setChecked(false);
-                                    }
+                                            @Override
+                                            public void onCancel() {
+                                                ((SwitchPreference) findPreference(PREF_USE_FACEBOOK))
+                                                        .setChecked(false);
+                                            }
 
-                                    @Override
-                                    public void onError() {
-                                        ((SwitchPreferenceCompat)findPreference(PREF_USE_FACEBOOK))
-                                                .setChecked(false);
-                                    }
-                                });
+                                            @Override
+                                            public void onError() {
+                                                ((SwitchPreference) findPreference(PREF_USE_FACEBOOK))
+                                                        .setChecked(false);
+                                            }
+                                        });
                             }
                             return true;
                         }
                     });
 
-            findPreference(PREF_USE_CONTACTS)
-                    .setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermission();
+            }
+        }
+
+        @TargetApi(Build.VERSION_CODES.M)
+        public void requestPermission() {
+            findPreference(PREF_USE_CONTACTS).setOnPreferenceChangeListener(
+                    new Preference.OnPreferenceChangeListener() {
                         @Override
                         public boolean onPreferenceChange(Preference preference, Object newValue) {
-                            boolean value = (boolean) newValue;
-                            if (value) {
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-                                    getActivity()
-                                            .requestPermissions(
-                                                    new String[]{
-                                                            android.Manifest.permission.READ_CONTACTS},
-                                                    PERMISSIONS_REQUEST_READ_CONTACTS);
+                            Activity ac = getActivity();
+                            if ((boolean) newValue
+                                    && ac.checkSelfPermission(
+                                    Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+                                ac.requestPermissions(
+                                        new String[]{android.Manifest.permission.READ_CONTACTS},
+                                        PERMISSIONS_REQUEST_READ_CONTACTS);
                             }
                             return true;
                         }
@@ -118,7 +144,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         public void onContactsPermissionResult(int[] grantResults) {
             if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                ((SwitchPreferenceCompat)findPreference(PREF_USE_CONTACTS)).setChecked(false);
+                ((SwitchPreference) findPreference(PREF_USE_CONTACTS)).setChecked(false);
             }
         }
     }

@@ -2,11 +2,11 @@ package com.kksionek.queuedroid.view;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.view.KeyEvent;
@@ -46,7 +46,6 @@ public class PointsDialogFragment extends DialogFragment {
         final EditText input = new EditText(getActivity());
         input.setInputType(InputType.TYPE_CLASS_NUMBER);
         input.setLines(1);
-        input.setSingleLine();
         input.setImeOptions(EditorInfo.IME_ACTION_DONE);
         builder.setView(input);
         builder.setMessage(R.string.view_keyboard_points_collected)
@@ -77,7 +76,7 @@ public class PointsDialogFragment extends DialogFragment {
 
     private void acceptInput(DialogInterface dialog, EditText input) {
         if (input.getText().toString().isEmpty()) {
-            Toast.makeText(getContext(), R.string.view_keyboard_input_points_toast, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), R.string.view_keyboard_input_points_toast, Toast.LENGTH_SHORT).show();
             return;
         }
         int points = Integer.parseInt(input.getText().toString());
