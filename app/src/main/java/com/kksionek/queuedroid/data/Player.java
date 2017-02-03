@@ -45,7 +45,7 @@ public class Player {
         mType = player.mType;
     }
 
-    public void reset() {
+    private void reset() {
         mId = "";
         mName = "";
         mImage = "";

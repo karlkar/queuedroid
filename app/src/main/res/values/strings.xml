@@ -58,4 +58,5 @@
     <string name="activity_settings_pref_keyboard_columns">Keyboard columns</string>
     <string name="view_keyboard_input_points_toast">Input points first</string>
     <string name="activity_main_on_back_pressed">Press back once more to quit.</string>
+    <string name="keyboard_current_player_points">Current player points:</string>
 </resources>

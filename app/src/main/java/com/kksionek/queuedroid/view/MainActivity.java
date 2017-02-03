@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements PointsDialogFragm
     private final View.OnClickListener mOnNextTurnBtnClicked = new OnNextTurnBtnClicked();
     private AdView mAdView;
     private KeyboardView mKeyboardView;
-    private AtomicInteger mBackCounter = new AtomicInteger(0);
+    private final AtomicInteger mBackCounter = new AtomicInteger(0);
     private RecyclerView mRecyclerView;
     private List<Player> mAllPlayers;
     private PlayerChooserViewAdapter mPlayerChooserViewAdapter;
@@ -361,7 +361,7 @@ public class MainActivity extends AppCompatActivity implements PointsDialogFragm
                 mQueueModel.getCurrentPlayerIndex());
     }
 
-    public Bitmap getRankBitmap() {
+    private Bitmap getRankBitmap() {
         Bitmap bitmap = Bitmap.createBitmap(
                 mRecyclerView.getMeasuredWidth(),
                 mRecyclerView.getMeasuredHeight(),

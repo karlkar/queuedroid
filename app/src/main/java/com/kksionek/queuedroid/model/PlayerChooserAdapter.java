@@ -1,9 +1,7 @@
 package com.kksionek.queuedroid.model;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,12 +13,9 @@ import com.bumptech.glide.Glide;
 import com.kksionek.queuedroid.R;
 import com.kksionek.queuedroid.data.Player;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
-public class PlayerChooserAdapter extends ArrayAdapter<Player> {
+class PlayerChooserAdapter extends ArrayAdapter<Player> {
 
     public PlayerChooserAdapter(Context context, List<Player> playerList) {
         super(context, R.layout.row_autocomplete, playerList);

@@ -13,7 +13,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Current player points: "/>
+            android:text="@string/keyboard_current_player_points"/>
 
         <TextView
             android:id="@+id/cur_points"

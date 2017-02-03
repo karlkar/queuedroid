@@ -4,7 +4,6 @@ import android.content.Context;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -22,8 +21,6 @@ public class KeyboardView extends LinearLayout {
     private static final int MAX_LENGTH = 10;
 
     private final TextView mCurPointsTextView;
-    private final Button mClearButton;
-    private final Button mBackspaceButton;
     private final RecyclerView mButtonRecylerView;
     private int mColsNum;
 
@@ -32,15 +29,15 @@ public class KeyboardView extends LinearLayout {
         LayoutInflater.from(getContext()).inflate(R.layout.keyboard, this);
 
         mCurPointsTextView = (TextView) findViewById(R.id.cur_points);
-        mClearButton = (Button) findViewById(R.id.clear_button);
-        mClearButton.setOnClickListener(new View.OnClickListener() {
+        Button clearButton = (Button) findViewById(R.id.clear_button);
+        clearButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 clearPoints();
             }
         });
-        mBackspaceButton = (Button) findViewById(R.id.backspace_button);
-        mBackspaceButton.setOnClickListener(new View.OnClickListener() {
+        Button backspaceButton = (Button) findViewById(R.id.backspace_button);
+        backspaceButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 CharSequence text = mCurPointsTextView.getText();

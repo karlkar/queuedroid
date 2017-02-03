@@ -11,10 +11,5 @@ public class QueueApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-
-        if (Settings.isFacebookEnabled(getBaseContext())) {
-            FacebookSdk.sdkInitialize(getApplicationContext());
-            AppEventsLogger.activateApp(this);
-        }
     }
 }

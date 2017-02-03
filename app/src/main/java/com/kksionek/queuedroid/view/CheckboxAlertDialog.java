@@ -13,7 +13,7 @@ import com.kksionek.queuedroid.model.Settings;
 
 import static com.kksionek.queuedroid.model.Settings.PREF_SHOW_NO_POINTS_CONFIRMATION_DIALOG;
 
-public class CheckboxAlertDialog {
+class CheckboxAlertDialog {
 
     public interface OnDialogClosedListener {
         void onDialogClosed(boolean result);

@@ -91,9 +91,7 @@ public class SettingsActivity extends AppCompatActivity {
                         public boolean onPreferenceChange(Preference preference, Object newValue) {
                             boolean value = (boolean) newValue;
 
-                            if (value && !FbController.isInitilized())
-                                FbController.initialize(getActivity().getApplication());
-                            if (value && !FbController.isLogged()) {
+                            if (value && FbController.isInitilized() && !FbController.isLogged()) {
                                 FbController.getInstance().logIn(
                                         getActivity(),
                                         new FbController.FacebookLoginListener() {

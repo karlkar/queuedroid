@@ -11,6 +11,8 @@ import com.kksionek.queuedroid.R;
 import com.kksionek.queuedroid.view.keyboard.ButtonViewHolder;
 import com.kksionek.queuedroid.view.keyboard.OnKeyboardItemClickListener;
 
+import static android.support.v7.widget.RecyclerView.NO_POSITION;
+
 public class KeyboardViewAdapter extends RecyclerView.Adapter<ButtonViewHolder> {
 
     private final Context mCtx;
@@ -29,13 +31,15 @@ public class KeyboardViewAdapter extends RecyclerView.Adapter<ButtonViewHolder> 
     }
 
     @Override
-    public void onBindViewHolder(ButtonViewHolder holder, final int position) {
+    public void onBindViewHolder(final ButtonViewHolder holder, int position) {
         holder.button.setText(String.valueOf(position));
         holder.button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mOnKeyboardItemClickListener != null)
-                    mOnKeyboardItemClickListener.onClick(position);
+                int pos = holder.getAdapterPosition();
+                if (pos == NO_POSITION || mOnKeyboardItemClickListener == null)
+                    return;
+                mOnKeyboardItemClickListener.onClick(pos);
             }
         });
     }

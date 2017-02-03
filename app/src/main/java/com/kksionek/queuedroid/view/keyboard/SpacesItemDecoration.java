@@ -6,8 +6,8 @@ import android.support.annotation.DimenRes;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-public class SpacesItemDecoration extends RecyclerView.ItemDecoration {
-    private int space;
+class SpacesItemDecoration extends RecyclerView.ItemDecoration {
+    private final int space;
 
     public SpacesItemDecoration(Context ctx, @DimenRes int space) {
         this.space = ctx.getResources().getDimensionPixelSize(space);

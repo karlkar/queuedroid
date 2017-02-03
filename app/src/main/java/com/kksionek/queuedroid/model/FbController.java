@@ -47,7 +47,7 @@ public class FbController {
         void onError();
     }
 
-    private static FbController sInstance = new FbController();
+    private static final FbController sInstance = new FbController();
 
     public static FbController getInstance() {
         return sInstance;
@@ -58,13 +58,6 @@ public class FbController {
 
     public static boolean isInitilized() {
         return FacebookSdk.isInitialized();
-    }
-
-    public static void initialize(Application application) {
-        if (!FacebookSdk.isInitialized()) {
-            FacebookSdk.sdkInitialize(application.getApplicationContext());
-            AppEventsLogger.activateApp(application);
-        }
     }
 
     public static boolean isLogged() {
@@ -102,7 +95,7 @@ public class FbController {
             mCallbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
-    public void getMyProfile(@Nullable final List<Player> targetList) {
+    private void getMyProfile(@Nullable final List<Player> targetList) {
         GraphRequest req = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
             @Override
             public void onCompleted(JSONObject object, GraphResponse response) {

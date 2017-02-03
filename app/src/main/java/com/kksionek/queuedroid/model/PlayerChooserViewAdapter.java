@@ -35,10 +35,10 @@ public class PlayerChooserViewAdapter extends RecyclerView.Adapter<PlayerChooser
     private static final int FONT_SMALL_SIZE = 15;
     private static final int FONT_LARGE_SIZE = 30;
 
-    private static ValueAnimator sIncreaseAnimator = ValueAnimator.ofFloat(
+    private static final ValueAnimator sIncreaseAnimator = ValueAnimator.ofFloat(
             FONT_SMALL_SIZE,
             FONT_LARGE_SIZE);
-    private static ValueAnimator sDecreaseAnimator = ValueAnimator.ofFloat(
+    private static final ValueAnimator sDecreaseAnimator = ValueAnimator.ofFloat(
             FONT_LARGE_SIZE,
             FONT_SMALL_SIZE);
     static {
@@ -151,10 +151,10 @@ public class PlayerChooserViewAdapter extends RecyclerView.Adapter<PlayerChooser
     }
 
     class PlayerChooserViewHolder extends RecyclerView.ViewHolder {
-        private ImageView mThumbnail;
-        private AutoCompleteTextView mAutoCompleteTextView;
-        private TextView mTextView;
-        private Button mPointsBtn;
+        private final ImageView mThumbnail;
+        private final AutoCompleteTextView mAutoCompleteTextView;
+        private final TextView mTextView;
+        private final Button mPointsBtn;
         private boolean mCurrent;
 
         PlayerChooserViewHolder(View viewItem) {

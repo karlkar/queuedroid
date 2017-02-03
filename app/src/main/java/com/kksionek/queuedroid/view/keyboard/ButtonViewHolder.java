@@ -6,7 +6,7 @@ import android.widget.Button;
 
 public class ButtonViewHolder extends RecyclerView.ViewHolder {
 
-    public Button button;
+    public final Button button;
 
     public ButtonViewHolder(View itemView) {
         super(itemView);

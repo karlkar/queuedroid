@@ -1,10 +1,7 @@
 package com.kksionek.queuedroid.model;
 
-import android.app.Activity;
 import android.content.Context;
 import android.preference.PreferenceManager;
-
-import com.kksionek.queuedroid.view.MainActivity;
 
 public class Settings {
     public static final String PREF_SHOW_NO_POINTS_CONFIRMATION_DIALOG =
