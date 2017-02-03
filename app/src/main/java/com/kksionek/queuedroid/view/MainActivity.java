@@ -3,15 +3,16 @@ package com.kksionek.queuedroid.view;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.transition.TransitionManager;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.AdListener;
@@ -19,13 +20,12 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import com.kksionek.queuedroid.data.Player;
+import com.kksionek.queuedroid.model.ContactsController;
 import com.kksionek.queuedroid.model.FbController;
-import com.kksionek.queuedroid.model.PlayerChooserAdapter;
+import com.kksionek.queuedroid.model.PlayerChooserViewAdapter;
 import com.kksionek.queuedroid.model.QueueModel;
 import com.kksionek.queuedroid.R;
 import com.kksionek.queuedroid.model.Settings;
-import com.kksionek.queuedroid.model.TooFewPlayersException;
-import com.kksionek.queuedroid.model.WrongPlayerException;
 import com.kksionek.queuedroid.view.keyboard.KeyboardView;
 
 import java.io.File;
@@ -40,16 +40,15 @@ import static android.content.Intent.ACTION_SEND;
 public class MainActivity extends FragmentActivity implements PointsDialogFragment.PointsDialogListener,
         PlayerChooserView.PlayerChooserViewActionListener {
 
-    public static final String TAG = "MAINACTIVITY";
+    private static final String TAG = "MainActivity";
     public static final int REQUEST_IMAGE_CAPTURE = 9876;
     public static final int REQUEST_IMAGE_CROP = 9877;
     public static final int PERMISSIONS_REQUEST_READ_CONTACTS = 2233;
 
     private final QueueModel mQueueModel = new QueueModel();
-    private PlayerContainerView mPlayerContainerView;
-    private Button mFirstButton;
-    private Button mSecondButton;
-    private Button mThirdButton;
+    private Button mFirstBtn;
+    private Button mSecondBtn;
+    private Button mThirdBtn;
 
     private final View.OnClickListener mOnStartGameBtnClicked = new OnStartGameBtnClicked();
     private final View.OnClickListener mOnSettingsBtnClicked = new View.OnClickListener() {
@@ -63,8 +62,11 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
     private final View.OnClickListener mOnNextTurnBtnClicked = new OnNextTurnBtnClicked();
     private AdView mAdView;
     private KeyboardView mKeyboardView;
-    private PlayerChooserAdapter mPlayerChooserAdapter;
     private AtomicInteger mBackCounter = new AtomicInteger(0);
+    private RecyclerView mRecyclerView;
+    private List<Player> mAllPlayers;
+    private PlayerChooserViewAdapter mPlayerChooserViewAdapter;
+    private Button mAddPlayerBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,22 +75,33 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
 
         final ViewGroup rootView = (ViewGroup) findViewById(R.id.root);
 
-        mPlayerContainerView = (PlayerContainerView) findViewById(R.id.button_container);
-        mPlayerChooserAdapter = new PlayerChooserAdapter(this);
-        mPlayerContainerView.setAdapter(mPlayerChooserAdapter);
-        mPlayerContainerView.setPlayerChooserViewActionListener(this);
+        mRecyclerView = (RecyclerView) findViewById(R.id.activity_main_recyclerview);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(
+                getBaseContext(),
+                LinearLayoutManager.VERTICAL,
+                false));
+        mPlayerChooserViewAdapter = new PlayerChooserViewAdapter(mQueueModel);
+        mRecyclerView.setAdapter(mPlayerChooserViewAdapter);
 
-        mFirstButton = (Button) findViewById(R.id.first_btn);
-        mFirstButton.setText(R.string.activity_main_button_play);
-        mFirstButton.setOnClickListener(mOnStartGameBtnClicked);
+        mAddPlayerBtn = (Button) findViewById(R.id.activity_main_button_add_player);
+        mAddPlayerBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPlayerChooserViewAdapter.add(new Player("", "", "", Player.Type.CUSTOM));
+            }
+        });
 
-        mSecondButton = (Button) findViewById(R.id.second_btn);
-        mSecondButton.setText(R.string.activity_main_button_settings);
-        mSecondButton.setOnClickListener(mOnSettingsBtnClicked);
+        mFirstBtn = (Button) findViewById(R.id.first_btn);
+        mFirstBtn.setText(R.string.activity_main_button_play);
+        mFirstBtn.setOnClickListener(mOnStartGameBtnClicked);
 
-        mThirdButton = (Button) findViewById(R.id.third_btn);
-        mThirdButton.setText(R.string.activity_main_button_share);
-        mThirdButton.setOnClickListener(new View.OnClickListener() {
+        mSecondBtn = (Button) findViewById(R.id.second_btn);
+        mSecondBtn.setText(R.string.activity_main_button_settings);
+        mSecondBtn.setOnClickListener(mOnSettingsBtnClicked);
+
+        mThirdBtn = (Button) findViewById(R.id.third_btn);
+        mThirdBtn.setText(R.string.activity_main_button_share);
+        mThirdBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (Settings.isFacebookEnabled(getBaseContext())
@@ -97,12 +110,12 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
                     FbController.shareOnFacebook(
                             MainActivity.this,
                             mQueueModel.getFbPlayers(),
-                            mPlayerContainerView.getRankBitmap());
+                            getRankBitmap());
                 } else {
                     try {
                         File file = new File(getCacheDir(), "SHARE.png");
                         FileOutputStream fOut = new FileOutputStream(file);
-                        mPlayerContainerView.getRankBitmap().compress(Bitmap.CompressFormat.PNG, 100, fOut);
+                        getRankBitmap().compress(Bitmap.CompressFormat.PNG, 100, fOut);
                         fOut.flush();
                         fOut.close();
                         file.setReadable(true, false);
@@ -136,6 +149,8 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
             }
         });
         mAdView.loadAd(adRequest);
+
+        mAllPlayers = ContactsController.loadContacts(this);
     }
 
     @Override
@@ -146,18 +161,14 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
 
         if (FbController.isInitilized()) {
             if (FbController.isLogged()) {
-                if (mPlayerChooserAdapter != null)
-                    mPlayerChooserAdapter.reloadDataset(
-                            Settings.isContactsEnabled(this),
-                            Settings.isFacebookEnabled(this));
+                FbController.getInstance().getFriendData(mAllPlayers);
+                mPlayerChooserViewAdapter.setAutocompleteItems(mAllPlayers);
             } else {
                 FbController.getInstance().logIn(this, new FbController.FacebookLoginListener() {
                     @Override
                     public void onLogged() {
-                        if (mPlayerChooserAdapter != null)
-                            mPlayerChooserAdapter.reloadDataset(
-                                    Settings.isContactsEnabled(MainActivity.this),
-                                    Settings.isFacebookEnabled(MainActivity.this));
+                        FbController.getInstance().getFriendData(mAllPlayers);
+                        mPlayerChooserViewAdapter.setAutocompleteItems(mAllPlayers);
                     }
 
                     @Override
@@ -218,20 +229,19 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
             cropIntent.putExtra("aspectY", 1);
             cropIntent.putExtra("return-data", true);
             startActivityForResult(cropIntent, REQUEST_IMAGE_CROP);
-        }
-        catch (ActivityNotFoundException ex) {
+        } catch (ActivityNotFoundException ex) {
             return false;
         }
         return true;
     }
 
     private void setImageData(Intent data) {
-        for (int i = 0; i < mPlayerContainerView.getChildCount() - 1; ++i) {
-            PlayerChooserView playerChooserView = (PlayerChooserView) mPlayerContainerView
-                    .getChildAt(i);
-            if (playerChooserView.onPhotoCreated(data))
-                return;
-        }
+//        for (int i = 0; i < mPlayerContainerView.getChildCount() - 1; ++i) {
+//            PlayerChooserView playerChooserView = (PlayerChooserView) mPlayerContainerView
+//                    .getChildAt(i);
+//            if (playerChooserView.onPhotoCreated(data))
+//                return;
+//        }
     }
 
     @Override
@@ -253,27 +263,22 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
     private class OnStartGameBtnClicked implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            try {
-                List<Player> players = mPlayerContainerView.onGameStarted();
-                mQueueModel.newGame(players);
+            List<Player> currentPlayers = mPlayerChooserViewAdapter.getCurrentPlayers();
+            if (currentPlayers.size() >= 2) {
+                mAddPlayerBtn.setVisibility(View.GONE);
+                mPlayerChooserViewAdapter.startGame();
+                mQueueModel.newGame(currentPlayers);
 
                 mKeyboardView.setVisibility(Settings.shouldUseInAppKeyboard(MainActivity.this) ?
                         View.VISIBLE : View.GONE);
-                mPlayerContainerView.setKeepScreenOn(Settings.isKeepOnScreen(MainActivity.this));
+                mRecyclerView.setKeepScreenOn(Settings.isKeepOnScreen(MainActivity.this));
 
-                mFirstButton.setText(R.string.activity_main_button_next_turn);
-                mFirstButton.setOnClickListener(mOnNextTurnBtnClicked);
+                mFirstBtn.setText(R.string.activity_main_button_next_turn);
+                mFirstBtn.setOnClickListener(mOnNextTurnBtnClicked);
 
-                mSecondButton.setText(R.string.activity_main_button_end_game);
-                mSecondButton.setOnClickListener(mOnEndGameBtnClicked);
-            } catch (TooFewPlayersException ex) {
-                Log.d(TAG, "onClick: Game cannot be started - too few players entered.");
-                Toast.makeText(MainActivity.this,
-                        R.string.activity_main_start_too_few_players_error_message,
-                        Toast.LENGTH_LONG)
-                        .show();
-            } catch (WrongPlayerException ex) {
-                Log.d(TAG, "onClick: Game cannot be started - some players are inproper.");
+                mSecondBtn.setText(R.string.activity_main_button_end_game);
+                mSecondBtn.setOnClickListener(mOnEndGameBtnClicked);
+            } else {
                 Toast.makeText(MainActivity.this,
                         R.string.activity_main_start_wrong_player_on_list_error_message,
                         Toast.LENGTH_LONG)
@@ -285,41 +290,42 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
     private class OnEndGameBtnClicked implements View.OnClickListener {
         @Override
         public void onClick(View view) {
-            mPlayerContainerView.onGameEnded(mQueueModel);
+            mPlayerChooserViewAdapter.sortPlayers(mQueueModel);
 
             mKeyboardView.setVisibility(View.GONE);
 
-            mFirstButton.setText(R.string.activity_main_button_new_game);
-            mFirstButton.setOnClickListener(new View.OnClickListener() {
+            mFirstBtn.setText(R.string.activity_main_button_new_game);
+            mFirstBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     restartGame(true);
                 }
             });
 
-            mSecondButton.setText(R.string.activity_main_button_play_again);
-            mSecondButton.setOnClickListener(new View.OnClickListener() {
+            mSecondBtn.setText(R.string.activity_main_button_play_again);
+            mSecondBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     restartGame(false);
                 }
             });
 
-            mThirdButton.setText(R.string.activity_main_button_share);
-            mThirdButton.setVisibility(View.VISIBLE);
+            mThirdBtn.setText(R.string.activity_main_button_share);
+            mThirdBtn.setVisibility(View.VISIBLE);
         }
     }
 
     private void restartGame(boolean hardReset) {
-        mPlayerContainerView.onGameRestarted(hardReset);
+        mPlayerChooserViewAdapter.reset(hardReset);
+        mAddPlayerBtn.setVisibility(View.VISIBLE);
 
-        mFirstButton.setText(R.string.activity_main_button_play);
-        mFirstButton.setOnClickListener(mOnStartGameBtnClicked);
+        mFirstBtn.setText(R.string.activity_main_button_play);
+        mFirstBtn.setOnClickListener(mOnStartGameBtnClicked);
 
-        mSecondButton.setText(R.string.activity_main_button_settings);
-        mSecondButton.setOnClickListener(mOnSettingsBtnClicked);
+        mSecondBtn.setText(R.string.activity_main_button_settings);
+        mSecondBtn.setOnClickListener(mOnSettingsBtnClicked);
 
-        mThirdButton.setVisibility(View.GONE);
+        mThirdBtn.setVisibility(View.GONE);
     }
 
     private class OnNextTurnBtnClicked implements View.OnClickListener {
@@ -352,8 +358,20 @@ public class MainActivity extends FragmentActivity implements PointsDialogFragme
     private void assignPointsAndNextTurn(int points) {
         mQueueModel.nextTurn(points);
         mKeyboardView.clearPoints();
-        mPlayerContainerView.nextTurn(
-                mQueueModel.getPointsOfPreviousPlayer(),
+        mPlayerChooserViewAdapter.updatePoints(
+                mQueueModel.getPreviousPlayerIndex(),
                 mQueueModel.getCurrentPlayerIndex());
     }
+
+    public Bitmap getRankBitmap() {
+        Bitmap bitmap = Bitmap.createBitmap(
+                mRecyclerView.getMeasuredWidth(),
+                mRecyclerView.getMeasuredHeight(),
+                Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        mRecyclerView.draw(canvas);
+        return bitmap;
+    }
+
+
 }

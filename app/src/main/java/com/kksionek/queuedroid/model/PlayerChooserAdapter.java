@@ -2,6 +2,7 @@ package com.kksionek.queuedroid.model;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,52 +18,17 @@ import com.kksionek.queuedroid.data.Player;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 public class PlayerChooserAdapter extends ArrayAdapter<Player> {
 
-    private ContactsController mContactsController = null;
-
-    private boolean mContactsLoaded = false;
-    private boolean mFacebookLoaded = false;
-
-    private ArrayList<Player> mList = new ArrayList<>();
-
-    public PlayerChooserAdapter(Context context) {
-        super(context, R.layout.row_autocomplete);
+    public PlayerChooserAdapter(Context context, List<Player> playerList) {
+        super(context, R.layout.row_autocomplete, playerList);
     }
 
+    @NonNull
     @Override
-    public void add(Player object) {
-        if (!mList.contains(object)) {
-            mList.add(object);
-            super.add(object);
-        } else {
-            if (object.isFromFacebook()) {
-                mList.remove(object);
-                super.remove(object);
-                mList.add(object);
-                super.add(object);
-            } else
-                return;
-        }
-
-        sort(new Comparator<Player>() {
-            @Override
-            public int compare(Player lhs, Player rhs) {
-                return lhs.getName().compareTo(rhs.getName());
-            }
-        });
-        notifyDataSetChanged();
-    }
-
-    @Override
-    public void clear() {
-        mList.clear();
-        super.clear();
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         PlayerViewHolder holder;
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext())
@@ -86,33 +52,6 @@ public class PlayerChooserAdapter extends ArrayAdapter<Player> {
         holder.imageThumb.setVisibility(player.isFromFacebook() ? View.VISIBLE : View.GONE);
 
         return convertView;
-    }
-
-    private void loadPlayersFromContacts() {
-        if (mContactsController == null)
-            mContactsController = new ContactsController();
-        mContactsController.loadContacts(getContext(), this);
-    }
-
-    private void loadPlayersFromFacebook() {
-        if (FbController.isLogged())
-            FbController.getInstance().getFriendData(this);
-    }
-
-    public void reloadDataset(boolean contactsEnabled, boolean facebookEnabled) {
-        if (mContactsLoaded == contactsEnabled && mFacebookLoaded == facebookEnabled)
-            return;
-
-        clear();
-        if (contactsEnabled) {
-            loadPlayersFromContacts();
-        }
-        if (facebookEnabled) {
-            loadPlayersFromFacebook();
-        }
-
-        mFacebookLoaded = facebookEnabled;
-        mContactsLoaded = contactsEnabled;
     }
 
     static class PlayerViewHolder {

@@ -15,6 +15,10 @@ public class QueueModel {
         return mPlayers.size();
     }
 
+    public int getPreviousPlayerIndex() {
+        return mPreviousPlayerIndex;
+    }
+
     public int getCurrentPlayerIndex() {
         return mCurrentPlayerIndex;
     }

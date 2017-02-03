@@ -5,13 +5,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.TransitionDrawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -23,13 +25,14 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.kksionek.queuedroid.R;
 import com.kksionek.queuedroid.data.Player;
 import com.kksionek.queuedroid.model.PlayerChooserAdapter;
-import com.kksionek.queuedroid.R;
 import com.kksionek.queuedroid.model.Settings;
 
 public class PlayerChooserView extends LinearLayout {
-
+    private static final String TAG = "PlayerChooserView";
+    
     public interface PlayerChooserViewActionListener {
         void onPictureRequested(Intent takePictureIntent);
         void onPointsRequested();
@@ -38,8 +41,6 @@ public class PlayerChooserView extends LinearLayout {
     public interface OnRemoveListener {
         void onRemoveClicked();
     }
-
-    private Context mCtx;
 
     private PlayerChooserViewActionListener mPlayerChooserViewActionListener;
 
@@ -59,12 +60,10 @@ public class PlayerChooserView extends LinearLayout {
 
     public PlayerChooserView(Context context) {
         super(context, null);
-        mCtx = context;
 
         setOrientation(LinearLayout.HORIZONTAL);
         setGravity(Gravity.CENTER_VERTICAL);
-
-        LayoutInflater.from(mCtx).inflate(R.layout.player_chooser_view, this, true);
+        inflate(context, R.layout.player_chooser_view, this);
 
         mPlayerThumbnail = (ImageView) findViewById(R.id.thumbnail);
         initThumbnail();
@@ -102,7 +101,7 @@ public class PlayerChooserView extends LinearLayout {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 mPlayer = (Player) parent.getItemAtPosition(position);
-                Glide.with(mCtx)
+                Glide.with(getContext())
                         .load(mPlayer.getImage())
                         .placeholder(R.drawable.ic_contact_picture)
                         .into(mPlayerThumbnail);

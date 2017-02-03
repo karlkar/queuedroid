@@ -31,6 +31,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class FbController {
 
@@ -101,14 +102,14 @@ public class FbController {
             mCallbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
-    public void getMyProfile(@Nullable final PlayerChooserAdapter adapter) {
+    public void getMyProfile(@Nullable final List<Player> targetList) {
         GraphRequest req = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
             @Override
             public void onCompleted(JSONObject object, GraphResponse response) {
                 Log.d(TAG, "onCompleted: " + object.toString());
                 mMyProfile = Player.createFacebookFriend(object, true);
-                if (adapter != null)
-                    adapter.add(mMyProfile);
+                if (targetList != null)
+                    targetList.add(mMyProfile);
             }
         });
         Bundle parameters = new Bundle();
@@ -117,11 +118,11 @@ public class FbController {
         req.executeAsync();
     }
 
-    public void getFriendData(@NonNull final PlayerChooserAdapter adapter) {
-        requestFriends(adapter, null);
+    public void getFriendData(@NonNull List<Player> targetList) {
+        requestFriends(targetList, null);
     }
 
-    private void requestFriends(@NonNull final PlayerChooserAdapter adapter, @Nullable String nextToken) {
+    private void requestFriends(@NonNull final List<Player> targetList, @Nullable String nextToken) {
         GraphRequest req = new GraphRequest(AccessToken.getCurrentAccessToken(), "/me/taggable_friends", null, HttpMethod.GET, new GraphRequest.Callback() {
             @Override
             public void onCompleted(GraphResponse response) {
@@ -133,16 +134,16 @@ public class FbController {
                         JSONArray friendArray = response.getJSONObject().getJSONArray("data");
                         for (int i = 0; i < friendArray.length(); ++i) {
                             Log.d(TAG, "onCompleted: FRIEND = " + friendArray.get(i).toString());
-                            adapter.add(Player.createFacebookFriend(friendArray.getJSONObject(i)));
+                            targetList.add(Player.createFacebookFriend(friendArray.getJSONObject(i)));
                         }
                         if (!response.getJSONObject().isNull("paging")) {
                             String token = response.getJSONObject().getJSONObject("paging").getJSONObject("cursors").getString("after");
-                            requestFriends(adapter, token);
+                            requestFriends(targetList, token);
                         } else {
                             if (mMyProfile != null)
-                                adapter.add(mMyProfile);
+                                targetList.add(mMyProfile);
                             else
-                                getMyProfile(adapter);
+                                getMyProfile(targetList);
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();

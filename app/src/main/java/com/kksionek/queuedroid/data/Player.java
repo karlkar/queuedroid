@@ -15,10 +15,14 @@ public class Player {
         CUSTOM
     }
 
-    private final String mId;
-    private final String mName;
-    private final String mImage;
-    private final Type mType;
+    private String mId;
+    private String mName;
+    private String mImage;
+    private Type mType;
+
+    public Player() {
+        reset();
+    }
 
     public Player(String name) {
         mId = "";
@@ -32,6 +36,20 @@ public class Player {
         mName = name;
         mImage = image;
         mType = type;
+    }
+
+    public void set(Player player) {
+        mId = player.mId;
+        mName = player.mName;
+        mImage = player.mImage;
+        mType = player.mType;
+    }
+
+    public void reset() {
+        mId = "";
+        mName = "";
+        mImage = "";
+        mType = Type.CUSTOM;
     }
 
     @Override
