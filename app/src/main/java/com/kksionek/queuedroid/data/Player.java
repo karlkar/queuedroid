@@ -8,6 +8,10 @@ import org.json.JSONObject;
 
 public class Player {
 
+    public void setName(String name) {
+        mName = name;
+    }
+
     public enum Type {
         MY_FB_PROFILE,
         FACEBOOK,

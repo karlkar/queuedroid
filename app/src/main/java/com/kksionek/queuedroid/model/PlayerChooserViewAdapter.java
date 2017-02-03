@@ -5,6 +5,8 @@ import android.content.Context;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Build;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,6 +43,7 @@ public class PlayerChooserViewAdapter extends RecyclerView.Adapter<PlayerChooser
     private static final ValueAnimator sDecreaseAnimator = ValueAnimator.ofFloat(
             FONT_LARGE_SIZE,
             FONT_SMALL_SIZE);
+
     static {
         sIncreaseAnimator.setDuration(ANIMATION_DURATION);
         sDecreaseAnimator.setDuration(ANIMATION_DURATION);
@@ -165,16 +168,35 @@ public class PlayerChooserViewAdapter extends RecyclerView.Adapter<PlayerChooser
             mPointsBtn = (Button) viewItem.findViewById(R.id.pointsView);
             mCurrent = false;
 
+            mAutoCompleteTextView.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    int pos = getAdapterPosition();
+                    if (pos == NO_POSITION)
+                        return;
+                    mPlayers.get(pos).getPlayer().setName(s.toString());
+                }
+            });
+
             mAutoCompleteTextView.setOnKeyListener(new View.OnKeyListener() {
                 @Override
                 public boolean onKey(View v, int keyCode, KeyEvent event) {
+                    int pos = getAdapterPosition();
+                    if (pos == NO_POSITION)
+                        return false;
                     if (keyCode == KeyEvent.KEYCODE_DEL) {
-                        int pos = getAdapterPosition();
-                        if (pos == NO_POSITION)
-                            return false;
                         mPlayers.get(pos).reset();
                         mThumbnail.setImageResource(R.drawable.ic_contact_picture);
                     }
+                    mPlayers.get(pos).getPlayer().setName(mAutoCompleteTextView.getText().toString());
                     return false;
                 }
             });
@@ -206,7 +228,7 @@ public class PlayerChooserViewAdapter extends RecyclerView.Adapter<PlayerChooser
                 public void onClick(View v) {
                     if (mEditable) {
                         int pos = getAdapterPosition();
-                        if (pos > 0 && pos < mPlayers.size()) {
+                        if (pos >= 0 && pos < mPlayers.size()) {
                             mPlayers.remove(pos);
                             notifyItemRemoved(pos);
                         }

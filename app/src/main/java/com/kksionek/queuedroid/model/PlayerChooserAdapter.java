@@ -17,7 +17,7 @@ import java.util.List;
 
 class PlayerChooserAdapter extends ArrayAdapter<Player> {
 
-    public PlayerChooserAdapter(Context context, List<Player> playerList) {
+    PlayerChooserAdapter(Context context, List<Player> playerList) {
         super(context, R.layout.row_autocomplete, playerList);
     }
 
@@ -49,7 +49,7 @@ class PlayerChooserAdapter extends ArrayAdapter<Player> {
         return convertView;
     }
 
-    static class PlayerViewHolder {
+    private static class PlayerViewHolder {
         ImageView image;
         ImageView imageThumb;
         TextView text;
