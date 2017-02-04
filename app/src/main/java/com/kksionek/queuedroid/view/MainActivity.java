@@ -6,10 +6,14 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.transition.TransitionManager;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -19,29 +23,33 @@ import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
+import com.kksionek.queuedroid.R;
 import com.kksionek.queuedroid.data.Player;
+import com.kksionek.queuedroid.model.ActionListener;
 import com.kksionek.queuedroid.model.ContactsController;
 import com.kksionek.queuedroid.model.FbController;
 import com.kksionek.queuedroid.model.PlayerChooserViewAdapter;
 import com.kksionek.queuedroid.model.QueueModel;
-import com.kksionek.queuedroid.R;
 import com.kksionek.queuedroid.model.Settings;
 import com.kksionek.queuedroid.view.keyboard.KeyboardView;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static android.content.Intent.ACTION_SEND;
 
-public class MainActivity extends AppCompatActivity implements PointsDialogFragment.PointsDialogListener {
+public class MainActivity extends AppCompatActivity implements PointsDialogFragment.PointsDialogListener, ActionListener {
 
     private static final String TAG = "MainActivity";
     public static final int REQUEST_IMAGE_CAPTURE = 9876;
-    public static final int REQUEST_IMAGE_CROP = 9877;
     public static final int PERMISSIONS_REQUEST_READ_CONTACTS = 2233;
 
     private final QueueModel mQueueModel = new QueueModel();
@@ -66,6 +74,7 @@ public class MainActivity extends AppCompatActivity implements PointsDialogFragm
     private List<Player> mAllPlayers;
     private PlayerChooserViewAdapter mPlayerChooserViewAdapter;
     private Button mAddPlayerBtn;
+    private Uri mRequestedPhotoURI;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements PointsDialogFragm
                 getBaseContext(),
                 LinearLayoutManager.VERTICAL,
                 false));
-        mPlayerChooserViewAdapter = new PlayerChooserViewAdapter(mQueueModel);
+        mPlayerChooserViewAdapter = new PlayerChooserViewAdapter(this, mQueueModel);
         mRecyclerView.setAdapter(mPlayerChooserViewAdapter);
 
         mAddPlayerBtn = (Button) findViewById(R.id.activity_main_button_add_player);
@@ -158,7 +167,7 @@ public class MainActivity extends AppCompatActivity implements PointsDialogFragm
         if (mKeyboardView != null)
             mKeyboardView.setColumnCount(Settings.getKeyboardColumnsCount(this));
 
-        if (FbController.isInitilized()) {
+        if (false && FbController.isInitilized()) {
             if (FbController.isLogged()) {
                 FbController.getInstance().getFriendData(mAllPlayers);
                 mPlayerChooserViewAdapter.setAutocompleteItems(mAllPlayers);
@@ -208,39 +217,20 @@ public class MainActivity extends AppCompatActivity implements PointsDialogFragm
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE) {
-            if (resultCode != RESULT_OK || !performCrop(data.getData()))
-                setImageData(resultCode == RESULT_OK ? data : null);
-            return;
-        } else if (requestCode == REQUEST_IMAGE_CROP) {
-            setImageData(resultCode == RESULT_OK ? data : null);
+            if (resultCode == RESULT_OK) {
+                setImageData(mRequestedPhotoURI);
+            } else
+                mRequestedPhotoURI = null;
             return;
         }
         super.onActivityResult(requestCode, resultCode, data);
         FbController.getInstance().onActivityResult(requestCode, resultCode, data);
     }
 
-    private boolean performCrop(Uri data) {
-        try {
-            Intent cropIntent = new Intent("com.android.camera.action.CROP");
-            cropIntent.setDataAndType(data, "image/*");
-            cropIntent.putExtra("crop", "true");
-            cropIntent.putExtra("aspectX", 1);
-            cropIntent.putExtra("aspectY", 1);
-            cropIntent.putExtra("return-data", true);
-            startActivityForResult(cropIntent, REQUEST_IMAGE_CROP);
-        } catch (ActivityNotFoundException ex) {
-            return false;
-        }
-        return true;
-    }
-
-    private void setImageData(Intent data) {
-//        for (int i = 0; i < mPlayerContainerView.getChildCount() - 1; ++i) {
-//            PlayerChooserView playerChooserView = (PlayerChooserView) mPlayerContainerView
-//                    .getChildAt(i);
-//            if (playerChooserView.onPhotoCreated(data))
-//                return;
-//        }
+    private void setImageData(@NonNull Uri data) {
+        Log.d(TAG, "setImageData: " + data.toString());
+        mPlayerChooserViewAdapter.setRequestedPhoto(data);
+        mRequestedPhotoURI = null;
     }
 
     @Override
@@ -248,14 +238,46 @@ public class MainActivity extends AppCompatActivity implements PointsDialogFragm
         assignPointsAndNextTurn(points);
     }
 
-//    @Override
-//    public void onPictureRequested(Intent takePictureIntent) {
-//        startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-//    }
-
     public void requestPoints() {
         PointsDialogFragment dialog = new PointsDialogFragment();
         dialog.show(getFragmentManager(), "PointsDialogFragment");
+    }
+
+    @Override
+    public void requestPhoto() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        takePictureIntent.putExtra("aspectX", 1);
+        takePictureIntent.putExtra("aspectY", 1);
+        takePictureIntent.putExtra("outputX", 300);
+        takePictureIntent.putExtra("outputY", 300);
+        if (takePictureIntent.resolveActivity(this.getPackageManager()) != null) {
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (photoFile != null) {
+                mRequestedPhotoURI = FileProvider.getUriForFile(this,
+                        "com.kksionek.queuedroid",
+                        photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mRequestedPhotoURI);
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            }
+        }
+    }
+
+    private File createImageFile() throws IOException {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+        String imageFileName = "PNG_" + timeStamp + "_";
+        File storageDir = getCacheDir();
+        //TODO: Clean the cache
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".png",         /* suffix */
+                storageDir      /* directory */
+        );
+        return image;
     }
 
     private class OnStartGameBtnClicked implements View.OnClickListener {

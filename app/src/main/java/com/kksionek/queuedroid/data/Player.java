@@ -8,17 +8,6 @@ import org.json.JSONObject;
 
 public class Player {
 
-    public void setName(String name) {
-        mName = name;
-    }
-
-    public enum Type {
-        MY_FB_PROFILE,
-        FACEBOOK,
-        CONTACTS,
-        CUSTOM
-    }
-
     private String mId;
     private String mName;
     private String mImage;
@@ -34,12 +23,28 @@ public class Player {
         mImage = null;
         mType = Type.CUSTOM;
     }
-
+    
     public Player(@NonNull String id, @NonNull String name, @Nullable String image, @NonNull Type type) {
         mId = id;
         mName = name;
         mImage = image;
         mType = type;
+    }
+
+    public static Player createFacebookFriend(@NonNull JSONObject jsonFriend) {
+        return createFacebookFriend(jsonFriend, false);
+    }
+
+    public static Player createFacebookFriend(@NonNull JSONObject jsonFriend, boolean myProfile) {
+        try {
+            String id = jsonFriend.getString("id");
+            String name = jsonFriend.getString("name");
+            String image = jsonFriend.getJSONObject("picture").getJSONObject("data").getString("url");
+            return new Player(id, name, image, myProfile ? Type.MY_FB_PROFILE : Type.FACEBOOK);
+        } catch (JSONException | NullPointerException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public void set(Player player) {
@@ -69,8 +74,16 @@ public class Player {
         return mName;
     }
 
+    public void setName(String name) {
+        mName = name;
+    }
+
     public String getImage() {
         return mImage;
+    }
+
+    public void setImage(String image) {
+        mImage = image;
     }
 
     public boolean isFromFacebook() {
@@ -86,19 +99,10 @@ public class Player {
         return mName;
     }
 
-    public static Player createFacebookFriend(@NonNull JSONObject jsonFriend) {
-        return createFacebookFriend(jsonFriend, false);
-    }
-
-    public static Player createFacebookFriend(@NonNull JSONObject jsonFriend, boolean myProfile) {
-        try {
-            String id = jsonFriend.getString("id");
-            String name = jsonFriend.getString("name");
-            String image = jsonFriend.getJSONObject("picture").getJSONObject("data").getString("url");
-            return new Player(id, name, image, myProfile ? Type.MY_FB_PROFILE : Type.FACEBOOK);
-        } catch (JSONException | NullPointerException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public enum Type {
+        MY_FB_PROFILE,
+        FACEBOOK,
+        CONTACTS,
+        CUSTOM
     }
 }

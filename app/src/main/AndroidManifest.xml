@@ -8,12 +8,12 @@
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <application
+        android:name=".QueueApplication"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:name=".QueueApplication">
+        android:theme="@style/AppTheme">
 
         <!-- This meta-data tag is required to use Google Play Services. -->
         <meta-data
@@ -34,11 +34,22 @@
             </intent-filter>
         </activity>
 
-         <provider android:authorities="com.facebook.app.FacebookContentProvider1616015895382966"
-         android:name="com.facebook.FacebookContentProvider"
-         android:exported="true"/>
+        <activity android:name=".view.SettingsActivity" />
 
-        <activity android:name=".view.SettingsActivity"/>
+        <provider
+            android:name="com.facebook.FacebookContentProvider"
+            android:authorities="com.facebook.app.FacebookContentProvider1616015895382966"
+            android:exported="true" />
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.kksionek.queuedroid"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"/>
+        </provider>
     </application>
 
 </manifest>

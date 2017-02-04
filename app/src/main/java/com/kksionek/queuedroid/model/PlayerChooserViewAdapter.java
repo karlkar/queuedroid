@@ -3,6 +3,7 @@ package com.kksionek.queuedroid.model;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.drawable.TransitionDrawable;
+import android.net.Uri;
 import android.os.Build;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -53,8 +54,11 @@ public class PlayerChooserViewAdapter extends RecyclerView.Adapter<PlayerChooser
     private List<Player> mAllPossiblePlayers = new ArrayList<>();
     private final QueueModel mQueueModel;
     private boolean mEditable = true;
+    private final ActionListener mActionListener;
+    private PlayerChooserViewHolder mPhotoRequester;
 
-    public PlayerChooserViewAdapter(QueueModel queueModel) {
+    public PlayerChooserViewAdapter(ActionListener actionListener, QueueModel queueModel) {
+        mActionListener = actionListener;
         mQueueModel = queueModel;
         setHasStableIds(true);
         mPlayers.add(new PlayerItemData());
@@ -153,6 +157,17 @@ public class PlayerChooserViewAdapter extends RecyclerView.Adapter<PlayerChooser
         notifyDataSetChanged();
     }
 
+    public void setRequestedPhoto(Uri imageUri) {
+        if (mPhotoRequester != null) {
+            int pos = mPhotoRequester.getAdapterPosition();
+            if (pos != NO_POSITION) {
+                mPlayers.get(pos).getPlayer().setImage(imageUri.toString());
+                notifyItemChanged(pos);
+            }
+            mPhotoRequester = null;
+        }
+    }
+
     class PlayerChooserViewHolder extends RecyclerView.ViewHolder {
         private final ImageView mThumbnail;
         private final AutoCompleteTextView mAutoCompleteTextView;
@@ -167,6 +182,18 @@ public class PlayerChooserViewAdapter extends RecyclerView.Adapter<PlayerChooser
             mTextView = (TextView) viewItem.findViewById(R.id.staticText);
             mPointsBtn = (Button) viewItem.findViewById(R.id.pointsView);
             mCurrent = false;
+
+            mThumbnail.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mAutoCompleteTextView.getText().length() > 0) {
+                        if (mActionListener != null) {
+                            mPhotoRequester = PlayerChooserViewHolder.this;
+                            mActionListener.requestPhoto();
+                        }
+                    }
+                }
+            });
 
             mAutoCompleteTextView.addTextChangedListener(new TextWatcher() {
                 @Override
@@ -240,7 +267,7 @@ public class PlayerChooserViewAdapter extends RecyclerView.Adapter<PlayerChooser
         public void bindTo(PlayerItemData playerInList) {
             Context context = mTextView.getContext();
             bindThumbnail(playerInList, context);
-            bindAutoCompleteTextView(playerInList, context);
+            bindAutoCompleteTextView(playerInList);
             bindTextView(playerInList);
             bindPointsBtn(playerInList, context);
         }
@@ -252,7 +279,7 @@ public class PlayerChooserViewAdapter extends RecyclerView.Adapter<PlayerChooser
                     .into(mThumbnail);
         }
 
-        private void bindAutoCompleteTextView(final PlayerItemData playerInList, Context context) {
+        private void bindAutoCompleteTextView(final PlayerItemData playerInList) {
             if (mEditable) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
                     mAutoCompleteTextView.setText(playerInList.getName(), false);
@@ -290,10 +317,8 @@ public class PlayerChooserViewAdapter extends RecyclerView.Adapter<PlayerChooser
             TransitionDrawable transitionDrawable = (TransitionDrawable) mPointsBtn.getBackground();
             int duration = context.getResources().getInteger(android.R.integer.config_shortAnimTime);
             if (mEditable) {
-                if (!playerInList.isEditable()) {
-                    transitionDrawable.startTransition(duration);
-                    mPointsBtn.setText("");
-                }
+                transitionDrawable.startTransition(duration);
+                mPointsBtn.setText("");
             } else {
                 if (playerInList.isEditable()) {
                     transitionDrawable.reverseTransition(duration);
