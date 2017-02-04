@@ -8,14 +8,16 @@ public class PlayerItemData {
     private int mPoints;
     private boolean mEditable;
     private boolean mCurrent;
-    private int mInitialPosition;
+    private final int mInitialPosition;
 
     public PlayerItemData() {
         reset();
+        mInitialPosition = sInitialPositionCounter++;
     }
 
     public PlayerItemData(Player player) {
         set(player);
+        mInitialPosition = sInitialPositionCounter++;
     }
 
     public String getImage() {
@@ -31,7 +33,6 @@ public class PlayerItemData {
         mPoints = 0;
         mEditable = !player.getName().isEmpty();
         mCurrent = false;
-        mInitialPosition = sInitialPositionCounter++;
     }
 
     public void reset() {

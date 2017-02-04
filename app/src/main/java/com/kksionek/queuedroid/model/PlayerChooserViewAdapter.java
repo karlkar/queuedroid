@@ -67,7 +67,7 @@ public class PlayerChooserViewAdapter extends RecyclerView.Adapter<PlayerChooser
 
     @Override
     public long getItemId(int position) {
-        return mPlayers.get(position).getName().hashCode();
+        return mPlayers.get(position).getInitialPosition();
     }
 
     public void add(Player player) {
@@ -256,8 +256,13 @@ public class PlayerChooserViewAdapter extends RecyclerView.Adapter<PlayerChooser
                     if (mEditable) {
                         int pos = getAdapterPosition();
                         if (pos >= 0 && pos < mPlayers.size()) {
-                            mPlayers.remove(pos);
-                            notifyItemRemoved(pos);
+                            if (mPlayers.size() > 2) {
+                                mPlayers.remove(pos);
+                                notifyItemRemoved(pos);
+                            } else {
+                                mPlayers.get(pos).reset();
+                                notifyItemChanged(pos);
+                            }
                         }
                     }
                 }
