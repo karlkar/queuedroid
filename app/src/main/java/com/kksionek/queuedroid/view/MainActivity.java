@@ -13,6 +13,7 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SimpleItemAnimator;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -89,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements PointsDialogFragm
                 LinearLayoutManager.VERTICAL,
                 false));
         mPlayerChooserViewAdapter = new PlayerChooserViewAdapter(this, mQueueModel);
+        ((SimpleItemAnimator) mRecyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
         mRecyclerView.setAdapter(mPlayerChooserViewAdapter);
 
         mAddPlayerBtn = (Button) findViewById(R.id.activity_main_button_add_player);
