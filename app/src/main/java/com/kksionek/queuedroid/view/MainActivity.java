@@ -294,6 +294,7 @@ public class MainActivity extends AppCompatActivity implements PointsDialogFragm
 
                 mKeyboardView.setVisibility(Settings.shouldUseInAppKeyboard(MainActivity.this) ?
                         View.VISIBLE : View.GONE);
+                mKeyboardView.clearPoints();
                 mRecyclerView.setKeepScreenOn(Settings.isKeepOnScreen(MainActivity.this));
 
                 mFirstBtn.setText(R.string.activity_main_button_next_turn);

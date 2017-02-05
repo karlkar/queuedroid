@@ -1,63 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_height="wrap_content"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="horizontal">
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:layout_weight="1"
         android:background="@drawable/btn_big_raw"
-        android:layout_weight="1">
+        android:orientation="horizontal">
 
         <ImageView
             android:id="@+id/thumbnail"
-            android:contentDescription="@string/cd_thumbnail"
-            android:scaleType="centerCrop"
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:layout_gravity="center"
             android:layout_marginLeft="5dp"
             android:layout_marginStart="5dp"
-            android:layout_gravity="center"/>
+            android:contentDescription="@string/cd_thumbnail"
+            android:scaleType="centerCrop" />
 
         <AutoCompleteTextView
             android:id="@+id/text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textNoSuggestions|textPersonName"
-            android:layout_marginLeft="10dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginRight="10dp"
             android:layout_marginEnd="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginStart="10dp"
             android:hint="@string/view_player_chooser_name_hint"
-            android:imeOptions="actionNext|flagNoFullscreen"/>
+            android:imeOptions="actionNext|flagNoFullscreen"
+            android:inputType="textNoSuggestions|textPersonName" />
 
         <TextView
             android:id="@+id/staticText"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginLeft="10dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginRight="10dp"
             android:layout_marginEnd="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginStart="10dp"
+            android:ellipsize="end"
             android:gravity="center_vertical"
             android:maxLines="1"
-            android:ellipsize="end"
-            android:visibility="gone"/>
+            android:visibility="gone" />
     </LinearLayout>
 
     <Button
         android:id="@+id/pointsView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@drawable/btn_cancel"
+        android:gravity="center"
+        android:maxLines="1"
+        android:minWidth="48dip"
         android:paddingLeft="5dp"
         android:paddingRight="5dp"
-        android:maxLines="1"
         android:text=""
-        android:textSize="20sp"
-        android:background="@drawable/btn_cancel"
-        android:minWidth="48dip" />
+        android:textSize="20sp" />
 
 </LinearLayout>
