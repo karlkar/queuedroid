@@ -1,7 +1,6 @@
 package com.kksionek.queuedroid.model;
 
 import android.app.Activity;
-import android.app.Application;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -17,7 +16,6 @@ import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.HttpMethod;
-import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.share.model.SharePhoto;
@@ -43,7 +41,9 @@ public class FbController {
 
     public interface FacebookLoginListener {
         void onLogged();
+
         void onCancel();
+
         void onError();
     }
 

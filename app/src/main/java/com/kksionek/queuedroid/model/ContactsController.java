@@ -17,15 +17,14 @@ public class ContactsController {
 
     private ContactsController() {}
 
-    public static List<Player> loadContacts(Context context) {
+    public static void loadContacts(Context context, List<Player> list) {
         ContentResolver cr = context.getContentResolver();
         Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
 
         if (cursor == null) {
             Log.e(TAG, "loadContacts: Cannot obtain contact list");
-            return null;
+            return;
         }
-        List<Player> list = new ArrayList<>(cursor.getCount());
         if (cursor.getCount() > 0) {
             while (cursor.moveToNext()) {
                 String id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
@@ -38,6 +37,5 @@ public class ContactsController {
             }
         }
         cursor.close();
-        return list;
     }
 }

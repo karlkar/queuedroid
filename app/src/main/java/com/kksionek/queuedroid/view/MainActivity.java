@@ -38,6 +38,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -72,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements PointsDialogFragm
     private KeyboardView mKeyboardView;
     private final AtomicInteger mBackCounter = new AtomicInteger(0);
     private RecyclerView mRecyclerView;
-    private List<Player> mAllPlayers;
+    private final List<Player> mAllPlayers = new ArrayList<>();
     private PlayerChooserViewAdapter mPlayerChooserViewAdapter;
     private Button mAddPlayerBtn;
     private Uri mRequestedPhotoURI;
@@ -90,6 +91,7 @@ public class MainActivity extends AppCompatActivity implements PointsDialogFragm
                 LinearLayoutManager.VERTICAL,
                 false));
         mPlayerChooserViewAdapter = new PlayerChooserViewAdapter(this, mQueueModel);
+        mPlayerChooserViewAdapter.setAutocompleteItems(mAllPlayers);
         DefaultItemAnimator itemAnimator = new MyAnimator();
         mRecyclerView.setItemAnimator(itemAnimator);
         mRecyclerView.setAdapter(mPlayerChooserViewAdapter);
@@ -161,16 +163,15 @@ public class MainActivity extends AppCompatActivity implements PointsDialogFragm
         });
         mAdView.loadAd(adRequest);
 
-        mAllPlayers = ContactsController.loadContacts(this);
+        getAutocompleteData();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (mKeyboardView != null)
-            mKeyboardView.setColumnCount(Settings.getKeyboardColumnsCount(this));
-
-        if (false && FbController.isInitilized()) {
+    private void getAutocompleteData() {
+        //TODO: Load contacts after change in settings
+        if (Settings.isContactsEnabled(this)) {
+            ContactsController.loadContacts(this, mAllPlayers);
+        }
+        if (Settings.isFacebookEnabled(this) && FbController.isInitilized()) {
             if (FbController.isLogged()) {
                 FbController.getInstance().getFriendData(mAllPlayers);
                 mPlayerChooserViewAdapter.setAutocompleteItems(mAllPlayers);
@@ -192,6 +193,14 @@ public class MainActivity extends AppCompatActivity implements PointsDialogFragm
                 });
             }
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mKeyboardView != null)
+            mKeyboardView.setColumnCount(Settings.getKeyboardColumnsCount(this));
+
         if (mAdView != null)
             mAdView.resume();
     }
