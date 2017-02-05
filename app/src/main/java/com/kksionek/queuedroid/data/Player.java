@@ -17,13 +17,6 @@ public class Player {
         reset();
     }
 
-    public Player(String name) {
-        mId = "";
-        mName = name;
-        mImage = null;
-        mType = Type.CUSTOM;
-    }
-
     public Player(@NonNull String id, @NonNull String name, @Nullable String image, @NonNull Type type) {
         mId = id;
         mName = name;

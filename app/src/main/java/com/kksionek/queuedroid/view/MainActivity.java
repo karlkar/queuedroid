@@ -17,7 +17,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ScrollView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.AdListener;
@@ -54,10 +54,14 @@ public class MainActivity extends AppCompatActivity implements PointsDialogFragm
     public static final int REQUEST_IMAGE_CAPTURE = 9876;
     public static final int PERMISSIONS_REQUEST_READ_CONTACTS = 2233;
 
-    private final QueueModel mQueueModel = new QueueModel();
+    private LinearLayout mItemsContainer;
+    private RecyclerView mRecyclerView;
+    private Button mAddPlayerBtn;
+    private KeyboardView mKeyboardView;
     private Button mFirstBtn;
     private Button mSecondBtn;
     private Button mThirdBtn;
+    private AdView mAdView;
 
     private final View.OnClickListener mOnStartGameBtnClicked = new OnStartGameBtnClicked();
     private final View.OnClickListener mOnSettingsBtnClicked = new View.OnClickListener() {
@@ -69,14 +73,11 @@ public class MainActivity extends AppCompatActivity implements PointsDialogFragm
     };
     private final View.OnClickListener mOnEndGameBtnClicked = new OnEndGameBtnClicked();
     private final View.OnClickListener mOnNextTurnBtnClicked = new OnNextTurnBtnClicked();
-    private AdView mAdView;
-    private KeyboardView mKeyboardView;
+
+    private final QueueModel mQueueModel = new QueueModel();
     private final AtomicInteger mBackCounter = new AtomicInteger(0);
-    private ScrollView mScrollContainer;
-    private RecyclerView mRecyclerView;
     private final List<Player> mAllPlayers = new ArrayList<>();
     private PlayerChooserViewAdapter mPlayerChooserViewAdapter;
-    private Button mAddPlayerBtn;
     private Uri mRequestedPhotoURI;
 
     @Override
@@ -86,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements PointsDialogFragm
 
         final ViewGroup rootView = (ViewGroup) findViewById(R.id.root);
 
-        mScrollContainer = (ScrollView) findViewById(R.id.scroll_container);
+        mItemsContainer = (LinearLayout) findViewById(R.id.activity_main_items_container);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.activity_main_recyclerview);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(
@@ -103,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements PointsDialogFragm
         mAddPlayerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mPlayerChooserViewAdapter.add(new Player("", "", "", Player.Type.CUSTOM));
+                mPlayerChooserViewAdapter.add(new Player());
             }
         });
 
@@ -298,19 +299,23 @@ public class MainActivity extends AppCompatActivity implements PointsDialogFragm
     private void assignPointsAndNextTurn(int points) {
         mQueueModel.nextTurn(points);
         mKeyboardView.clearPoints();
+        int currentPlayerIndex = mQueueModel.getCurrentPlayerIndex();
         mPlayerChooserViewAdapter.updatePoints(
                 mQueueModel.getPreviousPlayerIndex(),
-                mQueueModel.getCurrentPlayerIndex());
-        mRecyclerView.scrollToPosition(mQueueModel.getCurrentPlayerIndex());
+                currentPlayerIndex);
+        if (currentPlayerIndex == 0)
+            mRecyclerView.smoothScrollToPosition(currentPlayerIndex);
+        else
+            mRecyclerView.scrollToPosition(currentPlayerIndex);
     }
 
     private Bitmap getRankBitmap() {
         Bitmap bitmap = Bitmap.createBitmap(
-                mScrollContainer.getMeasuredWidth(),
-                mScrollContainer.getMeasuredHeight(),
+                mItemsContainer.getMeasuredWidth(),
+                mItemsContainer.getMeasuredHeight(),
                 Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
-        mScrollContainer.draw(canvas);
+        mItemsContainer.draw(canvas);
         return bitmap;
     }
 
@@ -322,7 +327,7 @@ public class MainActivity extends AppCompatActivity implements PointsDialogFragm
                 View currentFocus = getCurrentFocus();
                 if (currentFocus != null)
                     currentFocus.clearFocus();
-                mRecyclerView.scrollToPosition(0);
+                mRecyclerView.smoothScrollToPosition(0);
                 mAddPlayerBtn.setVisibility(View.GONE);
                 mPlayerChooserViewAdapter.startGame();
                 mQueueModel.newGame(currentPlayers);

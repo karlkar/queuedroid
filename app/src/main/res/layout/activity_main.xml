@@ -5,9 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
+    android:background="@color/activity_main_background_color"
     android:focusable="true"
     android:focusableInTouchMode="true"
-    android:background="@color/activity_main_background_color"
     tools:context="com.kksionek.queuedroid.view.MainActivity">
 
     <LinearLayout
@@ -17,45 +17,38 @@
         android:layout_alignParentTop="true"
         android:layout_marginBottom="@dimen/main_activity_players_margin">
 
-        <ScrollView
-            android:id="@+id/scroll_container"
+        <LinearLayout
+            android:id="@+id/activity_main_items_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
             android:layout_marginTop="25dp"
             android:background="@drawable/scroller_bg"
-            android:paddingBottom="1dp">
+            android:orientation="vertical"
+            tools:ignore="UselessParent">
 
-            <LinearLayout
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/activity_main_recyclerview"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:paddingBottom="@dimen/main_activity_players_margin"
+                android:paddingLeft="@dimen/main_activity_players_margin"
+                android:paddingRight="@dimen/main_activity_players_margin"
+                android:paddingTop="@dimen/main_activity_players_margin"
+                tools:listitem="@layout/player_chooser_view" />
+
+            <Button
+                android:id="@+id/activity_main_button_add_player"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_margin="2dp">
-
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/activity_main_recyclerview"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:nestedScrollingEnabled="true"
-                    tools:nestedScrollingEnabled="true"
-                    tools:listitem="@layout/player_chooser_view"
-                    android:paddingBottom="@dimen/main_activity_players_margin"
-                    android:paddingLeft="@dimen/main_activity_players_margin"
-                    android:paddingRight="@dimen/main_activity_players_margin"
-                    android:paddingTop="@dimen/main_activity_players_margin" />
-
-                <Button
-                    android:id="@+id/activity_main_button_add_player"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/main_activity_control_buttons_margin"
-                    android:layout_marginLeft="@dimen/main_activity_players_margin"
-                    android:layout_marginRight="@dimen/main_activity_players_margin"
-                    android:background="@drawable/btn_big"
-                    android:text="@string/view_player_chooser_button_add_player" />
-            </LinearLayout>
-        </ScrollView>
+                android:layout_marginBottom="@dimen/main_activity_control_buttons_margin"
+                android:layout_marginLeft="@dimen/main_activity_players_margin"
+                android:layout_marginRight="@dimen/main_activity_players_margin"
+                android:background="@drawable/btn_big"
+                android:text="@string/view_player_chooser_button_add_player" />
+        </LinearLayout>
     </LinearLayout>
 
     <com.kksionek.queuedroid.view.keyboard.KeyboardView
