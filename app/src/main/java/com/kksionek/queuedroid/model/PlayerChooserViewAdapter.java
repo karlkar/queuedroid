@@ -1,13 +1,14 @@
 package com.kksionek.queuedroid.model;
 
-import android.animation.ValueAnimator;
 import android.content.Context;
-import android.graphics.drawable.TransitionDrawable;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +24,7 @@ import com.bumptech.glide.Glide;
 import com.kksionek.queuedroid.R;
 import com.kksionek.queuedroid.data.Player;
 import com.kksionek.queuedroid.data.PlayerItemData;
+import com.kksionek.queuedroid.view.MyAnimator;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,26 +36,15 @@ import static android.support.v7.widget.RecyclerView.NO_POSITION;
 public class PlayerChooserViewAdapter extends RecyclerView.Adapter<PlayerChooserViewAdapter.PlayerChooserViewHolder> {
 
     private static final String TAG = "PlayerChooserViewAdapte";
-    private static final int ANIMATION_DURATION = 600;
-    private static final int FONT_SMALL_SIZE = 15;
-    private static final int FONT_LARGE_SIZE = 30;
 
-    private static final ValueAnimator sIncreaseAnimator = ValueAnimator.ofFloat(
-            FONT_SMALL_SIZE,
-            FONT_LARGE_SIZE);
-    private static final ValueAnimator sDecreaseAnimator = ValueAnimator.ofFloat(
-            FONT_LARGE_SIZE,
-            FONT_SMALL_SIZE);
+    public static final String PAYLOAD_THUMBNAIL = "PAYLOAD_THUMBNAIL";
+    public static final String PAYLOAD_AUTOCOMPLETE = "PAYLOAD_AUTOCOMPLETE";
+    public static final String PAYLOAD_TEXT = "PAYLOAD_TEXT";
+    public static final String PAYLOAD_POINTS = "PAYLOAD_POINTS";
 
-    static {
-        sIncreaseAnimator.setDuration(ANIMATION_DURATION);
-        sDecreaseAnimator.setDuration(ANIMATION_DURATION);
-    }
-
-    private final List<PlayerItemData> mPlayers = new ArrayList<>();
+    private List<PlayerItemData> mPlayers = new ArrayList<>();
     private List<Player> mAllPossiblePlayers = new ArrayList<>();
     private final QueueModel mQueueModel;
-    private boolean mEditable = true;
     private final ActionListener mActionListener;
     private PlayerChooserViewHolder mPhotoRequester;
 
@@ -90,6 +81,33 @@ public class PlayerChooserViewAdapter extends RecyclerView.Adapter<PlayerChooser
     }
 
     @Override
+    public void onBindViewHolder(PlayerChooserViewHolder holder, int position, List<Object> payloads) {
+        if (payloads == null || payloads.isEmpty()) {
+            onBindViewHolder(holder, position);
+            return;
+        }
+
+        Log.d(TAG, "onBindViewHolder: with payload");
+        Bundle o = (Bundle) payloads.get(0);
+        for (String key : o.keySet()) {
+            switch (key) {
+                case PAYLOAD_THUMBNAIL:
+                    holder.bindThumbnail(mPlayers.get(position));
+                    break;
+                case PAYLOAD_AUTOCOMPLETE:
+                    holder.bindAutoCompleteTextView(mPlayers.get(position));
+                    break;
+                case PAYLOAD_TEXT:
+                    holder.bindTextView(mPlayers.get(position));
+                    break;
+                case PAYLOAD_POINTS:
+                    holder.bindPointsBtn(mPlayers.get(position));
+                    break;
+            }
+        }
+    }
+
+    @Override
     public int getItemCount() {
         return mPlayers.size();
     }
@@ -108,17 +126,27 @@ public class PlayerChooserViewAdapter extends RecyclerView.Adapter<PlayerChooser
         return players;
     }
 
-    public void sortPlayers(QueueModel queueModel) {
+    public void endGame(QueueModel queueModel) {
+        final ArrayList<PlayerItemData> newList = new ArrayList<>(mPlayers.size());
+        PlayerItemData itemData;
         for (int i = 0; i < queueModel.getPlayersCount(); ++i) {
-            mPlayers.get(i).setPoints(queueModel.getPointsOfPlayer(i));
+            itemData = (PlayerItemData) mPlayers.get(i).clone();
+            newList.add(itemData);
+            itemData.setPoints(queueModel.getPointsOfPlayer(i));
+            itemData.setCurrent(false);
         }
-        Collections.sort(mPlayers, new Comparator<PlayerItemData>() {
+
+        Collections.sort(newList, new Comparator<PlayerItemData>() {
             @Override
             public int compare(PlayerItemData left, PlayerItemData right) {
                 return Integer.valueOf(right.getPoints()).compareTo(left.getPoints());
             }
         });
-        notifyDataSetChanged();
+
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new MyDiffCallback(mPlayers, newList));
+        mPlayers.clear();
+        mPlayers.addAll(newList);
+        diffResult.dispatchUpdatesTo(this);
     }
 
     public void updatePoints(int previousPlayerIndex, int currentPlayerIndex) {
@@ -131,30 +159,45 @@ public class PlayerChooserViewAdapter extends RecyclerView.Adapter<PlayerChooser
 
     public void reset(boolean hardReset) {
         if (hardReset) {
+            int size = mPlayers.size();
             mPlayers.clear();
             mPlayers.add(new PlayerItemData());
             mPlayers.add(new PlayerItemData());
+            notifyItemRangeChanged(0, 2);
+            notifyItemRangeRemoved(2, size - 2);
         } else {
-            for (PlayerItemData playerItemData : mPlayers) {
-                playerItemData.setPoints(0);
-                playerItemData.setCurrent(false);
+            ArrayList<PlayerItemData> newList = new ArrayList<>(mPlayers.size());
+            PlayerItemData itemData;
+            for (PlayerItemData item : mPlayers) {
+                itemData = (PlayerItemData) item.clone();
+                itemData.setPoints(0);
+                itemData.setEditable(true);
+                itemData.setCurrent(false);
+                newList.add(itemData);
             }
-            Collections.sort(mPlayers, new Comparator<PlayerItemData>() {
+            Collections.sort(newList, new Comparator<PlayerItemData>() {
                 @Override
                 public int compare(PlayerItemData o1, PlayerItemData o2) {
-                    return (o1.getInitialPosition() < o2.getInitialPosition()) ?
-                            -1 : ((o1.getInitialPosition() == o2.getInitialPosition()) ? 0 : 1);
+                    return Integer.valueOf(o1.getInitialPosition()).compareTo(o2.getInitialPosition());
                 }
             });
+            DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new MyDiffCallback(mPlayers, newList));
+            mPlayers.clear();
+            mPlayers.addAll(newList);
+            diffResult.dispatchUpdatesTo(this);
         }
-        mEditable = true;
-        notifyDataSetChanged();
     }
 
     public void startGame() {
-        mEditable = false;
+        for (PlayerItemData playerItemData : mPlayers)
+            playerItemData.setEditable(false);
         mPlayers.get(0).setCurrent(true);
-        notifyDataSetChanged();
+//        Bundle diff = new Bundle();
+//        diff.putBoolean(PAYLOAD_POINTS, true);
+//        diff.putBoolean(PAYLOAD_TEXT, true);
+//        diff.putBoolean(PAYLOAD_AUTOCOMPLETE, true);
+//        notifyItemRangeChanged(0, mPlayers.size(), diff);
+        notifyItemRangeChanged(0, mPlayers.size());
     }
 
     public void setRequestedPhoto(Uri imageUri) {
@@ -168,12 +211,11 @@ public class PlayerChooserViewAdapter extends RecyclerView.Adapter<PlayerChooser
         }
     }
 
-    class PlayerChooserViewHolder extends RecyclerView.ViewHolder {
-        private final ImageView mThumbnail;
-        private final AutoCompleteTextView mAutoCompleteTextView;
-        private final TextView mTextView;
-        private final Button mPointsBtn;
-        private boolean mCurrent;
+    public class PlayerChooserViewHolder extends RecyclerView.ViewHolder {
+        public final ImageView mThumbnail;
+        public final AutoCompleteTextView mAutoCompleteTextView;
+        public final TextView mTextView;
+        public final Button mPointsBtn;
 
         PlayerChooserViewHolder(View viewItem) {
             super(viewItem);
@@ -181,7 +223,6 @@ public class PlayerChooserViewAdapter extends RecyclerView.Adapter<PlayerChooser
             mAutoCompleteTextView = (AutoCompleteTextView) viewItem.findViewById(R.id.text);
             mTextView = (TextView) viewItem.findViewById(R.id.staticText);
             mPointsBtn = (Button) viewItem.findViewById(R.id.pointsView);
-            mCurrent = false;
 
             mThumbnail.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -253,16 +294,16 @@ public class PlayerChooserViewAdapter extends RecyclerView.Adapter<PlayerChooser
             mPointsBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (mEditable) {
-                        int pos = getAdapterPosition();
-                        if (pos >= 0 && pos < mPlayers.size()) {
-                            if (mPlayers.size() > 2) {
-                                mPlayers.remove(pos);
-                                notifyItemRemoved(pos);
-                            } else {
-                                mPlayers.get(pos).reset();
-                                notifyItemChanged(pos);
-                            }
+                    int pos = getAdapterPosition();
+                    if (pos >= 0 && pos < mPlayers.size()) {
+                        if (!mPlayers.get(pos).isEditable())
+                            return;
+                        if (mPlayers.size() > 2) {
+                            mPlayers.remove(pos);
+                            notifyItemRemoved(pos);
+                        } else {
+                            mPlayers.get(pos).reset();
+                            notifyItemChanged(pos);
                         }
                     }
                 }
@@ -270,22 +311,22 @@ public class PlayerChooserViewAdapter extends RecyclerView.Adapter<PlayerChooser
         }
 
         public void bindTo(PlayerItemData playerInList) {
-            Context context = mTextView.getContext();
-            bindThumbnail(playerInList, context);
+            bindThumbnail(playerInList);
             bindAutoCompleteTextView(playerInList);
             bindTextView(playerInList);
-            bindPointsBtn(playerInList, context);
+            bindPointsBtn(playerInList);
         }
 
-        private void bindThumbnail(PlayerItemData playerInList, Context context) {
+        public void bindThumbnail(PlayerItemData playerInList) {
+            Context context = mThumbnail.getContext();
             Glide.with(context)
                     .load(playerInList.getImage())
                     .placeholder(R.drawable.ic_contact_picture)
                     .into(mThumbnail);
         }
 
-        private void bindAutoCompleteTextView(final PlayerItemData playerInList) {
-            if (mEditable) {
+        public void bindAutoCompleteTextView(final PlayerItemData playerInList) {
+            if (playerInList.isEditable()) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
                     mAutoCompleteTextView.setText(playerInList.getName(), false);
                 else
@@ -296,47 +337,20 @@ public class PlayerChooserViewAdapter extends RecyclerView.Adapter<PlayerChooser
                 mAutoCompleteTextView.setVisibility(View.GONE);
         }
 
-        private void bindTextView(PlayerItemData playerInList) {
-            mTextView.setVisibility(mEditable ? View.GONE : View.VISIBLE);
+        public void bindTextView(PlayerItemData playerInList) {
+            mTextView.setVisibility(playerInList.isEditable() ? View.GONE : View.VISIBLE);
             mTextView.setText(playerInList.getName());
-            if (mEditable) {
-                mCurrent = false;
-            } else {
-                if (playerInList.isCurrent() || mCurrent) {
-                    ValueAnimator animator = mCurrent ? sDecreaseAnimator : sIncreaseAnimator;
-                    animator.removeAllUpdateListeners();
-                    animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                        @Override
-                        public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                            float animatedValue = (float) valueAnimator.getAnimatedValue();
-                            mTextView.setTextSize(animatedValue);
-                        }
-                    });
-                    animator.start();
-                    mCurrent = playerInList.isCurrent();
-                }
-            }
+            mTextView.setTextSize(playerInList.isCurrent() ? MyAnimator.FONT_LARGE_SIZE : MyAnimator.FONT_SMALL_SIZE);
         }
 
-        private void bindPointsBtn(final PlayerItemData playerInList, Context context) {
-            TransitionDrawable transitionDrawable = (TransitionDrawable) mPointsBtn.getBackground();
-            int duration = context.getResources().getInteger(android.R.integer.config_shortAnimTime);
-            if (mEditable) {
-                transitionDrawable.startTransition(duration);
+        public void bindPointsBtn(final PlayerItemData playerInList) {
+            if (playerInList.isEditable()) {
+                mPointsBtn.setBackgroundResource(R.drawable.btn_cancel);
                 mPointsBtn.setText("");
             } else {
-                if (playerInList.isEditable()) {
-                    transitionDrawable.reverseTransition(duration);
-                    mPointsBtn.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            mPointsBtn.setText(String.valueOf(playerInList.getPoints()));
-                        }
-                    }, duration);
-                } else
-                    mPointsBtn.setText(String.valueOf(playerInList.getPoints()));
+                mPointsBtn.setBackgroundResource(R.drawable.btn_uncheck);
+                mPointsBtn.setText(String.valueOf(playerInList.getPoints()));
             }
-            playerInList.setEditable(mEditable);
         }
     }
 }

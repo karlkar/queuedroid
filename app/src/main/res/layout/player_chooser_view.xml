@@ -57,7 +57,7 @@
         android:maxLines="1"
         android:text=""
         android:textSize="20sp"
-        android:background="@drawable/points_view_transition_drawable"
+        android:background="@drawable/btn_cancel"
         android:minWidth="48dip" />
 
 </LinearLayout>

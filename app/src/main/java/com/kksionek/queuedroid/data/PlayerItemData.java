@@ -1,6 +1,6 @@
 package com.kksionek.queuedroid.data;
 
-public class PlayerItemData {
+public class PlayerItemData implements Cloneable {
 
     private static int sInitialPositionCounter = 0;
 
@@ -20,6 +20,24 @@ public class PlayerItemData {
         mInitialPosition = sInitialPositionCounter++;
     }
 
+    private PlayerItemData(PlayerItemData itemData) {
+        set(itemData.getPlayer());
+        mPoints = itemData.getPoints();
+        mEditable = itemData.isEditable();
+        mCurrent = itemData.isCurrent();
+        mInitialPosition = itemData.getInitialPosition();
+    }
+
+    @Override
+    public Object clone() {
+        try {
+            return super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public String getImage() {
         return mPlayer.getImage();
     }
@@ -31,8 +49,8 @@ public class PlayerItemData {
     public void set(Player player) {
         mPlayer = player;
         mPoints = 0;
-        mEditable = !player.getName().isEmpty();
-        mCurrent = false;
+        mEditable = true;
+        mCurrent = false; // TODO check it
     }
 
     public void reset() {
@@ -69,5 +87,16 @@ public class PlayerItemData {
 
     public int getInitialPosition() {
         return mInitialPosition;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof PlayerItemData))
+            return false;
+        PlayerItemData other = (PlayerItemData) obj;
+        return mPlayer.equals(other.getPlayer())
+                && mPoints == other.mPoints
+                && mEditable == other.mEditable
+                && mCurrent == other.mCurrent;
     }
 }

@@ -1,6 +1,5 @@
 package com.kksionek.queuedroid.view;
 
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -11,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.transition.TransitionManager;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
@@ -90,7 +90,8 @@ public class MainActivity extends AppCompatActivity implements PointsDialogFragm
                 LinearLayoutManager.VERTICAL,
                 false));
         mPlayerChooserViewAdapter = new PlayerChooserViewAdapter(this, mQueueModel);
-        ((SimpleItemAnimator) mRecyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
+        DefaultItemAnimator itemAnimator = new MyAnimator();
+        mRecyclerView.setItemAnimator(itemAnimator);
         mRecyclerView.setAdapter(mPlayerChooserViewAdapter);
 
         mAddPlayerBtn = (Button) findViewById(R.id.activity_main_button_add_player);
@@ -312,7 +313,7 @@ public class MainActivity extends AppCompatActivity implements PointsDialogFragm
     private class OnEndGameBtnClicked implements View.OnClickListener {
         @Override
         public void onClick(View view) {
-            mPlayerChooserViewAdapter.sortPlayers(mQueueModel);
+            mPlayerChooserViewAdapter.endGame(mQueueModel);
 
             mKeyboardView.setVisibility(View.GONE);
 
@@ -394,6 +395,4 @@ public class MainActivity extends AppCompatActivity implements PointsDialogFragm
         mRecyclerView.draw(canvas);
         return bitmap;
     }
-
-
 }

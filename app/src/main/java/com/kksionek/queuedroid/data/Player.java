@@ -23,7 +23,7 @@ public class Player {
         mImage = null;
         mType = Type.CUSTOM;
     }
-    
+
     public Player(@NonNull String id, @NonNull String name, @Nullable String image, @NonNull Type type) {
         mId = id;
         mName = name;
@@ -63,7 +63,9 @@ public class Player {
 
     @Override
     public boolean equals(Object o) {
-        return o instanceof Player && mName.equals(((Player) o).mName);
+        return o instanceof Player
+                && mName.equals(((Player) o).mName)
+                && mImage.equals(((Player) o).mImage);
     }
 
     public String getId() {
