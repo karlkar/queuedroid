@@ -5,6 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     android:background="@color/activity_main_background_color"
     tools:context="com.kksionek.queuedroid.view.MainActivity">
 
@@ -12,39 +14,48 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@+id/keyboard_view"
-        android:layout_alignParentTop="true">
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="@dimen/main_activity_players_margin">
 
-        <LinearLayout
+        <ScrollView
             android:id="@+id/scroll_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/main_activity_players_margin"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
             android:layout_marginTop="25dp"
             android:background="@drawable/scroller_bg"
-            android:orientation="vertical">
+            android:paddingBottom="1dp">
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/activity_main_recyclerview"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingBottom="@dimen/main_activity_players_margin"
-                android:paddingLeft="@dimen/main_activity_players_margin"
-                android:paddingRight="@dimen/main_activity_players_margin"
-                android:paddingTop="@dimen/main_activity_players_margin" />
+                android:orientation="vertical"
+                android:layout_margin="2dp">
 
-            <Button
-                android:id="@+id/activity_main_button_add_player"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/main_activity_control_buttons_margin"
-                android:layout_marginLeft="@dimen/main_activity_players_margin"
-                android:layout_marginRight="@dimen/main_activity_players_margin"
-                android:layout_marginTop="@dimen/main_activity_players_margin"
-                android:background="@drawable/btn_big"
-                android:text="@string/view_player_chooser_button_add_player" />
-        </LinearLayout>
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/activity_main_recyclerview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="true"
+                    tools:nestedScrollingEnabled="true"
+                    tools:listitem="@layout/player_chooser_view"
+                    android:paddingBottom="@dimen/main_activity_players_margin"
+                    android:paddingLeft="@dimen/main_activity_players_margin"
+                    android:paddingRight="@dimen/main_activity_players_margin"
+                    android:paddingTop="@dimen/main_activity_players_margin" />
+
+                <Button
+                    android:id="@+id/activity_main_button_add_player"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/main_activity_control_buttons_margin"
+                    android:layout_marginLeft="@dimen/main_activity_players_margin"
+                    android:layout_marginRight="@dimen/main_activity_players_margin"
+                    android:background="@drawable/btn_big"
+                    android:text="@string/view_player_chooser_button_add_player" />
+            </LinearLayout>
+        </ScrollView>
     </LinearLayout>
 
     <com.kksionek.queuedroid.view.keyboard.KeyboardView
@@ -91,7 +102,7 @@
             android:layout_marginLeft="@dimen/main_activity_players_margin"
             android:layout_marginRight="@dimen/main_activity_players_margin"
             android:layout_marginTop="@dimen/main_activity_control_buttons_margin"
-            android:background="@drawable/btn_big"/>
+            android:background="@drawable/btn_big" />
 
         <Button
             android:id="@+id/third_btn"

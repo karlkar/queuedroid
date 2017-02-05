@@ -13,11 +13,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SimpleItemAnimator;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.AdListener;
@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements PointsDialogFragm
     private AdView mAdView;
     private KeyboardView mKeyboardView;
     private final AtomicInteger mBackCounter = new AtomicInteger(0);
+    private ScrollView mScrollContainer;
     private RecyclerView mRecyclerView;
     private final List<Player> mAllPlayers = new ArrayList<>();
     private PlayerChooserViewAdapter mPlayerChooserViewAdapter;
@@ -84,6 +85,8 @@ public class MainActivity extends AppCompatActivity implements PointsDialogFragm
         setContentView(R.layout.activity_main);
 
         final ViewGroup rootView = (ViewGroup) findViewById(R.id.root);
+
+        mScrollContainer = (ScrollView) findViewById(R.id.scroll_container);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.activity_main_recyclerview);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(
@@ -292,11 +295,34 @@ public class MainActivity extends AppCompatActivity implements PointsDialogFragm
         return image;
     }
 
+    private void assignPointsAndNextTurn(int points) {
+        mQueueModel.nextTurn(points);
+        mKeyboardView.clearPoints();
+        mPlayerChooserViewAdapter.updatePoints(
+                mQueueModel.getPreviousPlayerIndex(),
+                mQueueModel.getCurrentPlayerIndex());
+        mRecyclerView.scrollToPosition(mQueueModel.getCurrentPlayerIndex());
+    }
+
+    private Bitmap getRankBitmap() {
+        Bitmap bitmap = Bitmap.createBitmap(
+                mScrollContainer.getMeasuredWidth(),
+                mScrollContainer.getMeasuredHeight(),
+                Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        mScrollContainer.draw(canvas);
+        return bitmap;
+    }
+
     private class OnStartGameBtnClicked implements View.OnClickListener {
         @Override
         public void onClick(View v) {
             List<Player> currentPlayers = mPlayerChooserViewAdapter.getCurrentPlayers();
             if (currentPlayers.size() >= 2) {
+                View currentFocus = getCurrentFocus();
+                if (currentFocus != null)
+                    currentFocus.clearFocus();
+                mRecyclerView.scrollToPosition(0);
                 mAddPlayerBtn.setVisibility(View.GONE);
                 mPlayerChooserViewAdapter.startGame();
                 mQueueModel.newGame(currentPlayers);
@@ -328,37 +354,37 @@ public class MainActivity extends AppCompatActivity implements PointsDialogFragm
             mKeyboardView.setVisibility(View.GONE);
 
             mFirstBtn.setText(R.string.activity_main_button_new_game);
-            mFirstBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    restartGame(true);
-                }
-            });
+            mFirstBtn.setOnClickListener(new OnRestartGameClicked(true));
 
             mSecondBtn.setText(R.string.activity_main_button_play_again);
-            mSecondBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    restartGame(false);
-                }
-            });
+            mSecondBtn.setOnClickListener(new OnRestartGameClicked(false));
 
             mThirdBtn.setText(R.string.activity_main_button_share);
             mThirdBtn.setVisibility(View.VISIBLE);
         }
     }
 
-    private void restartGame(boolean hardReset) {
-        mPlayerChooserViewAdapter.reset(hardReset);
-        mAddPlayerBtn.setVisibility(View.VISIBLE);
+    private class OnRestartGameClicked implements View.OnClickListener {
 
-        mFirstBtn.setText(R.string.activity_main_button_play);
-        mFirstBtn.setOnClickListener(mOnStartGameBtnClicked);
+        private boolean mHardReset;
 
-        mSecondBtn.setText(R.string.activity_main_button_settings);
-        mSecondBtn.setOnClickListener(mOnSettingsBtnClicked);
+        public OnRestartGameClicked(boolean hardReset) {
+            mHardReset = hardReset;
+        }
 
-        mThirdBtn.setVisibility(View.GONE);
+        @Override
+        public void onClick(View v) {
+            mPlayerChooserViewAdapter.reset(mHardReset);
+            mAddPlayerBtn.setVisibility(View.VISIBLE);
+
+            mFirstBtn.setText(R.string.activity_main_button_play);
+            mFirstBtn.setOnClickListener(mOnStartGameBtnClicked);
+
+            mSecondBtn.setText(R.string.activity_main_button_settings);
+            mSecondBtn.setOnClickListener(mOnSettingsBtnClicked);
+
+            mThirdBtn.setVisibility(View.GONE);
+        }
     }
 
     private class OnNextTurnBtnClicked implements View.OnClickListener {
@@ -386,23 +412,5 @@ public class MainActivity extends AppCompatActivity implements PointsDialogFragm
                 requestPoints();
             }
         }
-    }
-
-    private void assignPointsAndNextTurn(int points) {
-        mQueueModel.nextTurn(points);
-        mKeyboardView.clearPoints();
-        mPlayerChooserViewAdapter.updatePoints(
-                mQueueModel.getPreviousPlayerIndex(),
-                mQueueModel.getCurrentPlayerIndex());
-    }
-
-    private Bitmap getRankBitmap() {
-        Bitmap bitmap = Bitmap.createBitmap(
-                mRecyclerView.getMeasuredWidth(),
-                mRecyclerView.getMeasuredHeight(),
-                Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        mRecyclerView.draw(canvas);
-        return bitmap;
     }
 }

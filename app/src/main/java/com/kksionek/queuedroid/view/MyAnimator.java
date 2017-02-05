@@ -40,7 +40,7 @@ public class MyAnimator extends DefaultItemAnimator {
         sDecreaseAnimator.setDuration(ANIMATION_DURATION);
     }
 
-    private ArrayMap<RecyclerView.ViewHolder, AnimatorInfo> mAnimatorMap = new ArrayMap<>();
+    private final ArrayMap<RecyclerView.ViewHolder, AnimatorInfo> mAnimatorMap = new ArrayMap<>();
 
     @Override
     public boolean canReuseUpdatedViewHolder(@NonNull RecyclerView.ViewHolder viewHolder) {
@@ -129,7 +129,9 @@ public class MyAnimator extends DefaultItemAnimator {
             @Override
             public void onAnimationEnd(Animator animation) {
                 dispatchAnimationFinished(newHolder);
-                mAnimatorMap.remove(newHolder);
+                synchronized (mAnimatorMap) {
+                    mAnimatorMap.remove(newHolder);
+                }
             }
         });
         textResizeAnim.start();
@@ -151,11 +153,17 @@ public class MyAnimator extends DefaultItemAnimator {
     @Override
     public void endAnimation(RecyclerView.ViewHolder item) {
         super.endAnimation(item);
-        if (!mAnimatorMap.isEmpty()) {
-            final int numRunning = mAnimatorMap.size();
-            for (int i = numRunning; i >= 0; i--) {
-                if (item == mAnimatorMap.keyAt(i)) {
-                    mAnimatorMap.valueAt(i).textResizer.cancel();
+        synchronized (mAnimatorMap) {
+            if (!mAnimatorMap.isEmpty()) {
+                final int numRunning = mAnimatorMap.size();
+                for (int i = numRunning; i >= 0; i--) {
+                    try {
+                        if (item == mAnimatorMap.keyAt(i)) {
+                            mAnimatorMap.valueAt(i).textResizer.cancel();
+                        }
+                    } catch (ArrayIndexOutOfBoundsException ex) {
+                        ex.printStackTrace();
+                    }
                 }
             }
         }
@@ -169,10 +177,12 @@ public class MyAnimator extends DefaultItemAnimator {
     @Override
     public void endAnimations() {
         super.endAnimations();
-        if (!mAnimatorMap.isEmpty()) {
-            final int numRunning = mAnimatorMap.size();
-            for (int i = numRunning; i >= 0; i--) {
-                mAnimatorMap.valueAt(i).textResizer.cancel();
+        synchronized (mAnimatorMap) {
+            if (!mAnimatorMap.isEmpty()) {
+                final int numRunning = mAnimatorMap.size();
+                for (int i = numRunning; i >= 0; i--) {
+                    mAnimatorMap.valueAt(i).textResizer.cancel();
+                }
             }
         }
     }
