@@ -24,6 +24,7 @@ import com.bumptech.glide.Glide;
 import com.kksionek.queuedroid.R;
 import com.kksionek.queuedroid.data.Player;
 import com.kksionek.queuedroid.data.PlayerItemData;
+import com.kksionek.queuedroid.view.MainActivity;
 import com.kksionek.queuedroid.view.MyAnimator;
 
 import java.util.ArrayList;
@@ -52,8 +53,28 @@ public class PlayerChooserViewAdapter extends RecyclerView.Adapter<PlayerChooser
         mActionListener = actionListener;
         mQueueModel = queueModel;
         setHasStableIds(true);
-        mPlayers.add(new PlayerItemData());
-        mPlayers.add(new PlayerItemData());
+        if (queueModel.getPlayersCount() == 0) {
+            mPlayers.add(new PlayerItemData());
+            mPlayers.add(new PlayerItemData());
+        } else {
+            for (int i = 0; i < mQueueModel.getPlayersCount(); ++i) {
+                mPlayers.add(new PlayerItemData(mQueueModel.getPlayerAt(i), mQueueModel.getPointsOfPlayer(i)));
+                mPlayers.get(i).setEditable(false);
+                mPlayers.get(i).setCurrent(i == mQueueModel.getCurrentPlayerIndex());
+            }
+        }
+    }
+
+    public PlayerChooserViewAdapter(ActionListener actionListener, QueueModel queueModel, ArrayList<Player> items) {
+        mActionListener = actionListener;
+        mQueueModel = queueModel;
+        setHasStableIds(true);
+        for (Player player : items) {
+            mPlayers.add(new PlayerItemData(player));
+        }
+        while (mPlayers.size() < 2) {
+            mPlayers.add(new PlayerItemData());
+        }
     }
 
     @Override
@@ -64,6 +85,13 @@ public class PlayerChooserViewAdapter extends RecyclerView.Adapter<PlayerChooser
     public void add(Player player) {
         mPlayers.add(new PlayerItemData(player));
         notifyItemInserted(mPlayers.size() - 1);
+    }
+
+    public void addAll(ArrayList<Player> adapterItems) {
+        for (Player player : adapterItems) {
+            mPlayers.add(new PlayerItemData(player));
+        }
+        notifyItemRangeInserted(mPlayers.size(), adapterItems.size());
     }
 
     @Override
@@ -116,8 +144,8 @@ public class PlayerChooserViewAdapter extends RecyclerView.Adapter<PlayerChooser
         mAllPossiblePlayers = allPlayers;
     }
 
-    public List<Player> getCurrentPlayers() {
-        List<Player> players = new ArrayList<>();
+    public ArrayList<Player> getCurrentPlayers() {
+        ArrayList<Player> players = new ArrayList<>();
         for (PlayerItemData playerItemData : mPlayers) {
             if (playerItemData.getPlayer() != null
                     && !playerItemData.getPlayer().getName().isEmpty())
@@ -276,7 +304,7 @@ public class PlayerChooserViewAdapter extends RecyclerView.Adapter<PlayerChooser
                     if (pos == NO_POSITION)
                         return;
                     Player player = (Player) parent.getItemAtPosition(position);
-                    mPlayers.get(pos).set(player);
+                    mPlayers.get(pos).set(player, 0);
                     Glide.with(view.getContext())
                             .load(player.getImage())
                             .placeholder(R.drawable.ic_contact_picture)

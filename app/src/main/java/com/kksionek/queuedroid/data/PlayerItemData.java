@@ -16,16 +16,12 @@ public class PlayerItemData implements Cloneable {
     }
 
     public PlayerItemData(Player player) {
-        set(player);
-        mInitialPosition = sInitialPositionCounter++;
+        this(player, 0);
     }
 
-    private PlayerItemData(PlayerItemData itemData) {
-        set(itemData.getPlayer());
-        mPoints = itemData.getPoints();
-        mEditable = itemData.isEditable();
-        mCurrent = itemData.isCurrent();
-        mInitialPosition = itemData.getInitialPosition();
+    public PlayerItemData(Player player, int pointsOfPlayer) {
+        set(player, pointsOfPlayer);
+        mInitialPosition = sInitialPositionCounter++;
     }
 
     @Override
@@ -46,15 +42,15 @@ public class PlayerItemData implements Cloneable {
         return mPlayer.getName();
     }
 
-    public void set(Player player) {
+    public void set(Player player, int points) {
         mPlayer = player;
-        mPoints = 0;
+        mPoints = points;
         mEditable = true;
-        mCurrent = false; // TODO check it
+        mCurrent = false;
     }
 
     public void reset() {
-        set(new Player());
+        set(new Player(), 0);
     }
 
     public Player getPlayer() {

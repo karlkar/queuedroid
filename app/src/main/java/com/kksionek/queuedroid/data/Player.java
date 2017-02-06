@@ -1,12 +1,14 @@
 package com.kksionek.queuedroid.data;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class Player {
+public class Player implements Parcelable {
 
     private String mId;
     private String mName;
@@ -23,6 +25,42 @@ public class Player {
         mImage = image;
         mType = type;
     }
+
+    protected Player(Parcel in) {
+        mId = in.readString();
+        mName = in.readString();
+        mImage = in.readString();
+        int type = in.readInt();
+        switch (type) {
+            case 0:
+                mType = Type.MY_FB_PROFILE;
+                break;
+            case 1:
+                mType = Type.FACEBOOK;
+                break;
+            case 2:
+                mType = Type.CONTACTS;
+                break;
+            case 3:
+                mType = Type.CUSTOM;
+                break;
+            default:
+                mType = Type.CUSTOM;
+                break;
+        }
+    }
+
+    public static final Creator<Player> CREATOR = new Creator<Player>() {
+        @Override
+        public Player createFromParcel(Parcel in) {
+            return new Player(in);
+        }
+
+        @Override
+        public Player[] newArray(int size) {
+            return new Player[size];
+        }
+    };
 
     public static Player createFacebookFriend(@NonNull JSONObject jsonFriend) {
         return createFacebookFriend(jsonFriend, false);
@@ -92,6 +130,34 @@ public class Player {
     @Override
     public String toString() {
         return mName;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(mId);
+        dest.writeString(mName);
+        dest.writeString(mImage);
+        int type = 3;
+        switch (mType) {
+            case MY_FB_PROFILE:
+                type = 0;
+                break;
+            case FACEBOOK:
+                type = 1;
+                break;
+            case CONTACTS:
+                type = 2;
+                break;
+            case CUSTOM:
+                type = 3;
+                break;
+        }
+        dest.writeInt(type);
     }
 
     public enum Type {

@@ -23,7 +23,6 @@ import android.widget.Toast;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.MobileAds;
 import com.kksionek.queuedroid.R;
 import com.kksionek.queuedroid.data.Player;
 import com.kksionek.queuedroid.model.ActionListener;
@@ -54,6 +53,9 @@ public class MainActivity extends AppCompatActivity implements PointsDialogFragm
     public static final int REQUEST_IMAGE_CAPTURE = 9876;
     public static final int PERMISSIONS_REQUEST_READ_CONTACTS = 2233;
 
+    public static final String SIS_IN_GAME = "IN_GAME";
+    public static final String SIS_ADAPTER_ITEMS = "ADAPTER_ITEMS";
+
     private LinearLayout mItemsContainer;
     private RecyclerView mRecyclerView;
     private Button mAddPlayerBtn;
@@ -74,11 +76,12 @@ public class MainActivity extends AppCompatActivity implements PointsDialogFragm
     private final View.OnClickListener mOnEndGameBtnClicked = new OnEndGameBtnClicked();
     private final View.OnClickListener mOnNextTurnBtnClicked = new OnNextTurnBtnClicked();
 
-    private final QueueModel mQueueModel = new QueueModel();
+    private QueueModel mQueueModel = null;
     private final AtomicInteger mBackCounter = new AtomicInteger(0);
     private final List<Player> mAllPlayers = new ArrayList<>();
     private PlayerChooserViewAdapter mPlayerChooserViewAdapter;
     private Uri mRequestedPhotoURI;
+    private boolean mInGame = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,19 +91,14 @@ public class MainActivity extends AppCompatActivity implements PointsDialogFragm
         final ViewGroup rootView = (ViewGroup) findViewById(R.id.root);
 
         mItemsContainer = (LinearLayout) findViewById(R.id.activity_main_items_container);
-
-        mRecyclerView = (RecyclerView) findViewById(R.id.activity_main_recyclerview);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(
-                getBaseContext(),
-                LinearLayoutManager.VERTICAL,
-                false));
-        mPlayerChooserViewAdapter = new PlayerChooserViewAdapter(this, mQueueModel);
-        mPlayerChooserViewAdapter.setAutocompleteItems(mAllPlayers);
-        DefaultItemAnimator itemAnimator = new MyAnimator();
-        mRecyclerView.setItemAnimator(itemAnimator);
-        mRecyclerView.setAdapter(mPlayerChooserViewAdapter);
-
         mAddPlayerBtn = (Button) findViewById(R.id.activity_main_button_add_player);
+        mFirstBtn = (Button) findViewById(R.id.first_btn);
+        mSecondBtn = (Button) findViewById(R.id.second_btn);
+        mThirdBtn = (Button) findViewById(R.id.third_btn);
+        mRecyclerView = (RecyclerView) findViewById(R.id.activity_main_recyclerview);
+        mKeyboardView = (KeyboardView) findViewById(R.id.keyboard_view);
+        mAdView = (AdView) findViewById(R.id.ad_view);
+
         mAddPlayerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -108,15 +106,12 @@ public class MainActivity extends AppCompatActivity implements PointsDialogFragm
             }
         });
 
-        mFirstBtn = (Button) findViewById(R.id.first_btn);
         mFirstBtn.setText(R.string.activity_main_button_play);
         mFirstBtn.setOnClickListener(mOnStartGameBtnClicked);
 
-        mSecondBtn = (Button) findViewById(R.id.second_btn);
         mSecondBtn.setText(R.string.activity_main_button_settings);
         mSecondBtn.setOnClickListener(mOnSettingsBtnClicked);
 
-        mThirdBtn = (Button) findViewById(R.id.third_btn);
         mThirdBtn.setText(R.string.activity_main_button_share);
         mThirdBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -148,11 +143,6 @@ public class MainActivity extends AppCompatActivity implements PointsDialogFragm
             }
         });
 
-        mKeyboardView = (KeyboardView) findViewById(R.id.keyboard_view);
-
-        MobileAds.initialize(getApplicationContext(), "ca-app-pub-9982327151344679~7308090141");
-
-        mAdView = (AdView) findViewById(R.id.ad_view);
         mAdView.setVisibility(View.GONE);
         AdRequest adRequest = new AdRequest.Builder()
                 .addTestDevice(getString(R.string.adMobTestDeviceS5))
@@ -168,6 +158,40 @@ public class MainActivity extends AppCompatActivity implements PointsDialogFragm
         mAdView.loadAd(adRequest);
 
         getAutocompleteData();
+
+        mQueueModel = new QueueModel(savedInstanceState);
+        if (savedInstanceState == null) {
+            mPlayerChooserViewAdapter = new PlayerChooserViewAdapter(this, mQueueModel);
+        } else {
+            mInGame = savedInstanceState.getBoolean(SIS_IN_GAME);
+            if (mInGame) {
+                mPlayerChooserViewAdapter = new PlayerChooserViewAdapter(this, mQueueModel);
+                setupInGameView();
+            } else {
+                ArrayList<Player> adapterItems = savedInstanceState.getParcelableArrayList(SIS_ADAPTER_ITEMS);
+                mPlayerChooserViewAdapter = new PlayerChooserViewAdapter(this, mQueueModel, adapterItems);
+            }
+        }
+
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(
+                getBaseContext(),
+                LinearLayoutManager.VERTICAL,
+                false));
+        mPlayerChooserViewAdapter.setAutocompleteItems(mAllPlayers);
+        DefaultItemAnimator itemAnimator = new MyAnimator();
+        mRecyclerView.setItemAnimator(itemAnimator);
+        mRecyclerView.setAdapter(mPlayerChooserViewAdapter);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(SIS_IN_GAME, mInGame);
+        if (mInGame) {
+            mQueueModel.saveInstanceState(outState);
+        } else {
+            outState.putParcelableArrayList(SIS_ADAPTER_ITEMS, mPlayerChooserViewAdapter.getCurrentPlayers());
+        }
     }
 
     private void getAutocompleteData() {
@@ -324,24 +348,15 @@ public class MainActivity extends AppCompatActivity implements PointsDialogFragm
         public void onClick(View v) {
             List<Player> currentPlayers = mPlayerChooserViewAdapter.getCurrentPlayers();
             if (currentPlayers.size() >= 2) {
+                mInGame = true;
                 View currentFocus = getCurrentFocus();
                 if (currentFocus != null)
                     currentFocus.clearFocus();
                 mRecyclerView.smoothScrollToPosition(0);
-                mAddPlayerBtn.setVisibility(View.GONE);
                 mPlayerChooserViewAdapter.startGame();
                 mQueueModel.newGame(currentPlayers);
 
-                mKeyboardView.setVisibility(Settings.shouldUseInAppKeyboard(MainActivity.this) ?
-                        View.VISIBLE : View.GONE);
-                mKeyboardView.clearPoints();
-                mRecyclerView.setKeepScreenOn(Settings.isKeepOnScreen(MainActivity.this));
-
-                mFirstBtn.setText(R.string.activity_main_button_next_turn);
-                mFirstBtn.setOnClickListener(mOnNextTurnBtnClicked);
-
-                mSecondBtn.setText(R.string.activity_main_button_end_game);
-                mSecondBtn.setOnClickListener(mOnEndGameBtnClicked);
+                setupInGameView();
             } else {
                 Toast.makeText(MainActivity.this,
                         R.string.activity_main_start_wrong_player_on_list_error_message,
@@ -351,21 +366,56 @@ public class MainActivity extends AppCompatActivity implements PointsDialogFragm
         }
     }
 
+    private void setupInGameView() {
+        mAddPlayerBtn.setVisibility(View.GONE);
+
+        mKeyboardView.setVisibility(Settings.shouldUseInAppKeyboard(MainActivity.this) ?
+                View.VISIBLE : View.GONE);
+        mKeyboardView.clearPoints();
+        mRecyclerView.setKeepScreenOn(Settings.isKeepOnScreen(MainActivity.this));
+
+        mFirstBtn.setText(R.string.activity_main_button_next_turn);
+        mFirstBtn.setOnClickListener(mOnNextTurnBtnClicked);
+
+        mSecondBtn.setText(R.string.activity_main_button_end_game);
+        mSecondBtn.setOnClickListener(mOnEndGameBtnClicked);
+    }
+
+    private void setupResultView() {
+        mKeyboardView.setVisibility(View.GONE);
+        mAddPlayerBtn.setVisibility(View.GONE);
+
+        mFirstBtn.setText(R.string.activity_main_button_new_game);
+        mFirstBtn.setOnClickListener(new OnRestartGameClicked(true));
+
+        mSecondBtn.setText(R.string.activity_main_button_play_again);
+        mSecondBtn.setOnClickListener(new OnRestartGameClicked(false));
+
+        mThirdBtn.setText(R.string.activity_main_button_share);
+        mThirdBtn.setVisibility(View.VISIBLE);
+    }
+
+    private void setupStartView() {
+        mKeyboardView.setVisibility(View.GONE);
+        mAddPlayerBtn.setVisibility(View.VISIBLE);
+
+        mFirstBtn.setText(R.string.activity_main_button_play);
+        mFirstBtn.setOnClickListener(mOnStartGameBtnClicked);
+
+        mSecondBtn.setText(R.string.activity_main_button_settings);
+        mSecondBtn.setOnClickListener(mOnSettingsBtnClicked);
+
+        mThirdBtn.setVisibility(View.GONE);
+    }
+
     private class OnEndGameBtnClicked implements View.OnClickListener {
         @Override
         public void onClick(View view) {
+            mInGame = false;
             mPlayerChooserViewAdapter.endGame(mQueueModel);
+            mQueueModel.resetScoreboard();
 
-            mKeyboardView.setVisibility(View.GONE);
-
-            mFirstBtn.setText(R.string.activity_main_button_new_game);
-            mFirstBtn.setOnClickListener(new OnRestartGameClicked(true));
-
-            mSecondBtn.setText(R.string.activity_main_button_play_again);
-            mSecondBtn.setOnClickListener(new OnRestartGameClicked(false));
-
-            mThirdBtn.setText(R.string.activity_main_button_share);
-            mThirdBtn.setVisibility(View.VISIBLE);
+            setupResultView();
         }
     }
 
@@ -380,15 +430,7 @@ public class MainActivity extends AppCompatActivity implements PointsDialogFragm
         @Override
         public void onClick(View v) {
             mPlayerChooserViewAdapter.reset(mHardReset);
-            mAddPlayerBtn.setVisibility(View.VISIBLE);
-
-            mFirstBtn.setText(R.string.activity_main_button_play);
-            mFirstBtn.setOnClickListener(mOnStartGameBtnClicked);
-
-            mSecondBtn.setText(R.string.activity_main_button_settings);
-            mSecondBtn.setOnClickListener(mOnSettingsBtnClicked);
-
-            mThirdBtn.setVisibility(View.GONE);
+            setupStartView();
         }
     }
 

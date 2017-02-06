@@ -1,15 +1,35 @@
 package com.kksionek.queuedroid.model;
 
+import android.os.Bundle;
+
 import com.kksionek.queuedroid.data.Player;
+import com.kksionek.queuedroid.view.MainActivity;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class QueueModel {
-    private final List<Player> mPlayers = new ArrayList<>();
-    private final List<Integer> mPoints = new ArrayList<>();
+    private static final String SIS_PLAYERS = "PLAYERS";
+    private static final String SIS_POINTS = "POINTS";
+    private static final String SIS_PREV_PLAYER = "PREV_PLAYER";
+    private static final String SIS_CUR_PLAYER = "CUR_PLAYER";
+
+    private final ArrayList<Player> mPlayers;
+    private final ArrayList<Integer> mPoints;
     private int mPreviousPlayerIndex = 0;
     private int mCurrentPlayerIndex = 0;
+
+    public QueueModel(Bundle savedInstanceState) {
+        if (savedInstanceState == null || !savedInstanceState.getBoolean(MainActivity.SIS_IN_GAME)) {
+            mPlayers = new ArrayList<>();
+            mPoints = new ArrayList<>();
+        } else {
+            mPlayers = savedInstanceState.getParcelableArrayList(SIS_PLAYERS);
+            mPoints = savedInstanceState.getIntegerArrayList(SIS_POINTS);
+            mPreviousPlayerIndex = savedInstanceState.getInt(SIS_PREV_PLAYER);
+            mCurrentPlayerIndex = savedInstanceState.getInt(SIS_CUR_PLAYER);
+        }
+    }
 
     public int getPlayersCount() {
         return mPlayers.size();
@@ -73,5 +93,17 @@ public class QueueModel {
                 list.add(player.getId());
         }
         return list;
+    }
+
+    public void saveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList(SIS_PLAYERS, mPlayers);
+        outState.putIntegerArrayList(SIS_POINTS, mPoints);
+        outState.putInt(SIS_PREV_PLAYER, mPreviousPlayerIndex);
+        outState.putInt(SIS_CUR_PLAYER, mCurrentPlayerIndex);
+    }
+
+
+    public Player getPlayerAt(int idx) {
+        return mPlayers.get(idx);
     }
 }
