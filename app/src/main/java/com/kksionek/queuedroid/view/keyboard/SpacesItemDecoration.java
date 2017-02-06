@@ -6,6 +6,7 @@ import android.support.annotation.DimenRes;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+@SuppressWarnings("SameParameterValue")
 class SpacesItemDecoration extends RecyclerView.ItemDecoration {
     private final int space;
 

@@ -24,7 +24,6 @@ import com.bumptech.glide.Glide;
 import com.kksionek.queuedroid.R;
 import com.kksionek.queuedroid.data.Player;
 import com.kksionek.queuedroid.data.PlayerItemData;
-import com.kksionek.queuedroid.view.MainActivity;
 import com.kksionek.queuedroid.view.MyAnimator;
 
 import java.util.ArrayList;
@@ -38,12 +37,12 @@ public class PlayerChooserViewAdapter extends RecyclerView.Adapter<PlayerChooser
 
     private static final String TAG = "PlayerChooserViewAdapte";
 
-    public static final String PAYLOAD_THUMBNAIL = "PAYLOAD_THUMBNAIL";
-    public static final String PAYLOAD_AUTOCOMPLETE = "PAYLOAD_AUTOCOMPLETE";
-    public static final String PAYLOAD_TEXT = "PAYLOAD_TEXT";
-    public static final String PAYLOAD_POINTS = "PAYLOAD_POINTS";
+    private static final String PAYLOAD_THUMBNAIL = "PAYLOAD_THUMBNAIL";
+    private static final String PAYLOAD_AUTOCOMPLETE = "PAYLOAD_AUTOCOMPLETE";
+    private static final String PAYLOAD_TEXT = "PAYLOAD_TEXT";
+    private static final String PAYLOAD_POINTS = "PAYLOAD_POINTS";
 
-    private List<PlayerItemData> mPlayers = new ArrayList<>();
+    private final List<PlayerItemData> mPlayers = new ArrayList<>();
     private List<Player> mAllPossiblePlayers = new ArrayList<>();
     private final QueueModel mQueueModel;
     private final ActionListener mActionListener;

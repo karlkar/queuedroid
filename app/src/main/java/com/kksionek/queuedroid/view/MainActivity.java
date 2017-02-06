@@ -50,7 +50,7 @@ import static android.content.Intent.ACTION_SEND;
 public class MainActivity extends AppCompatActivity implements PointsDialogFragment.PointsDialogListener, ActionListener {
 
     private static final String TAG = "MainActivity";
-    public static final int REQUEST_IMAGE_CAPTURE = 9876;
+    private static final int REQUEST_IMAGE_CAPTURE = 9876;
     public static final int PERMISSIONS_REQUEST_READ_CONTACTS = 2233;
 
     public static final String SIS_IN_GAME = "IN_GAME";
@@ -278,7 +278,7 @@ public class MainActivity extends AppCompatActivity implements PointsDialogFragm
         assignPointsAndNextTurn(points);
     }
 
-    public void requestPoints() {
+    private void requestPoints() {
         PointsDialogFragment dialog = new PointsDialogFragment();
         dialog.show(getFragmentManager(), "PointsDialogFragment");
     }
@@ -312,12 +312,11 @@ public class MainActivity extends AppCompatActivity implements PointsDialogFragm
         String imageFileName = "PNG_" + timeStamp + "_";
         File storageDir = getCacheDir();
         //TODO: Clean the cache
-        File image = File.createTempFile(
+        return File.createTempFile(
                 imageFileName,  /* prefix */
                 ".png",         /* suffix */
                 storageDir      /* directory */
         );
-        return image;
     }
 
     private void assignPointsAndNextTurn(int points) {
@@ -421,7 +420,7 @@ public class MainActivity extends AppCompatActivity implements PointsDialogFragm
 
     private class OnRestartGameClicked implements View.OnClickListener {
 
-        private boolean mHardReset;
+        private final boolean mHardReset;
 
         public OnRestartGameClicked(boolean hardReset) {
             mHardReset = hardReset;

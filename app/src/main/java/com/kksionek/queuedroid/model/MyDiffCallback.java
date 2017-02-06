@@ -1,6 +1,5 @@
 package com.kksionek.queuedroid.model;
 
-import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
 
 import com.kksionek.queuedroid.data.PlayerItemData;
@@ -12,7 +11,7 @@ import java.util.List;
 //import static com.kksionek.queuedroid.model.PlayerChooserViewAdapter.PAYLOAD_TEXT;
 //import static com.kksionek.queuedroid.model.PlayerChooserViewAdapter.PAYLOAD_THUMBNAIL;
 
-public class MyDiffCallback extends DiffUtil.Callback {
+class MyDiffCallback extends DiffUtil.Callback {
     private static final String TAG = "MyDiffCallback";
 
     private final List<PlayerItemData> mOldList;
@@ -71,4 +70,4 @@ public class MyDiffCallback extends DiffUtil.Callback {
 //            return null;
 //        return diffBundle;
 //    }
-};
+}

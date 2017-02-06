@@ -8,7 +8,6 @@ import android.util.Log;
 
 import com.kksionek.queuedroid.data.Player;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ContactsController {

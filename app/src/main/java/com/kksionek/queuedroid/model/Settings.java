@@ -3,6 +3,7 @@ package com.kksionek.queuedroid.model;
 import android.content.Context;
 import android.preference.PreferenceManager;
 
+@SuppressWarnings("SameParameterValue")
 public class Settings {
     public static final String PREF_SHOW_NO_POINTS_CONFIRMATION_DIALOG =
             "PREF_SHOW_NO_POINTS_CONFIRMATION_DIALOG";

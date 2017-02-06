@@ -2,19 +2,13 @@ package com.kksionek.queuedroid.view;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.animation.FloatEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
-import android.content.Context;
-import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.v4.util.ArrayMap;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
-import android.util.TypedValue;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.TextView;
 
 import com.kksionek.queuedroid.model.PlayerChooserViewAdapter;
@@ -143,7 +137,7 @@ public class MyAnimator extends DefaultItemAnimator {
     }
 
     private class AnimatorInfo {
-        ObjectAnimator textResizer;
+        final ObjectAnimator textResizer;
 
         public AnimatorInfo(ObjectAnimator oldTextRotator) {
             this.textResizer = oldTextRotator;
