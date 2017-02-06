@@ -32,6 +32,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import static android.support.v7.widget.RecyclerView.NO_POSITION;
+import static android.view.View.FOCUS_DOWN;
 
 public class PlayerChooserViewAdapter extends RecyclerView.Adapter<PlayerChooserViewAdapter.PlayerChooserViewHolder> {
 
@@ -311,6 +312,9 @@ public class PlayerChooserViewAdapter extends RecyclerView.Adapter<PlayerChooser
                     InputMethodManager imm = (InputMethodManager) view.getContext()
                             .getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(mAutoCompleteTextView.getWindowToken(), 0);
+                    View nextFocus = mAutoCompleteTextView.focusSearch(FOCUS_DOWN);
+                    if (nextFocus != null)
+                        nextFocus.requestFocus(FOCUS_DOWN);
                 }
             });
 
@@ -323,13 +327,14 @@ public class PlayerChooserViewAdapter extends RecyclerView.Adapter<PlayerChooser
                 public void onClick(View v) {
                     int pos = getAdapterPosition();
                     if (pos >= 0 && pos < mPlayers.size()) {
-                        if (!mPlayers.get(pos).isEditable())
+                        PlayerItemData playerItemData = mPlayers.get(pos);
+                        if (!playerItemData.isEditable())
                             return;
                         if (mPlayers.size() > 2) {
                             mPlayers.remove(pos);
                             notifyItemRemoved(pos);
                         } else {
-                            mPlayers.get(pos).reset();
+                            playerItemData.reset();
                             notifyItemChanged(pos);
                         }
                     }
