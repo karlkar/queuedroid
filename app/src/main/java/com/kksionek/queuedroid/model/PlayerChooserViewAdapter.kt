@@ -24,8 +24,8 @@ import com.kksionek.queuedroid.view.MyAnimator
 import java.util.*
 
 class PlayerChooserViewAdapter : RecyclerView.Adapter<PlayerChooserViewHolder> {
-    private val mPlayers: MutableList<PlayerItemData> = ArrayList()
-    private var mAllPossiblePlayers: List<Player?> = ArrayList()
+    private val mPlayers: MutableList<PlayerItemData> = mutableListOf()
+    private var mAllPossiblePlayers: List<Player?> = mutableListOf()
     private val mQueueModel: QueueModel
     private val mActionListener: ActionListener?
     private var mPhotoRequester: PlayerChooserViewHolder? = null

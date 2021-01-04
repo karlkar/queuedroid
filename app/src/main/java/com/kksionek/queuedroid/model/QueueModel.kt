@@ -2,7 +2,7 @@ package com.kksionek.queuedroid.model
 
 import android.os.Bundle
 import com.kksionek.queuedroid.data.Player
-import com.kksionek.queuedroid.view.MainActivity
+import com.kksionek.queuedroid.view.MainFragment.Companion.SIS_IN_GAME
 import java.util.*
 
 class QueueModel(savedInstanceState: Bundle?) {
@@ -81,7 +81,7 @@ class QueueModel(savedInstanceState: Bundle?) {
     }
 
     init {
-        if (savedInstanceState == null || !savedInstanceState.getBoolean(MainActivity.SIS_IN_GAME)) {
+        if (savedInstanceState == null || !savedInstanceState.getBoolean(SIS_IN_GAME)) {
             mPlayers = ArrayList()
             mPoints = ArrayList()
         } else {
