@@ -1,100 +1,86 @@
-package com.kksionek.queuedroid.view.keyboard;
+package com.kksionek.queuedroid.view.keyboard
 
-import android.content.Context;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import android.util.AttributeSet;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.content.Context
+import android.util.AttributeSet
+import android.view.LayoutInflater
+import android.view.View
+import android.widget.Button
+import android.widget.LinearLayout
+import android.widget.TextView
+import android.widget.Toast
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.kksionek.queuedroid.R
+import com.kksionek.queuedroid.model.Settings
+import com.kksionek.queuedroid.model.keyboard.KeyboardViewAdapter
 
-import com.kksionek.queuedroid.R;
-import com.kksionek.queuedroid.model.Settings;
-import com.kksionek.queuedroid.model.keyboard.KeyboardViewAdapter;
+class KeyboardView(context: Context?, attrs: AttributeSet?) : LinearLayout(context, attrs) {
 
-public class KeyboardView extends LinearLayout {
-    private static final String TAG = "KEYBOARDVIEW";
+    private val mCurPointsTextView: TextView
+    private val mButtonRecylerView: RecyclerView
+    private var mColsNum = 0
 
-    private static final int MAX_LENGTH = 10;
-
-    private final TextView mCurPointsTextView;
-    private final RecyclerView mButtonRecylerView;
-    private int mColsNum;
-
-    public KeyboardView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        LayoutInflater.from(getContext()).inflate(R.layout.keyboard, this);
-
-        mCurPointsTextView = (TextView) findViewById(R.id.cur_points);
-        Button clearButton = (Button) findViewById(R.id.clear_button);
-        clearButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                clearPoints();
-            }
-        });
-        Button backspaceButton = (Button) findViewById(R.id.backspace_button);
-        backspaceButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                CharSequence text = mCurPointsTextView.getText();
-                if (text.length() == 1)
-                    clearPoints();
-                else
-                    mCurPointsTextView.setText(text.subSequence(0, text.length() - 1));
-            }
-        });
-
-        mButtonRecylerView = (RecyclerView) findViewById(R.id.button_grid_view);
-        KeyboardViewAdapter keyboardViewAdapter = new KeyboardViewAdapter(getContext());
-        keyboardViewAdapter.setOnKeyboardItemClickListener(new KeyboardListener());
-        mButtonRecylerView.setAdapter(keyboardViewAdapter);
-        if (isInEditMode())
-            mColsNum = 5;
-        else
-            mColsNum = Settings.getKeyboardColumnsCount(getContext());
-        mButtonRecylerView.setLayoutManager(
-                new GridLayoutManager(
-                        getContext(),
-                        mColsNum,
-                        GridLayoutManager.VERTICAL,
-                        false));
-        mButtonRecylerView.addItemDecoration(
-                new SpacesItemDecoration(getContext(), R.dimen.keyboard_item_gap_size));
-    }
-
-    public void setColumnCount(int columnCount) {
+    fun setColumnCount(columnCount: Int) {
         if (mColsNum != columnCount) {
-            mColsNum = columnCount;
-            mButtonRecylerView.setLayoutManager(new GridLayoutManager(
-                    getContext(),
-                    mColsNum,
-                    GridLayoutManager.VERTICAL,
-                    false));
+            mColsNum = columnCount
+            mButtonRecylerView.layoutManager = GridLayoutManager(
+                context,
+                mColsNum,
+                GridLayoutManager.VERTICAL,
+                false
+            )
         }
     }
 
-    public int getPoints() {
-        return Integer.valueOf(mCurPointsTextView.getText().toString());
+    val points: Int
+        get() = mCurPointsTextView.text.toString().toInt()
+
+    fun clearPoints() {
+        mCurPointsTextView.text = "0"
     }
 
-    public void clearPoints() {
-        mCurPointsTextView.setText("0");
-    }
-
-    class KeyboardListener implements OnKeyboardItemClickListener {
-
-        public void onClick(int position) {
-            CharSequence text = mCurPointsTextView.getText();
-            if (text.charAt(0) == '0')
-                mCurPointsTextView.setText(String.valueOf(position));
-            else if (text.length() < MAX_LENGTH)
-                mCurPointsTextView.setText(text + String.valueOf(position));
-            else
-                Toast.makeText(getContext(), R.string.view_keyboard_too_long_input_message, Toast.LENGTH_SHORT).show();
+    internal inner class KeyboardListener : OnKeyboardItemClickListener {
+        override fun onClick(position: Int) {
+            val text = mCurPointsTextView.text
+            when {
+                text[0] == '0' -> mCurPointsTextView.text = position.toString()
+                text.length < MAX_LENGTH -> mCurPointsTextView.text = text.toString() + position.toString()
+                else -> Toast.makeText(
+                    context, R.string.view_keyboard_too_long_input_message, Toast.LENGTH_SHORT
+                ).show()
+            }
         }
+    }
+
+    companion object {
+        private const val TAG = "KEYBOARDVIEW"
+        private const val MAX_LENGTH = 10
+    }
+
+    init {
+        LayoutInflater.from(getContext()).inflate(R.layout.keyboard, this)
+        mCurPointsTextView = findViewById<View>(R.id.cur_points) as TextView
+        val clearButton = findViewById<View>(R.id.clear_button) as Button
+        clearButton.setOnClickListener { clearPoints() }
+        val backspaceButton = findViewById<View>(R.id.backspace_button) as Button
+        backspaceButton.setOnClickListener {
+            val text = mCurPointsTextView.text
+            if (text.length == 1) clearPoints() else mCurPointsTextView.text =
+                text.subSequence(0, text.length - 1)
+        }
+        mButtonRecylerView = findViewById<View>(R.id.button_grid_view) as RecyclerView
+        val keyboardViewAdapter = KeyboardViewAdapter(getContext())
+        keyboardViewAdapter.setOnKeyboardItemClickListener(KeyboardListener())
+        mButtonRecylerView.adapter = keyboardViewAdapter
+        mColsNum = if (isInEditMode) 5 else Settings.getKeyboardColumnsCount(getContext())
+        mButtonRecylerView.layoutManager = GridLayoutManager(
+            getContext(),
+            mColsNum,
+            GridLayoutManager.VERTICAL,
+            false
+        )
+        mButtonRecylerView.addItemDecoration(
+            SpacesItemDecoration(getContext(), R.dimen.keyboard_item_gap_size)
+        )
     }
 }

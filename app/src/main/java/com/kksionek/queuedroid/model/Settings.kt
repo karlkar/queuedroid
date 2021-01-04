@@ -1,57 +1,54 @@
-package com.kksionek.queuedroid.model;
+package com.kksionek.queuedroid.model
 
-import android.content.Context;
-import android.preference.PreferenceManager;
+import android.content.Context
+import androidx.preference.PreferenceManager
 
-@SuppressWarnings("SameParameterValue")
-public class Settings {
-    public static final String PREF_SHOW_NO_POINTS_CONFIRMATION_DIALOG =
-            "PREF_SHOW_NO_POINTS_CONFIRMATION_DIALOG";
-    public static final String PREF_KEEP_SCREEN_ON = "PREF_KEEP_SCREEN_ON";
-    public static final String PREF_KEYBOARD_COLUMNS = "PREF_KEYBOARD_COLUMNS";
-    public static final String PREF_USE_FACEBOOK = "PREF_USE_FACEBOOK";
-    public static final String PREF_USE_CONTACTS = "PREF_USE_CONTACTS";
-    public static final String PREF_USE_BUILT_IN_KEYBOARD = "PREF_USE_BUILT_IN_KEYBOARD";
+object Settings {
+    const val PREF_SHOW_NO_POINTS_CONFIRMATION_DIALOG = "PREF_SHOW_NO_POINTS_CONFIRMATION_DIALOG"
+    const val PREF_KEEP_SCREEN_ON = "PREF_KEEP_SCREEN_ON"
+    const val PREF_KEYBOARD_COLUMNS = "PREF_KEYBOARD_COLUMNS"
+    const val PREF_USE_FACEBOOK = "PREF_USE_FACEBOOK"
+    const val PREF_USE_CONTACTS = "PREF_USE_CONTACTS"
+    const val PREF_USE_BUILT_IN_KEYBOARD = "PREF_USE_BUILT_IN_KEYBOARD"
 
-    private Settings() {}
-
-    public static boolean isShowNoPointsConfirmationDialog(Context context) {
-        return getBoolean(context, PREF_SHOW_NO_POINTS_CONFIRMATION_DIALOG, true);
+    fun isShowNoPointsConfirmationDialog(context: Context?): Boolean {
+        return getBoolean(context, PREF_SHOW_NO_POINTS_CONFIRMATION_DIALOG, true)
     }
 
-    public static boolean getBoolean(Context context, String pref, boolean defVal) {
-        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(pref, defVal);
+    fun getBoolean(context: Context?, pref: String?, defVal: Boolean): Boolean {
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(pref, defVal)
     }
 
-    public static void setBoolean(Context context, String pref, boolean val) {
-        PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(pref, val).apply();
+    fun setBoolean(context: Context?, pref: String?, `val`: Boolean) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(pref, `val`)
+            .apply()
     }
 
-    public static String getString(Context context, String pref, String defVal) {
-        return PreferenceManager.getDefaultSharedPreferences(context).getString(pref, defVal);
+    fun getString(context: Context?, pref: String?, defVal: String?): String? {
+        return PreferenceManager.getDefaultSharedPreferences(context).getString(pref, defVal)
     }
 
-    public static void setString(Context context, String pref, String val) {
-        PreferenceManager.getDefaultSharedPreferences(context).edit().putString(pref, val).apply();
+    fun setString(context: Context?, pref: String?, `val`: String?) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putString(pref, `val`).apply()
     }
 
-    public static boolean isKeepOnScreen(Context context) {
-        return getBoolean(context, PREF_KEEP_SCREEN_ON, true);
+    fun isKeepOnScreen(context: Context?): Boolean {
+        return getBoolean(context, PREF_KEEP_SCREEN_ON, true)
     }
 
-    public static int getKeyboardColumnsCount(Context context) {
-        return Integer.valueOf(getString(context, PREF_KEYBOARD_COLUMNS, "5"));
+    fun getKeyboardColumnsCount(context: Context?): Int {
+        return Integer.valueOf(getString(context, PREF_KEYBOARD_COLUMNS, "5")!!)
     }
 
-    public static boolean isContactsEnabled(Context context) {
-        return getBoolean(context, PREF_USE_CONTACTS, false);
+    fun isContactsEnabled(context: Context?): Boolean {
+        return getBoolean(context, PREF_USE_CONTACTS, false)
     }
 
-    public static boolean isFacebookEnabled(Context context) {
-        return getBoolean(context, PREF_USE_FACEBOOK, false);
+    fun isFacebookEnabled(context: Context?): Boolean {
+        return getBoolean(context, PREF_USE_FACEBOOK, false)
     }
 
-    public static boolean shouldUseInAppKeyboard(Context context) {
-        return getBoolean(context, PREF_USE_BUILT_IN_KEYBOARD, true);
+    fun shouldUseInAppKeyboard(context: Context?): Boolean {
+        return getBoolean(context, PREF_USE_BUILT_IN_KEYBOARD, true)
     }
 }

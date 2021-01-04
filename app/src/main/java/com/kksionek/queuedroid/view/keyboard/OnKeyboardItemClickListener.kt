@@ -1,5 +1,5 @@
-package com.kksionek.queuedroid.view.keyboard;
+package com.kksionek.queuedroid.view.keyboard
 
-public interface OnKeyboardItemClickListener {
-    void onClick(int position);
+interface OnKeyboardItemClickListener {
+    fun onClick(position: Int)
 }

@@ -1,55 +1,39 @@
-package com.kksionek.queuedroid.model.keyboard;
+package com.kksionek.queuedroid.model.keyboard
 
-import android.content.Context;
-import android.graphics.Color;
-import androidx.recyclerview.widget.RecyclerView;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
+import android.content.Context
+import android.graphics.Color
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import androidx.recyclerview.widget.RecyclerView
+import com.kksionek.queuedroid.R
+import com.kksionek.queuedroid.view.keyboard.ButtonViewHolder
+import com.kksionek.queuedroid.view.keyboard.OnKeyboardItemClickListener
 
-import com.kksionek.queuedroid.R;
-import com.kksionek.queuedroid.view.keyboard.ButtonViewHolder;
-import com.kksionek.queuedroid.view.keyboard.OnKeyboardItemClickListener;
+class KeyboardViewAdapter(private val mCtx: Context) : RecyclerView.Adapter<ButtonViewHolder>() {
 
-import static androidx.recyclerview.widget.RecyclerView.NO_POSITION;
+    private var mOnKeyboardItemClickListener: OnKeyboardItemClickListener? = null
 
-public class KeyboardViewAdapter extends RecyclerView.Adapter<ButtonViewHolder> {
-
-    private final Context mCtx;
-    private OnKeyboardItemClickListener mOnKeyboardItemClickListener = null;
-
-    public KeyboardViewAdapter(Context context) {
-        mCtx = context;
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ButtonViewHolder {
+        val button = Button(mCtx)
+        button.setBackgroundResource(R.drawable.btn_small)
+        button.setTextColor(Color.rgb(0, 0, 0))
+        return ButtonViewHolder(button)
     }
 
-    @Override
-    public ButtonViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        Button button = new Button(mCtx);
-        button.setBackgroundResource(R.drawable.btn_small);
-        button.setTextColor(Color.rgb(0,0,0));
-        return new ButtonViewHolder(button);
+    override fun onBindViewHolder(holder: ButtonViewHolder, position: Int) {
+        holder.button.text = position.toString()
+        holder.button.setOnClickListener(View.OnClickListener {
+            val pos = holder.adapterPosition
+            if (pos == RecyclerView.NO_POSITION || mOnKeyboardItemClickListener == null) return@OnClickListener
+            mOnKeyboardItemClickListener!!.onClick(pos)
+        })
     }
 
-    @Override
-    public void onBindViewHolder(final ButtonViewHolder holder, int position) {
-        holder.button.setText(String.valueOf(position));
-        holder.button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int pos = holder.getAdapterPosition();
-                if (pos == NO_POSITION || mOnKeyboardItemClickListener == null)
-                    return;
-                mOnKeyboardItemClickListener.onClick(pos);
-            }
-        });
-    }
+    override fun getItemCount(): Int =
+        10
 
-    @Override
-    public int getItemCount() {
-        return 10;
-    }
-
-    public void setOnKeyboardItemClickListener(OnKeyboardItemClickListener onKeyboardItemClickListener) {
-        mOnKeyboardItemClickListener = onKeyboardItemClickListener;
+    fun setOnKeyboardItemClickListener(onKeyboardItemClickListener: OnKeyboardItemClickListener?) {
+        mOnKeyboardItemClickListener = onKeyboardItemClickListener
     }
 }

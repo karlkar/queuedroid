@@ -1,462 +1,407 @@
-package com.kksionek.queuedroid.view;
+package com.kksionek.queuedroid.view
 
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.net.Uri;
-import android.os.Bundle;
-import android.provider.MediaStore;
-import androidx.annotation.NonNull;
-import androidx.transition.TransitionManager;
-import androidx.core.content.FileProvider;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.Toast;
+import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.net.Uri
+import android.os.Bundle
+import android.provider.MediaStore
+import android.util.Log
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.LinearLayout
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.transition.TransitionManager
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
+import com.kksionek.queuedroid.R
+import com.kksionek.queuedroid.data.Player
+import com.kksionek.queuedroid.model.*
+import com.kksionek.queuedroid.model.FbController.FacebookLoginListener
+import com.kksionek.queuedroid.view.PointsDialogFragment.PointsDialogListener
+import com.kksionek.queuedroid.view.keyboard.KeyboardView
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.*
+import java.util.concurrent.atomic.AtomicInteger
 
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.kksionek.queuedroid.R;
-import com.kksionek.queuedroid.data.Player;
-import com.kksionek.queuedroid.model.ActionListener;
-import com.kksionek.queuedroid.model.ContactsController;
-import com.kksionek.queuedroid.model.FbController;
-import com.kksionek.queuedroid.model.PlayerChooserViewAdapter;
-import com.kksionek.queuedroid.model.QueueModel;
-import com.kksionek.queuedroid.model.Settings;
-import com.kksionek.queuedroid.view.keyboard.KeyboardView;
+class MainActivity : AppCompatActivity(), PointsDialogListener, ActionListener {
+    private var mItemsContainer: LinearLayout? = null
+    private var mRecyclerView: RecyclerView? = null
+    private var mAddPlayerBtn: Button? = null
+    private var mKeyboardView: KeyboardView? = null
+    private var mFirstBtn: Button? = null
+    private var mSecondBtn: Button? = null
+    private var mThirdBtn: Button? = null
+    private var mAdView: AdView? = null
+    private val mOnStartGameBtnClicked: View.OnClickListener = OnStartGameBtnClicked()
+    private val mOnSettingsBtnClicked = View.OnClickListener {
+        val intent = Intent(this@MainActivity, SettingsActivity::class.java)
+        startActivity(intent)
+    }
+    private val mOnEndGameBtnClicked: View.OnClickListener = OnEndGameBtnClicked()
+    private val mOnNextTurnBtnClicked: View.OnClickListener = OnNextTurnBtnClicked()
+    private lateinit var mQueueModel: QueueModel
+    private val mBackCounter = AtomicInteger(0)
+    private val mAllPlayers: MutableList<Player> = mutableListOf()
+    private var mPlayerChooserViewAdapter: PlayerChooserViewAdapter? = null
+    private var mRequestedPhotoURI: Uri? = null
+    private var mInGame = false
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import static android.content.Intent.ACTION_SEND;
-
-public class MainActivity extends AppCompatActivity implements PointsDialogFragment.PointsDialogListener, ActionListener {
-
-    private static final String TAG = "MainActivity";
-    private static final int REQUEST_IMAGE_CAPTURE = 9876;
-    public static final int PERMISSIONS_REQUEST_READ_CONTACTS = 2233;
-
-    public static final String SIS_IN_GAME = "IN_GAME";
-    public static final String SIS_ADAPTER_ITEMS = "ADAPTER_ITEMS";
-
-    private LinearLayout mItemsContainer;
-    private RecyclerView mRecyclerView;
-    private Button mAddPlayerBtn;
-    private KeyboardView mKeyboardView;
-    private Button mFirstBtn;
-    private Button mSecondBtn;
-    private Button mThirdBtn;
-    private AdView mAdView;
-
-    private final View.OnClickListener mOnStartGameBtnClicked = new OnStartGameBtnClicked();
-    private final View.OnClickListener mOnSettingsBtnClicked = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
-            startActivity(intent);
-        }
-    };
-    private final View.OnClickListener mOnEndGameBtnClicked = new OnEndGameBtnClicked();
-    private final View.OnClickListener mOnNextTurnBtnClicked = new OnNextTurnBtnClicked();
-
-    private QueueModel mQueueModel = null;
-    private final AtomicInteger mBackCounter = new AtomicInteger(0);
-    private final List<Player> mAllPlayers = new ArrayList<>();
-    private PlayerChooserViewAdapter mPlayerChooserViewAdapter;
-    private Uri mRequestedPhotoURI;
-    private boolean mInGame = false;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        final ViewGroup rootView = (ViewGroup) findViewById(R.id.root);
-
-        mItemsContainer = (LinearLayout) findViewById(R.id.activity_main_items_container);
-        mAddPlayerBtn = (Button) findViewById(R.id.activity_main_button_add_player);
-        mFirstBtn = (Button) findViewById(R.id.first_btn);
-        mSecondBtn = (Button) findViewById(R.id.second_btn);
-        mThirdBtn = (Button) findViewById(R.id.third_btn);
-        mRecyclerView = (RecyclerView) findViewById(R.id.activity_main_recyclerview);
-        mKeyboardView = (KeyboardView) findViewById(R.id.keyboard_view);
-        mAdView = (AdView) findViewById(R.id.ad_view);
-
-        mAddPlayerBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mPlayerChooserViewAdapter.add(new Player());
-            }
-        });
-
-        mFirstBtn.setText(R.string.activity_main_button_play);
-        mFirstBtn.setOnClickListener(mOnStartGameBtnClicked);
-
-        mSecondBtn.setText(R.string.activity_main_button_settings);
-        mSecondBtn.setOnClickListener(mOnSettingsBtnClicked);
-
-        mThirdBtn.setText(R.string.activity_main_button_share);
-        mThirdBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (Settings.isFacebookEnabled(getBaseContext())
-                        && FbController.isInitilized()
-                        && FbController.isLogged()) {
-                    FbController.shareOnFacebook(
-                            MainActivity.this,
-                            mQueueModel.getFbPlayers(),
-                            getRankBitmap());
-                } else {
-                    try {
-                        File file = new File(getCacheDir(), "SHARE.png");
-                        FileOutputStream fOut = new FileOutputStream(file);
-                        getRankBitmap().compress(Bitmap.CompressFormat.PNG, 100, fOut);
-                        fOut.flush();
-                        fOut.close();
-                        file.setReadable(true, false);
-                        final Intent intent = new Intent(ACTION_SEND);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
-                        intent.setType("image/png");
-                        startActivity(Intent.createChooser(intent, ""));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        val rootView = findViewById<View>(R.id.root) as ViewGroup
+        mItemsContainer = findViewById<View>(R.id.activity_main_items_container) as LinearLayout
+        mAddPlayerBtn = findViewById<View>(R.id.activity_main_button_add_player) as Button
+        mFirstBtn = findViewById<View>(R.id.first_btn) as Button
+        mSecondBtn = findViewById<View>(R.id.second_btn) as Button
+        mThirdBtn = findViewById<View>(R.id.third_btn) as Button
+        mRecyclerView = findViewById<View>(R.id.activity_main_recyclerview) as RecyclerView
+        mKeyboardView = findViewById<View>(R.id.keyboard_view) as KeyboardView
+        mAdView = findViewById<View>(R.id.ad_view) as AdView
+        mAddPlayerBtn!!.setOnClickListener { mPlayerChooserViewAdapter!!.add(Player()) }
+        mFirstBtn!!.setText(R.string.activity_main_button_play)
+        mFirstBtn!!.setOnClickListener(mOnStartGameBtnClicked)
+        mSecondBtn!!.setText(R.string.activity_main_button_settings)
+        mSecondBtn!!.setOnClickListener(mOnSettingsBtnClicked)
+        mThirdBtn!!.setText(R.string.activity_main_button_share)
+        mThirdBtn!!.setOnClickListener {
+            if (Settings.isFacebookEnabled(baseContext)
+                && FbController.isInitilized
+                && FbController.isLogged
+            ) {
+                FbController.shareOnFacebook(
+                    this@MainActivity,
+                    mQueueModel.fbPlayers,
+                    rankBitmap
+                )
+            } else {
+                try {
+                    val file = File(cacheDir, "SHARE.png")
+                    val fOut = FileOutputStream(file)
+                    rankBitmap.compress(Bitmap.CompressFormat.PNG, 100, fOut)
+                    fOut.flush()
+                    fOut.close()
+                    file.setReadable(true, false)
+                    val intent = Intent(Intent.ACTION_SEND)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file))
+                    intent.type = "image/png"
+                    startActivity(Intent.createChooser(intent, ""))
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
             }
-        });
-
-        mAdView.setVisibility(View.GONE);
-        AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice(getString(R.string.adMobTestDeviceS5))
-                .addTestDevice(getString(R.string.adMobTestDeviceS7))
-                .build();
-        mAdView.setAdListener(new AdListener() {
-            @Override
-            public void onAdLoaded() {
-                TransitionManager.beginDelayedTransition(rootView);
-                mAdView.setVisibility(View.VISIBLE);
+        }
+        mAdView!!.visibility = View.GONE
+        val adRequest = AdRequest.Builder()
+            .addTestDevice(getString(R.string.adMobTestDeviceS5))
+            .addTestDevice(getString(R.string.adMobTestDeviceS7))
+            .build()
+        mAdView!!.adListener = object : AdListener() {
+            override fun onAdLoaded() {
+                TransitionManager.beginDelayedTransition(rootView)
+                mAdView!!.visibility = View.VISIBLE
             }
-        });
-        mAdView.loadAd(adRequest);
-
-        getAutocompleteData();
-
-        mQueueModel = new QueueModel(savedInstanceState);
+        }
+        mAdView!!.loadAd(adRequest)
+        autocompleteData
+        mQueueModel = QueueModel(savedInstanceState)
         if (savedInstanceState == null) {
-            mPlayerChooserViewAdapter = new PlayerChooserViewAdapter(this, mQueueModel);
+            mPlayerChooserViewAdapter = PlayerChooserViewAdapter(this, mQueueModel)
         } else {
-            mInGame = savedInstanceState.getBoolean(SIS_IN_GAME);
+            mInGame = savedInstanceState.getBoolean(SIS_IN_GAME)
             if (mInGame) {
-                mPlayerChooserViewAdapter = new PlayerChooserViewAdapter(this, mQueueModel);
-                setupInGameView();
+                mPlayerChooserViewAdapter = PlayerChooserViewAdapter(this, mQueueModel)
+                setupInGameView()
             } else {
-                ArrayList<Player> adapterItems = savedInstanceState.getParcelableArrayList(SIS_ADAPTER_ITEMS);
-                mPlayerChooserViewAdapter = new PlayerChooserViewAdapter(this, mQueueModel, adapterItems);
+                val adapterItems: ArrayList<Player> =
+                    savedInstanceState.getParcelableArrayList<Player>(
+                        SIS_ADAPTER_ITEMS
+                    ) as ArrayList<Player>
+                mPlayerChooserViewAdapter =
+                    PlayerChooserViewAdapter(this, mQueueModel, adapterItems)
             }
         }
-
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(
-                getBaseContext(),
-                LinearLayoutManager.VERTICAL,
-                false));
-        mPlayerChooserViewAdapter.setAutocompleteItems(mAllPlayers);
-        DefaultItemAnimator itemAnimator = new MyAnimator();
-        mRecyclerView.setItemAnimator(itemAnimator);
-        mRecyclerView.setAdapter(mPlayerChooserViewAdapter);
+        mRecyclerView!!.layoutManager = LinearLayoutManager(
+            baseContext,
+            LinearLayoutManager.VERTICAL,
+            false
+        )
+        mPlayerChooserViewAdapter!!.setAutocompleteItems(mAllPlayers)
+        val itemAnimator: DefaultItemAnimator = MyAnimator()
+        mRecyclerView!!.itemAnimator = itemAnimator
+        mRecyclerView!!.adapter = mPlayerChooserViewAdapter
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putBoolean(SIS_IN_GAME, mInGame);
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(SIS_IN_GAME, mInGame)
         if (mInGame) {
-            mQueueModel.saveInstanceState(outState);
+            mQueueModel.saveInstanceState(outState)
         } else {
-            outState.putParcelableArrayList(SIS_ADAPTER_ITEMS, mPlayerChooserViewAdapter.getCurrentPlayers());
+            outState.putParcelableArrayList(
+                SIS_ADAPTER_ITEMS,
+                arrayListOf(*mPlayerChooserViewAdapter!!.currentPlayers.toTypedArray())
+            )
         }
     }
 
-    private void getAutocompleteData() {
-        //TODO: Load contacts after change in settings
-        if (Settings.isContactsEnabled(this)) {
-            ContactsController.loadContacts(this, mAllPlayers);
-        }
-        if (Settings.isFacebookEnabled(this) && FbController.isInitilized()) {
-            if (FbController.isLogged()) {
-                FbController.getInstance().getFriendData(mAllPlayers);
-                mPlayerChooserViewAdapter.setAutocompleteItems(mAllPlayers);
-            } else {
-                FbController.getInstance().logIn(this, new FbController.FacebookLoginListener() {
-                    @Override
-                    public void onLogged() {
-                        FbController.getInstance().getFriendData(mAllPlayers);
-                        mPlayerChooserViewAdapter.setAutocompleteItems(mAllPlayers);
-                    }
+    //TODO: Load contacts after change in settings
+    private val autocompleteData: Unit
+        get() {
+            //TODO: Load contacts after change in settings
+            if (Settings.isContactsEnabled(this)) {
+                ContactsController.loadContacts(this, mAllPlayers)
+            }
+            if (Settings.isFacebookEnabled(this) && FbController.isInitilized) {
+                if (FbController.isLogged) {
+                    FbController.instance.getFriendData(mAllPlayers)
+                    mPlayerChooserViewAdapter!!.setAutocompleteItems(mAllPlayers)
+                } else {
+                    FbController.instance.logIn(this, object : FacebookLoginListener {
+                        override fun onLogged() {
+                            FbController.instance.getFriendData(mAllPlayers)
+                            mPlayerChooserViewAdapter!!.setAutocompleteItems(mAllPlayers)
+                        }
 
-                    @Override
-                    public void onCancel() {
-                    }
-
-                    @Override
-                    public void onError() {
-                    }
-                });
+                        override fun onCancel() {}
+                        override fun onError() {}
+                    })
+                }
             }
         }
+
+    override fun onResume() {
+        super.onResume()
+        if (mKeyboardView != null) mKeyboardView!!.setColumnCount(
+            Settings.getKeyboardColumnsCount(
+                this
+            )
+        )
+        if (mAdView != null) mAdView!!.resume()
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (mKeyboardView != null)
-            mKeyboardView.setColumnCount(Settings.getKeyboardColumnsCount(this));
-
-        if (mAdView != null)
-            mAdView.resume();
+    override fun onPause() {
+        if (mAdView != null) mAdView!!.pause()
+        super.onPause()
     }
 
-    @Override
-    protected void onPause() {
-        if (mAdView != null)
-            mAdView.pause();
-        super.onPause();
-    }
-
-    @Override
-    public void onBackPressed() {
+    override fun onBackPressed() {
         if (mBackCounter.incrementAndGet() < 2) {
-            Toast.makeText(getBaseContext(), R.string.activity_main_on_back_pressed, Toast.LENGTH_SHORT).show();
-            new Timer().schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    mBackCounter.set(0);
+            Toast.makeText(baseContext, R.string.activity_main_on_back_pressed, Toast.LENGTH_SHORT)
+                .show()
+            Timer().schedule(object : TimerTask() {
+                override fun run() {
+                    mBackCounter.set(0)
                 }
-            }, 2000);
-        } else
-            super.onBackPressed();
+            }, 2000)
+        } else super.onBackPressed()
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_IMAGE_CAPTURE) {
             if (resultCode == RESULT_OK) {
-                setImageData(mRequestedPhotoURI);
-            } else
-                mRequestedPhotoURI = null;
-            return;
+                setImageData(mRequestedPhotoURI!!)
+            } else mRequestedPhotoURI = null
+            return
         }
-        super.onActivityResult(requestCode, resultCode, data);
-        FbController.getInstance().onActivityResult(requestCode, resultCode, data);
+        super.onActivityResult(requestCode, resultCode, data)
+        FbController.instance.onActivityResult(requestCode, resultCode, data)
     }
 
-    private void setImageData(@NonNull Uri data) {
-        Log.d(TAG, "setImageData: " + data.toString());
-        mPlayerChooserViewAdapter.setRequestedPhoto(data);
-        mRequestedPhotoURI = null;
+    private fun setImageData(data: Uri) {
+        Log.d(TAG, "setImageData: $data")
+        mPlayerChooserViewAdapter!!.setRequestedPhoto(data)
+        mRequestedPhotoURI = null
     }
 
-    @Override
-    public void onDialogPositiveClick(int points) {
-        assignPointsAndNextTurn(points);
+    override fun onDialogPositiveClick(points: Int) {
+        assignPointsAndNextTurn(points)
     }
 
-    private void requestPoints() {
-        PointsDialogFragment dialog = new PointsDialogFragment();
-        dialog.show(getFragmentManager(), "PointsDialogFragment");
+    private fun requestPoints() {
+        val dialog = PointsDialogFragment()
+        dialog.show(supportFragmentManager, "PointsDialogFragment")
     }
 
-    @Override
-    public void requestPhoto() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        takePictureIntent.putExtra("aspectX", 1);
-        takePictureIntent.putExtra("aspectY", 1);
-        takePictureIntent.putExtra("outputX", 300);
-        takePictureIntent.putExtra("outputY", 300);
-        if (takePictureIntent.resolveActivity(this.getPackageManager()) != null) {
-            File photoFile = null;
+    override fun requestPhoto() {
+        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        takePictureIntent.putExtra("aspectX", 1)
+        takePictureIntent.putExtra("aspectY", 1)
+        takePictureIntent.putExtra("outputX", 300)
+        takePictureIntent.putExtra("outputY", 300)
+        if (takePictureIntent.resolveActivity(this.packageManager) != null) {
+            var photoFile: File? = null
             try {
-                photoFile = createImageFile();
-            } catch (IOException e) {
-                e.printStackTrace();
+                photoFile = createImageFile()
+            } catch (e: IOException) {
+                e.printStackTrace()
             }
             if (photoFile != null) {
-                mRequestedPhotoURI = FileProvider.getUriForFile(this,
-                        "com.kksionek.queuedroid",
-                        photoFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mRequestedPhotoURI);
-                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                mRequestedPhotoURI = FileProvider.getUriForFile(
+                    this,
+                    "com.kksionek.queuedroid",
+                    photoFile
+                )
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mRequestedPhotoURI)
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
             }
         }
     }
 
-    private File createImageFile() throws IOException {
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-        String imageFileName = "PNG_" + timeStamp + "_";
-        File storageDir = getCacheDir();
+    @Throws(IOException::class)
+    private fun createImageFile(): File {
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val imageFileName = "PNG_" + timeStamp + "_"
+        val storageDir = cacheDir
         //TODO: Clean the cache
         return File.createTempFile(
-                imageFileName,  /* prefix */
-                ".png",         /* suffix */
-                storageDir      /* directory */
-        );
+            imageFileName,  /* prefix */
+            ".png",  /* suffix */
+            storageDir /* directory */
+        )
     }
 
-    private void assignPointsAndNextTurn(int points) {
-        mQueueModel.nextTurn(points);
-        mKeyboardView.clearPoints();
-        int currentPlayerIndex = mQueueModel.getCurrentPlayerIndex();
-        mPlayerChooserViewAdapter.updatePoints(
-                mQueueModel.getPreviousPlayerIndex(),
-                currentPlayerIndex);
-        if (currentPlayerIndex == 0)
-            mRecyclerView.smoothScrollToPosition(currentPlayerIndex);
-        else
-            mRecyclerView.scrollToPosition(currentPlayerIndex);
+    private fun assignPointsAndNextTurn(points: Int) {
+        mQueueModel.nextTurn(points)
+        mKeyboardView!!.clearPoints()
+        val currentPlayerIndex = mQueueModel.currentPlayerIndex
+        mPlayerChooserViewAdapter!!.updatePoints(
+            mQueueModel.previousPlayerIndex,
+            currentPlayerIndex
+        )
+        if (currentPlayerIndex == 0) mRecyclerView!!.smoothScrollToPosition(currentPlayerIndex) else mRecyclerView!!.scrollToPosition(
+            currentPlayerIndex
+        )
     }
 
-    private Bitmap getRankBitmap() {
-        Bitmap bitmap = Bitmap.createBitmap(
-                mItemsContainer.getMeasuredWidth(),
-                mItemsContainer.getMeasuredHeight(),
-                Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        mItemsContainer.draw(canvas);
-        return bitmap;
-    }
+    private val rankBitmap: Bitmap
+        get() {
+            val bitmap = Bitmap.createBitmap(
+                mItemsContainer!!.measuredWidth,
+                mItemsContainer!!.measuredHeight,
+                Bitmap.Config.ARGB_8888
+            )
+            val canvas = Canvas(bitmap)
+            mItemsContainer!!.draw(canvas)
+            return bitmap
+        }
 
-    private class OnStartGameBtnClicked implements View.OnClickListener {
-        @Override
-        public void onClick(View v) {
-            List<Player> currentPlayers = mPlayerChooserViewAdapter.getCurrentPlayers();
-            if (currentPlayers.size() >= 2) {
-                mInGame = true;
-                View currentFocus = getCurrentFocus();
-                if (currentFocus != null)
-                    currentFocus.clearFocus();
-                mRecyclerView.smoothScrollToPosition(0);
-                mPlayerChooserViewAdapter.startGame();
-                mQueueModel.newGame(currentPlayers);
-
-                setupInGameView();
+    private inner class OnStartGameBtnClicked : View.OnClickListener {
+        override fun onClick(v: View) {
+            val currentPlayers = mPlayerChooserViewAdapter!!.currentPlayers
+            if (currentPlayers.size >= 2) {
+                mInGame = true
+                val currentFocus = currentFocus
+                currentFocus?.clearFocus()
+                mRecyclerView!!.smoothScrollToPosition(0)
+                mPlayerChooserViewAdapter!!.startGame()
+                mQueueModel.newGame(currentPlayers)
+                setupInGameView()
             } else {
-                Toast.makeText(MainActivity.this,
-                        R.string.activity_main_start_wrong_player_on_list_error_message,
-                        Toast.LENGTH_LONG)
-                        .show();
+                Toast.makeText(
+                    this@MainActivity,
+                    R.string.activity_main_start_wrong_player_on_list_error_message,
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
     }
 
-    private void setupInGameView() {
-        mAddPlayerBtn.setVisibility(View.GONE);
-
-        mKeyboardView.setVisibility(Settings.shouldUseInAppKeyboard(MainActivity.this) ?
-                View.VISIBLE : View.GONE);
-        mKeyboardView.clearPoints();
-        mRecyclerView.setKeepScreenOn(Settings.isKeepOnScreen(MainActivity.this));
-
-        mFirstBtn.setText(R.string.activity_main_button_next_turn);
-        mFirstBtn.setOnClickListener(mOnNextTurnBtnClicked);
-
-        mSecondBtn.setText(R.string.activity_main_button_end_game);
-        mSecondBtn.setOnClickListener(mOnEndGameBtnClicked);
+    private fun setupInGameView() {
+        mAddPlayerBtn!!.visibility = View.GONE
+        mKeyboardView!!.visibility =
+            if (Settings.shouldUseInAppKeyboard(this@MainActivity)) View.VISIBLE else View.GONE
+        mKeyboardView!!.clearPoints()
+        mRecyclerView!!.keepScreenOn =
+            Settings.isKeepOnScreen(this@MainActivity)
+        mFirstBtn!!.setText(R.string.activity_main_button_next_turn)
+        mFirstBtn!!.setOnClickListener(mOnNextTurnBtnClicked)
+        mSecondBtn!!.setText(R.string.activity_main_button_end_game)
+        mSecondBtn!!.setOnClickListener(mOnEndGameBtnClicked)
     }
 
-    private void setupResultView() {
-        mKeyboardView.setVisibility(View.GONE);
-        mAddPlayerBtn.setVisibility(View.GONE);
-
-        mFirstBtn.setText(R.string.activity_main_button_new_game);
-        mFirstBtn.setOnClickListener(new OnRestartGameClicked(true));
-
-        mSecondBtn.setText(R.string.activity_main_button_play_again);
-        mSecondBtn.setOnClickListener(new OnRestartGameClicked(false));
-
-        mThirdBtn.setText(R.string.activity_main_button_share);
-        mThirdBtn.setVisibility(View.VISIBLE);
+    private fun setupResultView() {
+        mKeyboardView!!.visibility = View.GONE
+        mAddPlayerBtn!!.visibility = View.GONE
+        mFirstBtn!!.setText(R.string.activity_main_button_new_game)
+        mFirstBtn!!.setOnClickListener(OnRestartGameClicked(true))
+        mSecondBtn!!.setText(R.string.activity_main_button_play_again)
+        mSecondBtn!!.setOnClickListener(OnRestartGameClicked(false))
+        mThirdBtn!!.setText(R.string.activity_main_button_share)
+        mThirdBtn!!.visibility = View.VISIBLE
     }
 
-    private void setupStartView() {
-        mKeyboardView.setVisibility(View.GONE);
-        mAddPlayerBtn.setVisibility(View.VISIBLE);
-
-        mFirstBtn.setText(R.string.activity_main_button_play);
-        mFirstBtn.setOnClickListener(mOnStartGameBtnClicked);
-
-        mSecondBtn.setText(R.string.activity_main_button_settings);
-        mSecondBtn.setOnClickListener(mOnSettingsBtnClicked);
-
-        mThirdBtn.setVisibility(View.GONE);
+    private fun setupStartView() {
+        mKeyboardView!!.visibility = View.GONE
+        mAddPlayerBtn!!.visibility = View.VISIBLE
+        mFirstBtn!!.setText(R.string.activity_main_button_play)
+        mFirstBtn!!.setOnClickListener(mOnStartGameBtnClicked)
+        mSecondBtn!!.setText(R.string.activity_main_button_settings)
+        mSecondBtn!!.setOnClickListener(mOnSettingsBtnClicked)
+        mThirdBtn!!.visibility = View.GONE
     }
 
-    private class OnEndGameBtnClicked implements View.OnClickListener {
-        @Override
-        public void onClick(View view) {
-            mInGame = false;
-            mPlayerChooserViewAdapter.endGame(mQueueModel);
-            mQueueModel.resetScoreboard();
-
-            setupResultView();
+    private inner class OnEndGameBtnClicked : View.OnClickListener {
+        override fun onClick(view: View) {
+            mInGame = false
+            mPlayerChooserViewAdapter!!.endGame(mQueueModel)
+            mQueueModel.resetScoreboard()
+            setupResultView()
         }
     }
 
-    private class OnRestartGameClicked implements View.OnClickListener {
-
-        private final boolean mHardReset;
-
-        public OnRestartGameClicked(boolean hardReset) {
-            mHardReset = hardReset;
-        }
-
-        @Override
-        public void onClick(View v) {
-            mPlayerChooserViewAdapter.reset(mHardReset);
-            setupStartView();
+    private inner class OnRestartGameClicked(private val mHardReset: Boolean) :
+        View.OnClickListener {
+        override fun onClick(v: View) {
+            mPlayerChooserViewAdapter!!.reset(mHardReset)
+            setupStartView()
         }
     }
 
-    private class OnNextTurnBtnClicked implements View.OnClickListener {
-        @Override
-        public void onClick(View v) {
-            if (Settings.shouldUseInAppKeyboard(MainActivity.this)) {
-                int pointsCollected = mKeyboardView.getPoints();
+    private inner class OnNextTurnBtnClicked : View.OnClickListener {
+        override fun onClick(v: View) {
+            if (Settings.shouldUseInAppKeyboard(this@MainActivity)) {
+                val pointsCollected = mKeyboardView!!.points
                 if (pointsCollected == 0
-                        && Settings.isShowNoPointsConfirmationDialog(MainActivity.this)) {
-                    CheckboxAlertDialog dialog = new CheckboxAlertDialog();
-                    dialog.show(MainActivity.this,
-                            R.string.checkbox_alert_dialog_title,
-                            R.string.checkbox_alert_dialog_message,
-                            new CheckboxAlertDialog.OnDialogClosedListener() {
-                                @Override
-                                public void onDialogClosed(boolean result) {
-                                    if (result)
-                                        assignPointsAndNextTurn(0);
-                                }
-                            });
-                    return;
+                    && Settings.isShowNoPointsConfirmationDialog(this@MainActivity)
+                ) {
+                    val dialog = CheckboxAlertDialog()
+                    dialog.show(
+                        this@MainActivity,
+                        R.string.checkbox_alert_dialog_title,
+                        R.string.checkbox_alert_dialog_message,
+                        object : CheckboxAlertDialog.OnDialogClosedListener {
+                            override fun onDialogClosed(result: Boolean) {
+                                if (result) assignPointsAndNextTurn(0)
+                            }
+                        })
+                    return
                 }
-                assignPointsAndNextTurn(pointsCollected);
+                assignPointsAndNextTurn(pointsCollected)
             } else {
-                requestPoints();
+                requestPoints()
             }
         }
+    }
+
+    companion object {
+        private const val TAG = "MainActivity"
+        private const val REQUEST_IMAGE_CAPTURE = 9876
+
+        const val PERMISSIONS_REQUEST_READ_CONTACTS = 2233
+        const val SIS_IN_GAME = "IN_GAME"
+        const val SIS_ADAPTER_ITEMS = "ADAPTER_ITEMS"
     }
 }

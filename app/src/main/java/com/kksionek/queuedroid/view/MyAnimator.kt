@@ -1,181 +1,149 @@
-package com.kksionek.queuedroid.view;
+package com.kksionek.queuedroid.view
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
-import androidx.annotation.NonNull;
-import androidx.collection.ArrayMap;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.RecyclerView;
-import android.util.DisplayMetrics;
-import android.widget.TextView;
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
+import androidx.collection.ArrayMap
+import androidx.core.animation.addListener
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.RecyclerView
+import com.kksionek.queuedroid.model.PlayerChooserViewAdapter.PlayerChooserViewHolder
 
-import com.kksionek.queuedroid.model.PlayerChooserViewAdapter;
+class MyAnimator : DefaultItemAnimator() {
+    companion object {
+        private const val TAG = "MyAnimator"
+        private const val ANIMATION_DURATION = 600
 
-import java.util.List;
+        const val FONT_SMALL_SIZE = 15
+        const val FONT_LARGE_SIZE = 30
 
-public class MyAnimator extends DefaultItemAnimator {
-    private static final String TAG = "MyAnimator";
+        private val sIncreaseAnimator = ValueAnimator.ofFloat(
+            FONT_SMALL_SIZE.toFloat(),
+            FONT_LARGE_SIZE.toFloat()
+        ).also { it.duration = ANIMATION_DURATION.toLong() }
 
-    private static final int ANIMATION_DURATION = 600;
-    public static final int FONT_SMALL_SIZE = 15;
-    public static final int FONT_LARGE_SIZE = 30;
-
-    private static final ValueAnimator sIncreaseAnimator = ValueAnimator.ofFloat(
-            FONT_SMALL_SIZE,
-            FONT_LARGE_SIZE);
-    private static final ValueAnimator sDecreaseAnimator = ValueAnimator.ofFloat(
-            FONT_LARGE_SIZE,
-            FONT_SMALL_SIZE);
-
-    static {
-        sIncreaseAnimator.setDuration(ANIMATION_DURATION);
-        sDecreaseAnimator.setDuration(ANIMATION_DURATION);
+        private val sDecreaseAnimator = ValueAnimator.ofFloat(
+            FONT_LARGE_SIZE.toFloat(),
+            FONT_SMALL_SIZE.toFloat()
+        ).also { it.duration = ANIMATION_DURATION.toLong() }
     }
 
-    private final ArrayMap<RecyclerView.ViewHolder, AnimatorInfo> mAnimatorMap = new ArrayMap<>();
+    private val mAnimatorMap = ArrayMap<RecyclerView.ViewHolder, AnimatorInfo>()
 
-    @Override
-    public boolean canReuseUpdatedViewHolder(@NonNull RecyclerView.ViewHolder viewHolder) {
-        return false;
+    override fun canReuseUpdatedViewHolder(viewHolder: RecyclerView.ViewHolder): Boolean =
+        false
+
+    private fun getItemHolderInfo(
+        viewHolder: PlayerChooserViewHolder,
+        info: PlayerItemInfo
+    ): ItemHolderInfo {
+        info.textSize = viewHolder.mTextView.textSize
+        return info
     }
 
-    @NonNull
-    private ItemHolderInfo getItemHolderInfo(
-            PlayerChooserViewAdapter.PlayerChooserViewHolder viewHolder,
-            PlayerItemInfo info) {
-        info.textSize = viewHolder.mTextView.getTextSize();
-        return info;
-    }
-
-    @NonNull
-    @Override
-    public ItemHolderInfo recordPreLayoutInformation(RecyclerView.State state,
-                                                     RecyclerView.ViewHolder viewHolder,
-                                                     int changeFlags,
-                                                     List<Object> payloads) {
-        PlayerItemInfo info = (PlayerItemInfo) super.recordPreLayoutInformation(
-                state,
-                viewHolder,
-                changeFlags,
-                payloads);
+    override fun recordPreLayoutInformation(
+        state: RecyclerView.State,
+        viewHolder: RecyclerView.ViewHolder,
+        changeFlags: Int,
+        payloads: List<Any>
+    ): ItemHolderInfo {
+        val info = super.recordPreLayoutInformation(
+            state,
+            viewHolder,
+            changeFlags,
+            payloads
+        ) as PlayerItemInfo
         return getItemHolderInfo(
-                (PlayerChooserViewAdapter.PlayerChooserViewHolder) viewHolder,
-                info);
+            viewHolder as PlayerChooserViewHolder,
+            info
+        )
     }
 
-    @NonNull
-    @Override
-    public ItemHolderInfo recordPostLayoutInformation(@NonNull RecyclerView.State state,
-                                                      @NonNull RecyclerView.ViewHolder viewHolder) {
-        PlayerItemInfo info = (PlayerItemInfo) super.recordPostLayoutInformation(state, viewHolder);
-        return getItemHolderInfo((PlayerChooserViewAdapter.PlayerChooserViewHolder) viewHolder, info);
+    override fun recordPostLayoutInformation(
+        state: RecyclerView.State,
+        viewHolder: RecyclerView.ViewHolder
+    ): ItemHolderInfo {
+        val info = super.recordPostLayoutInformation(state, viewHolder) as PlayerItemInfo
+        return getItemHolderInfo(viewHolder as PlayerChooserViewHolder, info)
     }
 
-    @Override
-    public ItemHolderInfo obtainHolderInfo() {
-        return new PlayerItemInfo();
+    override fun obtainHolderInfo(): ItemHolderInfo {
+        return PlayerItemInfo()
     }
 
-    private class PlayerItemInfo extends ItemHolderInfo {
-        float textSize;
+    private inner class PlayerItemInfo : ItemHolderInfo() {
+        var textSize = 0f
     }
 
-    @Override
-    public boolean animateChange(
-            @NonNull RecyclerView.ViewHolder oldHolder,
-            @NonNull final RecyclerView.ViewHolder newHolder,
-            @NonNull ItemHolderInfo preInfo,
-            @NonNull ItemHolderInfo postInfo) {
-        if (oldHolder != newHolder) {
-            return super.animateChange(oldHolder, newHolder, preInfo, postInfo);
+    override fun animateChange(
+        oldHolder: RecyclerView.ViewHolder,
+        newHolder: RecyclerView.ViewHolder,
+        preInfo: ItemHolderInfo,
+        postInfo: ItemHolderInfo
+    ): Boolean {
+        if (oldHolder !== newHolder) {
+            return super.animateChange(oldHolder, newHolder, preInfo, postInfo)
         }
-
-        PlayerChooserViewAdapter.PlayerChooserViewHolder viewHolder =
-                (PlayerChooserViewAdapter.PlayerChooserViewHolder) newHolder;
-
-        DisplayMetrics metrics = viewHolder.mTextView.getContext().getResources().getDisplayMetrics();
-        PlayerItemInfo oldInfo = (PlayerItemInfo) preInfo;
-        PlayerItemInfo newInfo = (PlayerItemInfo) postInfo;
-        float oldSize = oldInfo.textSize / metrics.scaledDensity;
-        float newSize = newInfo.textSize / metrics.scaledDensity;
-
-        final TextView newTextView = viewHolder.mTextView;
-
-        AnimatorInfo runningInfo = mAnimatorMap.get(newHolder);
-        long prevAnimPlayTime = 0;
+        val viewHolder = newHolder as PlayerChooserViewHolder
+        val metrics = viewHolder.mTextView.context.resources.displayMetrics
+        val oldInfo = preInfo as PlayerItemInfo
+        val newInfo = postInfo as PlayerItemInfo
+        val oldSize = oldInfo.textSize / metrics.scaledDensity
+        val newSize = newInfo.textSize / metrics.scaledDensity
+        val newTextView = viewHolder.mTextView
+        val runningInfo = mAnimatorMap[newHolder]
+        var prevAnimPlayTime: Long = 0
         if (runningInfo != null) {
-            prevAnimPlayTime = runningInfo.textResizer.getCurrentPlayTime();
-            runningInfo.textResizer.cancel();
+            prevAnimPlayTime = runningInfo.textResizer.currentPlayTime
+            runningInfo.textResizer.cancel()
         }
-
-        float startSize = oldSize;
+        var startSize = oldSize
         if (runningInfo != null) {
-            startSize = (float) runningInfo.textResizer.getAnimatedValue();
+            startSize = runningInfo.textResizer.animatedValue as Float
         }
-        ObjectAnimator textResizeAnim = ObjectAnimator.ofFloat(newTextView, "textSize", startSize, newSize);
+        val textResizeAnim = ObjectAnimator.ofFloat(newTextView, "textSize", startSize, newSize)
         if (runningInfo != null) {
-            textResizeAnim.setCurrentPlayTime(prevAnimPlayTime);
+            textResizeAnim.currentPlayTime = prevAnimPlayTime
         }
-
-        textResizeAnim.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                dispatchAnimationFinished(newHolder);
-                synchronized (mAnimatorMap) {
-                    mAnimatorMap.remove(newHolder);
-                }
-            }
-        });
-        textResizeAnim.start();
-
-        AnimatorInfo runningAnimInfo = new AnimatorInfo(textResizeAnim);
-        mAnimatorMap.put(newHolder, runningAnimInfo);
-
-        return true;
+        textResizeAnim.addListener {
+            dispatchAnimationFinished(newHolder)
+            synchronized(mAnimatorMap) { mAnimatorMap.remove(newHolder) }
+        }
+        textResizeAnim.start()
+        val runningAnimInfo = AnimatorInfo(textResizeAnim)
+        mAnimatorMap[newHolder] = runningAnimInfo
+        return true
     }
 
-    private class AnimatorInfo {
-        final ObjectAnimator textResizer;
+    private inner class AnimatorInfo(val textResizer: ObjectAnimator)
 
-        public AnimatorInfo(ObjectAnimator oldTextRotator) {
-            this.textResizer = oldTextRotator;
-        }
-    }
-
-    @Override
-    public void endAnimation(RecyclerView.ViewHolder item) {
-        super.endAnimation(item);
-        synchronized (mAnimatorMap) {
-            if (!mAnimatorMap.isEmpty()) {
-                final int numRunning = mAnimatorMap.size();
-                for (int i = numRunning; i >= 0; i--) {
+    override fun endAnimation(item: RecyclerView.ViewHolder) {
+        super.endAnimation(item)
+        synchronized(mAnimatorMap) {
+            if (!mAnimatorMap.isEmpty) {
+                val numRunning: Int = mAnimatorMap.size
+                for (i in numRunning downTo 0) {
                     try {
-                        if (item == mAnimatorMap.keyAt(i)) {
-                            mAnimatorMap.valueAt(i).textResizer.cancel();
+                        if (item === mAnimatorMap.keyAt(i)) {
+                            mAnimatorMap.valueAt(i).textResizer.cancel()
                         }
-                    } catch (ArrayIndexOutOfBoundsException ex) {
-                        ex.printStackTrace();
+                    } catch (ex: ArrayIndexOutOfBoundsException) {
+                        ex.printStackTrace()
                     }
                 }
             }
         }
     }
 
-    @Override
-    public boolean isRunning() {
-        return super.isRunning() || !mAnimatorMap.isEmpty();
-    }
+    override fun isRunning(): Boolean =
+        super.isRunning() || !mAnimatorMap.isEmpty
 
-    @Override
-    public void endAnimations() {
-        super.endAnimations();
-        synchronized (mAnimatorMap) {
-            if (!mAnimatorMap.isEmpty()) {
-                final int numRunning = mAnimatorMap.size();
-                for (int i = numRunning; i >= 0; i--) {
-                    mAnimatorMap.valueAt(i).textResizer.cancel();
+    override fun endAnimations() {
+        super.endAnimations()
+        synchronized(mAnimatorMap) {
+            if (mAnimatorMap.isNotEmpty()) {
+                val numRunning: Int = mAnimatorMap.size
+                for (i in numRunning downTo 0) {
+                    mAnimatorMap.valueAt(i).textResizer.cancel()
                 }
             }
         }

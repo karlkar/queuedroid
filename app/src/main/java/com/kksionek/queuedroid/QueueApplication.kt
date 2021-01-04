@@ -1,11 +1,5 @@
-package com.kksionek.queuedroid;
+package com.kksionek.queuedroid
 
-import android.app.Application;
+import android.app.Application
 
-public class QueueApplication extends Application {
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-    }
-}
+class QueueApplication : Application()

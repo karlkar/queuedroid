@@ -1,65 +1,58 @@
-package com.kksionek.queuedroid.view;
+package com.kksionek.queuedroid.view
 
-import android.content.Context;
-import android.content.DialogInterface;
-import androidx.annotation.StringRes;
-import androidx.appcompat.app.AlertDialog;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.CheckBox;
+import android.content.Context
+import android.content.DialogInterface
+import android.view.LayoutInflater
+import android.view.View
+import android.widget.CheckBox
+import androidx.annotation.StringRes
+import androidx.appcompat.app.AlertDialog
+import com.kksionek.queuedroid.R
+import com.kksionek.queuedroid.model.Settings
 
-import com.kksionek.queuedroid.R;
-import com.kksionek.queuedroid.model.Settings;
+internal class CheckboxAlertDialog {
 
-import static com.kksionek.queuedroid.model.Settings.PREF_SHOW_NO_POINTS_CONFIRMATION_DIALOG;
-
-@SuppressWarnings("SameParameterValue")
-class CheckboxAlertDialog {
-
-    public interface OnDialogClosedListener {
-        void onDialogClosed(boolean result);
+    interface OnDialogClosedListener {
+        fun onDialogClosed(result: Boolean)
     }
 
-    private Context mContext;
-    private CheckBox mDontShowAgain = null;
+    private var mContext: Context? = null
+    private var mDontShowAgain: CheckBox? = null
+    private var mClosedListener: OnDialogClosedListener? = null
 
-    private OnDialogClosedListener mClosedListener;
+    fun show(
+        context: Context?,
+        @StringRes title: Int,
+        @StringRes message: Int,
+        listener: OnDialogClosedListener?
+    ) {
+        mContext = context
+        mClosedListener = listener
+        val eulaLayout = LayoutInflater.from(mContext)
+            .inflate(R.layout.checkbox_alert_dialog, null)
+        mDontShowAgain = eulaLayout.findViewById<View>(R.id.skip) as CheckBox
 
-    public CheckboxAlertDialog() {
+        AlertDialog.Builder(mContext!!)
+            .setView(eulaLayout)
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton(android.R.string.ok, DialogButtonClickListener(true))
+            .setNegativeButton(android.R.string.cancel, DialogButtonClickListener(false))
+            .show()
     }
 
-    public void show(Context context, @StringRes int title, @StringRes int message, OnDialogClosedListener listener) {
-        mContext = context;
-        mClosedListener = listener;
+    private inner class DialogButtonClickListener(
+        private var mRetVal: Boolean = false
+    ) : DialogInterface.OnClickListener {
 
-        AlertDialog.Builder adb = new AlertDialog.Builder(mContext);
-        View eulaLayout = LayoutInflater.from(mContext)
-                .inflate(R.layout.checkbox_alert_dialog, null);
-
-        mDontShowAgain = (CheckBox) eulaLayout.findViewById(R.id.skip);
-        adb.setView(eulaLayout);
-        adb.setTitle(title);
-        adb.setMessage(message);
-        adb.setPositiveButton(android.R.string.ok, new DialogButtonClickListener(true));
-        adb.setNegativeButton(android.R.string.cancel, new DialogButtonClickListener(false));
-        adb.show();
-    }
-
-    private class DialogButtonClickListener implements DialogInterface.OnClickListener {
-        private boolean mRetVal = false;
-
-        public DialogButtonClickListener(boolean val) {
-            mRetVal = val;
-        }
-
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-            Settings.setBoolean(mContext,
-                    PREF_SHOW_NO_POINTS_CONFIRMATION_DIALOG,
-                    !mDontShowAgain.isChecked());
-
-            dialog.cancel();
-            mClosedListener.onDialogClosed(mRetVal);
+        override fun onClick(dialog: DialogInterface, which: Int) {
+            Settings.setBoolean(
+                mContext,
+                Settings.PREF_SHOW_NO_POINTS_CONFIRMATION_DIALOG,
+                !mDontShowAgain!!.isChecked
+            )
+            dialog.cancel()
+            mClosedListener!!.onDialogClosed(mRetVal)
         }
     }
 }

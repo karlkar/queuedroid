@@ -1,171 +1,141 @@
-package com.kksionek.queuedroid.model;
+package com.kksionek.queuedroid.model
 
-import android.app.Activity;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import android.util.Log;
+import android.app.Activity
+import android.content.Intent
+import android.graphics.Bitmap
+import android.os.Bundle
+import android.util.Log
+import com.facebook.*
+import com.facebook.login.LoginManager
+import com.facebook.login.LoginResult
+import com.facebook.share.model.SharePhoto
+import com.facebook.share.model.SharePhotoContent
+import com.facebook.share.widget.ShareDialog
+import com.kksionek.queuedroid.data.Player
+import org.json.JSONException
 
-import com.facebook.AccessToken;
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
-import com.facebook.FacebookSdk;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
-import com.facebook.HttpMethod;
-import com.facebook.login.LoginManager;
-import com.facebook.login.LoginResult;
-import com.facebook.share.model.SharePhoto;
-import com.facebook.share.model.SharePhotoContent;
-import com.facebook.share.widget.ShareDialog;
-import com.kksionek.queuedroid.data.Player;
+class FbController private constructor() {
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+    private var mMyProfile: Player? = null
+    private lateinit var mLoginManager: LoginManager
+    private var mCallbackManager: CallbackManager? = null
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-public class FbController {
-
-    private static final String TAG = "FbController";
-
-    private Player mMyProfile = null;
-    private LoginManager mLoginManager = null;
-    private CallbackManager mCallbackManager = null;
-
-    public interface FacebookLoginListener {
-        void onLogged();
-
-        void onCancel();
-
-        void onError();
+    interface FacebookLoginListener {
+        fun onLogged()
+        fun onCancel()
+        fun onError()
     }
 
-    private static final FbController sInstance = new FbController();
-
-    public static FbController getInstance() {
-        return sInstance;
-    }
-
-    private FbController() {
-    }
-
-    public static boolean isInitilized() {
-        return FacebookSdk.isInitialized();
-    }
-
-    public static boolean isLogged() {
-        return AccessToken.getCurrentAccessToken() != null;
-    }
-
-    public void logIn(@NonNull Activity activity, final FacebookLoginListener listener) {
-        mLoginManager = LoginManager.getInstance();
-        mCallbackManager = CallbackManager.Factory.create();
-        mLoginManager.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-                Log.d(TAG, "onSuccess: Facebook logged in");
-                getMyProfile(null);
-                listener.onLogged();
+    fun logIn(activity: Activity, listener: FacebookLoginListener) {
+        mLoginManager = LoginManager.getInstance()
+        mCallbackManager = CallbackManager.Factory.create()
+        mLoginManager.registerCallback(mCallbackManager, object : FacebookCallback<LoginResult?> {
+            override fun onSuccess(loginResult: LoginResult?) {
+                Log.d(TAG, "onSuccess: Facebook logged in")
+                getMyProfile(null)
+                listener.onLogged()
             }
 
-            @Override
-            public void onCancel() {
-                Log.d(TAG, "onCancel: Facebook login cancelled");
-                listener.onCancel();
+            override fun onCancel() {
+                Log.d(TAG, "onCancel: Facebook login cancelled")
+                listener.onCancel()
             }
 
-            @Override
-            public void onError(FacebookException error) {
-                Log.e(TAG, "onError: Facebook login error. Should try again...");
-                listener.onError();
+            override fun onError(error: FacebookException) {
+                Log.e(TAG, "onError: Facebook login error. Should try again...")
+                listener.onError()
             }
-        });
-        mLoginManager.logInWithReadPermissions(activity, Arrays.asList("user_friends"));
+        })
+        mLoginManager.logInWithReadPermissions(activity, listOf("user_friends"))
     }
 
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (mCallbackManager != null)
-            mCallbackManager.onActivityResult(requestCode, resultCode, data);
+    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        mCallbackManager?.onActivityResult(
+            requestCode,
+            resultCode,
+            data
+        )
     }
 
-    private void getMyProfile(@Nullable final List<Player> targetList) {
-        GraphRequest req = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
-            @Override
-            public void onCompleted(JSONObject object, GraphResponse response) {
-                Log.d(TAG, "onCompleted: " + object.toString());
-                mMyProfile = Player.createFacebookFriend(object, true);
-                if (targetList != null)
-                    targetList.add(mMyProfile);
-            }
-        });
-        Bundle parameters = new Bundle();
-        parameters.putString("fields", "id,name,picture");
-        req.setParameters(parameters);
-        req.executeAsync();
-    }
-
-    public void getFriendData(@NonNull List<Player> targetList) {
-        requestFriends(targetList, null);
-    }
-
-    private void requestFriends(@NonNull final List<Player> targetList, @Nullable String nextToken) {
-        GraphRequest req = new GraphRequest(AccessToken.getCurrentAccessToken(), "/me/taggable_friends", null, HttpMethod.GET, new GraphRequest.Callback() {
-            @Override
-            public void onCompleted(GraphResponse response) {
-                Log.d(TAG, "onCompleted: response = " + response.toString());
-                if (response.getError() != null)
-                    Log.e(TAG, "onCompleted: Couldn't obtain friend data.");
-                else {
-                    try {
-                        JSONArray friendArray = response.getJSONObject().getJSONArray("data");
-                        for (int i = 0; i < friendArray.length(); ++i) {
-                            Log.d(TAG, "onCompleted: FRIEND = " + friendArray.get(i).toString());
-                            targetList.add(Player.createFacebookFriend(friendArray.getJSONObject(i)));
-                        }
-                        if (!response.getJSONObject().isNull("paging")) {
-                            String token = response.getJSONObject().getJSONObject("paging").getJSONObject("cursors").getString("after");
-                            requestFriends(targetList, token);
-                        } else {
-                            if (mMyProfile != null)
-                                targetList.add(mMyProfile);
-                            else
-                                getMyProfile(targetList);
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+    private fun getMyProfile(targetList: MutableList<Player>?) {
+        val req =
+            GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken()) { `object`, _ ->
+                Log.d(TAG, "onCompleted: $`object`")
+                mMyProfile = Player.createFacebookFriend(`object`, true)?.also {
+                    targetList?.add(it)
                 }
             }
-        });
-        if (nextToken != null) {
-            Bundle parameters = new Bundle();
-            parameters.putString("after", nextToken);
-            req.setParameters(parameters);
-        }
-        req.executeAsync();
+        val parameters = Bundle()
+        parameters.putString("fields", "id,name,picture")
+        req.parameters = parameters
+        req.executeAsync()
     }
 
-    public static void shareOnFacebook(@NonNull Activity activity, @NonNull ArrayList<String> list, @NonNull Bitmap bitmap) {
-        if (ShareDialog.canShow(SharePhotoContent.class)) {
-            SharePhoto photo = new SharePhoto.Builder()
+    fun getFriendData(targetList: MutableList<Player>) {
+        requestFriends(targetList, null)
+    }
+
+    private fun requestFriends(targetList: MutableList<Player>, nextToken: String?) {
+        val req = GraphRequest(
+            AccessToken.getCurrentAccessToken(),
+            "/me/taggable_friends",
+            null,
+            HttpMethod.GET
+        ) { response ->
+            Log.d(TAG, "onCompleted: response = $response")
+            if (response.error != null) Log.e(
+                TAG,
+                "onCompleted: Couldn't obtain friend data."
+            ) else {
+                try {
+                    val friendArray = response.jsonObject.getJSONArray("data")
+                    for (i in 0 until friendArray.length()) {
+                        Log.d(TAG, "onCompleted: FRIEND = " + friendArray[i].toString())
+                        targetList.add(Player.createFacebookFriend(friendArray.getJSONObject(i)))
+                    }
+                    if (!response.jsonObject.isNull("paging")) {
+                        val token =
+                            response.jsonObject.getJSONObject("paging").getJSONObject("cursors")
+                                .getString("after")
+                        requestFriends(targetList, token)
+                    } else {
+                        mMyProfile?.let { targetList.add(it) } ?: getMyProfile(targetList)
+                    }
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                }
+            }
+        }
+        if (nextToken != null) {
+            val parameters = Bundle()
+            parameters.putString("after", nextToken)
+            req.parameters = parameters
+        }
+        req.executeAsync()
+    }
+
+    companion object {
+        private const val TAG = "FbController"
+
+        val instance = FbController()
+        val isInitilized: Boolean
+            get() = FacebookSdk.isInitialized()
+        val isLogged: Boolean
+            get() = AccessToken.getCurrentAccessToken() != null
+
+        fun shareOnFacebook(activity: Activity, list: List<String>, bitmap: Bitmap) {
+            if (ShareDialog.canShow(SharePhotoContent::class.java)) {
+                val photo = SharePhoto.Builder()
                     .setBitmap(bitmap)
                     .setUserGenerated(true)
-                    .build();
-
-            SharePhotoContent sharePhotoContent = new SharePhotoContent.Builder()
+                    .build()
+                val sharePhotoContent = SharePhotoContent.Builder()
                     .addPhoto(photo)
                     .setPeopleIds(list)
-                    .build();
-
-            ShareDialog shareDialog = new ShareDialog(activity);
-            shareDialog.show(sharePhotoContent);
+                    .build()
+                val shareDialog = ShareDialog(activity)
+                shareDialog.show(sharePhotoContent)
+            }
         }
     }
 }

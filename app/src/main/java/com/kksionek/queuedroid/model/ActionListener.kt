@@ -1,5 +1,5 @@
-package com.kksionek.queuedroid.model;
+package com.kksionek.queuedroid.model
 
-public interface ActionListener {
-    void requestPhoto();
+interface ActionListener {
+    fun requestPhoto()
 }

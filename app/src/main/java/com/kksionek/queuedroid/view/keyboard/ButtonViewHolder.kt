@@ -1,15 +1,9 @@
-package com.kksionek.queuedroid.view.keyboard;
+package com.kksionek.queuedroid.view.keyboard
 
-import androidx.recyclerview.widget.RecyclerView;
-import android.view.View;
-import android.widget.Button;
+import android.view.View
+import android.widget.Button
+import androidx.recyclerview.widget.RecyclerView
 
-public class ButtonViewHolder extends RecyclerView.ViewHolder {
-
-    public final Button button;
-
-    public ButtonViewHolder(View itemView) {
-        super(itemView);
-        button = (Button) itemView;
-    }
+class ButtonViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    val button: Button = itemView as Button
 }

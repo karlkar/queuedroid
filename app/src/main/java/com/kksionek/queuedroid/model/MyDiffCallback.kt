@@ -1,73 +1,59 @@
-package com.kksionek.queuedroid.model;
+package com.kksionek.queuedroid.model
 
-import androidx.recyclerview.widget.DiffUtil;
-
-import com.kksionek.queuedroid.data.PlayerItemData;
-
-import java.util.List;
+import androidx.recyclerview.widget.DiffUtil
+import com.kksionek.queuedroid.data.PlayerItemData
 
 //import static com.kksionek.queuedroid.model.PlayerChooserViewAdapter.PAYLOAD_AUTOCOMPLETE;
 //import static com.kksionek.queuedroid.model.PlayerChooserViewAdapter.PAYLOAD_POINTS;
 //import static com.kksionek.queuedroid.model.PlayerChooserViewAdapter.PAYLOAD_TEXT;
 //import static com.kksionek.queuedroid.model.PlayerChooserViewAdapter.PAYLOAD_THUMBNAIL;
 
-class MyDiffCallback extends DiffUtil.Callback {
-    private static final String TAG = "MyDiffCallback";
+internal class MyDiffCallback(
+    private val mOldList: List<PlayerItemData>,
+    private val mNewList: List<PlayerItemData>
+) : DiffUtil.Callback() {
 
-    private final List<PlayerItemData> mOldList;
-    private final List<PlayerItemData> mNewList;
+    override fun getOldListSize(): Int = mOldList.size
 
-    public MyDiffCallback(List<PlayerItemData> oldList, List<PlayerItemData> newList) {
-        mOldList = oldList;
-        mNewList = newList;
+    override fun getNewListSize(): Int = mNewList.size
+
+    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        return mOldList[oldItemPosition].initialPosition ==
+                mNewList[newItemPosition].initialPosition
     }
 
-    @Override
-    public int getOldListSize() {
-        return mOldList.size();
-    }
+    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        return mOldList[oldItemPosition] == mNewList[newItemPosition]
+    } //    @Nullable
 
-    @Override
-    public int getNewListSize() {
-        return mNewList.size();
-    }
+    //    @Override
+    //    public Object getChangePayload(int oldItemPosition, int newItemPosition) {
+    //        PlayerItemData oldItem = mOldList.get(oldItemPosition);
+    //        PlayerItemData newItem = mNewList.get(newItemPosition);
+    //
+    //        Bundle diffBundle = new Bundle();
+    //        if (!oldItem.getName().equals(newItem.getName())
+    //                || oldItem.isCurrent() != newItem.isCurrent()
+    //                || oldItem.isEditable() != newItem.isEditable()) {
+    //            Log.d(TAG, "getChangePayload: name/current/editable changed");
+    //            diffBundle.putBoolean(PAYLOAD_AUTOCOMPLETE, true);
+    //            diffBundle.putBoolean(PAYLOAD_TEXT, true);
+    //        }
+    //        if (!oldItem.getImage().equals(newItem.getImage())) {
+    //            Log.d(TAG, "getChangePayload: image changed");
+    //            diffBundle.putBoolean(PAYLOAD_THUMBNAIL, true);
+    //        }
+    //        if (oldItem.getPoints() != newItem.getPoints()
+    //                || oldItem.isEditable() != newItem.isEditable()) {
+    //            Log.d(TAG, "getChangePayload: points/editable changed");
+    //            diffBundle.putBoolean(PAYLOAD_POINTS, true);
+    //        }
+    //        if (diffBundle.size() == 0)
+    //            return null;
+    //        return diffBundle;
+    //    }
 
-    @Override
-    public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-        return mOldList.get(oldItemPosition).getInitialPosition() ==
-                mNewList.get(newItemPosition).getInitialPosition();
+    companion object {
+        private const val TAG = "MyDiffCallback"
     }
-
-    @Override
-    public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-        return mOldList.get(oldItemPosition).equals(mNewList.get(newItemPosition));
-    }
-
-//    @Nullable
-//    @Override
-//    public Object getChangePayload(int oldItemPosition, int newItemPosition) {
-//        PlayerItemData oldItem = mOldList.get(oldItemPosition);
-//        PlayerItemData newItem = mNewList.get(newItemPosition);
-//
-//        Bundle diffBundle = new Bundle();
-//        if (!oldItem.getName().equals(newItem.getName())
-//                || oldItem.isCurrent() != newItem.isCurrent()
-//                || oldItem.isEditable() != newItem.isEditable()) {
-//            Log.d(TAG, "getChangePayload: name/current/editable changed");
-//            diffBundle.putBoolean(PAYLOAD_AUTOCOMPLETE, true);
-//            diffBundle.putBoolean(PAYLOAD_TEXT, true);
-//        }
-//        if (!oldItem.getImage().equals(newItem.getImage())) {
-//            Log.d(TAG, "getChangePayload: image changed");
-//            diffBundle.putBoolean(PAYLOAD_THUMBNAIL, true);
-//        }
-//        if (oldItem.getPoints() != newItem.getPoints()
-//                || oldItem.isEditable() != newItem.isEditable()) {
-//            Log.d(TAG, "getChangePayload: points/editable changed");
-//            diffBundle.putBoolean(PAYLOAD_POINTS, true);
-//        }
-//        if (diffBundle.size() == 0)
-//            return null;
-//        return diffBundle;
-//    }
 }

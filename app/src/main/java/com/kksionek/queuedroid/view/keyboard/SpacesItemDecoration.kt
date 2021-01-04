@@ -1,24 +1,23 @@
-package com.kksionek.queuedroid.view.keyboard;
+package com.kksionek.queuedroid.view.keyboard
 
-import android.content.Context;
-import android.graphics.Rect;
-import androidx.annotation.DimenRes;
-import androidx.recyclerview.widget.RecyclerView;
-import android.view.View;
+import android.content.Context
+import android.graphics.Rect
+import android.view.View
+import androidx.annotation.DimenRes
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 
-@SuppressWarnings("SameParameterValue")
-class SpacesItemDecoration extends RecyclerView.ItemDecoration {
-    private final int space;
+internal class SpacesItemDecoration(ctx: Context, @DimenRes space: Int) : ItemDecoration() {
 
-    public SpacesItemDecoration(Context ctx, @DimenRes int space) {
-        this.space = ctx.getResources().getDimensionPixelSize(space);
+    private val space = ctx.resources.getDimensionPixelSize(space)
+
+    override fun getItemOffsets(
+        outRect: Rect, view: View,
+        parent: RecyclerView, state: RecyclerView.State
+    ) {
+        outRect.left = space
+        outRect.right = space
+        outRect.top = space
     }
 
-    @Override
-    public void getItemOffsets(Rect outRect, View view,
-                               RecyclerView parent, RecyclerView.State state) {
-        outRect.left = space;
-        outRect.right = space;
-        outRect.top = space;
-    }
 }
