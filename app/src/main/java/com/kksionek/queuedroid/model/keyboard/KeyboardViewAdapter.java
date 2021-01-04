@@ -2,7 +2,7 @@ package com.kksionek.queuedroid.model.keyboard;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -11,7 +11,7 @@ import com.kksionek.queuedroid.R;
 import com.kksionek.queuedroid.view.keyboard.ButtonViewHolder;
 import com.kksionek.queuedroid.view.keyboard.OnKeyboardItemClickListener;
 
-import static android.support.v7.widget.RecyclerView.NO_POSITION;
+import static androidx.recyclerview.widget.RecyclerView.NO_POSITION;
 
 public class KeyboardViewAdapter extends RecyclerView.Adapter<ButtonViewHolder> {
 

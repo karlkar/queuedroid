@@ -1,6 +1,6 @@
 package com.kksionek.queuedroid.model;
 
-import android.support.v7.util.DiffUtil;
+import androidx.recyclerview.widget.DiffUtil;
 
 import com.kksionek.queuedroid.data.PlayerItemData;
 
