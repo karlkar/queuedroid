@@ -1,9 +1,10 @@
 package com.kksionek.queuedroid.view.keyboard
 
-import android.view.View
-import android.widget.Button
 import androidx.recyclerview.widget.RecyclerView
+import com.kksionek.queuedroid.databinding.KeyboardButtonBinding
 
-class ButtonViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    val button: Button = itemView as Button
+class ButtonViewHolder(
+    private val binding: KeyboardButtonBinding
+) : RecyclerView.ViewHolder(binding.root) {
+    val button get() = binding.root
 }

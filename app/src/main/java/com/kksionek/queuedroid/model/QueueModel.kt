@@ -1,94 +1,88 @@
 package com.kksionek.queuedroid.model
 
-import android.os.Bundle
 import com.kksionek.queuedroid.data.Player
-import com.kksionek.queuedroid.view.MainFragment.Companion.SIS_IN_GAME
-import java.util.*
 
-class QueueModel(savedInstanceState: Bundle?) {
+class QueueModel {
 
-    private var mPlayers: MutableList<Player>? = null
-    private var mPoints: MutableList<Int>? = null
+    private val players = mutableListOf<Player>()
+    private val points = mutableListOf<Int>()
 
-    var previousPlayerIndex = 0
-        private set
     var currentPlayerIndex = 0
         private set
     val playersCount: Int
-        get() = mPlayers!!.size
+        get() = players.size
     val currentPlayer: String
-        get() = mPlayers!![currentPlayerIndex].name
+        get() = players[currentPlayerIndex].name
 
-    fun nextTurn(points: Int) {
-        previousPlayerIndex = currentPlayerIndex
-        mPoints!![currentPlayerIndex] = mPoints!![currentPlayerIndex] + points
-        currentPlayerIndex = ++currentPlayerIndex % mPlayers!!.size
+    fun dump(): Map<Player, Int> {
+        return players.zip(points) { player, points ->
+            player to points
+        }.toMap()
     }
 
-    val points: List<Int>
-        get() = mPoints!!
+    fun nextTurn(aPoints: Int) {
+        points[currentPlayerIndex] = points[currentPlayerIndex] + aPoints
+        currentPlayerIndex = ++currentPlayerIndex % players.size
+    }
+
+    val pointList: List<Int>
+        get() = points
 
     fun newGame() {
-        for (i in mPoints!!.indices) mPoints!![i] = 0
+        for (i in points.indices) {
+            points[i] = 0
+        }
     }
 
-    fun newGame(players: List<Player>) {
-        previousPlayerIndex = 0
+    fun newGame(playerList: List<Player>) {
         currentPlayerIndex = 0
-        mPlayers!!.clear()
-        mPoints!!.clear()
-        for (player in players) {
-            mPlayers!!.add(player)
-            mPoints!!.add(0)
+        players.clear()
+        points.clear()
+        for (player in playerList) {
+            players.add(player)
+            points.add(0)
         }
     }
 
     fun resetScoreboard() {
-        mPlayers!!.clear()
-        mPoints!!.clear()
+        players.clear()
+        points.clear()
     }
 
-    fun getPointsOfPlayer(index: Int): Int {
-        return mPoints!![index]
-    }
-
-    val pointsOfPreviousPlayer: Int
-        get() = mPoints!![previousPlayerIndex]
+    fun getPointsOfPlayer(index: Int): Int =
+        points[index]
 
     val fbPlayers: List<String>
-        get() {
-            return mPlayers?.filter { it.isFromFacebook && !it.isMyFbProfile }
-                ?.map { it.name }
-                .orEmpty()
-        }
+        get() = players.filter { it.isFromFacebook && !it.isMyFbProfile }
+            .map { it.name }
 
-    fun saveInstanceState(outState: Bundle) {
-        outState.putParcelableArrayList(SIS_PLAYERS, arrayListOf(*mPlayers!!.toTypedArray()))
-        outState.putIntegerArrayList(SIS_POINTS, arrayListOf(*mPoints!!.toTypedArray()))
-        outState.putInt(SIS_PREV_PLAYER, previousPlayerIndex)
-        outState.putInt(SIS_CUR_PLAYER, currentPlayerIndex)
-    }
 
-    fun getPlayerAt(idx: Int): Player {
-        return mPlayers!![idx]
-    }
+    fun getPlayerAt(idx: Int): Player =
+        players[idx]
 
-    companion object {
-        private const val SIS_PLAYERS = "PLAYERS"
-        private const val SIS_POINTS = "POINTS"
-        private const val SIS_PREV_PLAYER = "PREV_PLAYER"
-        private const val SIS_CUR_PLAYER = "CUR_PLAYER"
-    }
-
-    init {
-        if (savedInstanceState == null || !savedInstanceState.getBoolean(SIS_IN_GAME)) {
-            mPlayers = ArrayList()
-            mPoints = ArrayList()
-        } else {
-            mPlayers = savedInstanceState.getParcelableArrayList(SIS_PLAYERS)
-            mPoints = savedInstanceState.getIntegerArrayList(SIS_POINTS)
-            previousPlayerIndex = savedInstanceState.getInt(SIS_PREV_PLAYER)
-            currentPlayerIndex = savedInstanceState.getInt(SIS_CUR_PLAYER)
-        }
-    }
+//    fun saveInstanceState(outState: Bundle) {
+//        outState.putParcelableArrayList(SIS_PLAYERS, arrayListOf(*players!!.toTypedArray()))
+//        outState.putIntegerArrayList(SIS_POINTS, arrayListOf(*points!!.toTypedArray()))
+//        outState.putInt(SIS_PREV_PLAYER, previousPlayerIndex)
+//        outState.putInt(SIS_CUR_PLAYER, currentPlayerIndex)
+//    }
+//
+//    companion object {
+//        private const val SIS_PLAYERS = "PLAYERS"
+//        private const val SIS_POINTS = "POINTS"
+//        private const val SIS_PREV_PLAYER = "PREV_PLAYER"
+//        private const val SIS_CUR_PLAYER = "CUR_PLAYER"
+//    }
+//
+//    init {
+//        if (savedInstanceState == null || !savedInstanceState.getBoolean(SIS_IN_GAME)) {
+//            players = mutableListOf()
+//            points = mutableListOf()
+//        } else {
+//            players = savedInstanceState.getParcelableArrayList(SIS_PLAYERS)
+//            points = savedInstanceState.getIntegerArrayList(SIS_POINTS)
+//            previousPlayerIndex = savedInstanceState.getInt(SIS_PREV_PLAYER)
+//            currentPlayerIndex = savedInstanceState.getInt(SIS_CUR_PLAYER)
+//        }
+//    }
 }

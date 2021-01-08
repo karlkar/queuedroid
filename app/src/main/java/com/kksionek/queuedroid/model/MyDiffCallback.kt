@@ -17,14 +17,12 @@ internal class MyDiffCallback(
 
     override fun getNewListSize(): Int = mNewList.size
 
-    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return mOldList[oldItemPosition].initialPosition ==
-                mNewList[newItemPosition].initialPosition
-    }
+    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+        mOldList[oldItemPosition].initialPosition == mNewList[newItemPosition].initialPosition
 
-    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return mOldList[oldItemPosition] == mNewList[newItemPosition]
-    } //    @Nullable
+    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+        mOldList[oldItemPosition] == mNewList[newItemPosition]
+    //    @Nullable
 
     //    @Override
     //    public Object getChangePayload(int oldItemPosition, int newItemPosition) {

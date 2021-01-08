@@ -12,86 +12,63 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
-import android.widget.AdapterView.OnItemClickListener
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.kksionek.queuedroid.R
 import com.kksionek.queuedroid.data.Player
 import com.kksionek.queuedroid.data.PlayerItemData
+import com.kksionek.queuedroid.databinding.PlayerChooserViewBinding
 import com.kksionek.queuedroid.model.PlayerChooserViewAdapter.PlayerChooserViewHolder
 import com.kksionek.queuedroid.view.MyAnimator
 import java.util.*
 
-class PlayerChooserViewAdapter : RecyclerView.Adapter<PlayerChooserViewHolder> {
-    private val mPlayers: MutableList<PlayerItemData> = mutableListOf()
-    private var mAllPossiblePlayers: List<Player?> = mutableListOf()
-    private val mQueueModel: QueueModel
-    private val mActionListener: ActionListener?
-    private var mPhotoRequester: PlayerChooserViewHolder? = null
+class PlayerChooserViewAdapter(
+    private val actionListener: ActionListener
+) : RecyclerView.Adapter<PlayerChooserViewHolder>() {
 
-    constructor(actionListener: ActionListener?, queueModel: QueueModel) {
-        mActionListener = actionListener
-        mQueueModel = queueModel
+    private val players: MutableList<PlayerItemData> = mutableListOf()
+    private var allPossiblePlayers: List<Player> = emptyList()
+
+    private var photoRequester: PlayerChooserViewHolder? = null
+
+    // TODO: should be private?
+    var isEditable: Boolean = true
+
+    init {
         setHasStableIds(true)
-        if (queueModel.playersCount == 0) {
-            mPlayers.add(PlayerItemData())
-            mPlayers.add(PlayerItemData())
-        } else {
-            for (i in 0 until mQueueModel.playersCount) {
-                mPlayers.add(
-                    PlayerItemData(
-                        mQueueModel.getPlayerAt(i),
-                        mQueueModel.getPointsOfPlayer(i)
-                    )
-                )
-                mPlayers[i].isEditable = false
-                mPlayers[i].isCurrent = i == mQueueModel.currentPlayerIndex
-            }
-        }
+        players.addAll(listOf(PlayerItemData(), PlayerItemData()))
     }
 
-    constructor(
-        actionListener: ActionListener?,
-        queueModel: QueueModel,
-        items: List<Player>
-    ) {
-        mActionListener = actionListener
-        mQueueModel = queueModel
-        setHasStableIds(true)
-        for (player in items) {
-            mPlayers.add(PlayerItemData(player))
-        }
-        while (mPlayers.size < 2) {
-            mPlayers.add(PlayerItemData())
-        }
-    }
-
-    override fun getItemId(position: Int): Long {
-        return mPlayers[position].initialPosition.toLong()
-    }
+    override fun getItemId(position: Int): Long =
+        players[position].initialPosition.toLong()
 
     fun add(player: Player) {
-        mPlayers.add(PlayerItemData(player))
-        notifyItemInserted(mPlayers.size - 1)
+        players.add(PlayerItemData(player))
+        notifyItemInserted(players.size - 1)
     }
 
     fun addAll(adapterItems: List<Player>) {
-        mPlayers.addAll(adapterItems.map { PlayerItemData(it) })
-        notifyItemRangeInserted(mPlayers.size, adapterItems.size)
+        val startPosition = players.size
+        players.addAll(adapterItems.map { PlayerItemData(it) })
+        notifyItemRangeInserted(startPosition, adapterItems.size)
     }
 
+    val currentPlayers =
+        players.map { it.player }
+            .filter { it.name.isNotEmpty() }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlayerChooserViewHolder {
-        val viewItem = LayoutInflater.from(parent.context).inflate(
-            R.layout.player_chooser_view,
+        val binding = PlayerChooserViewBinding.inflate(
+            LayoutInflater.from(parent.context),
             parent,
             false
         )
-        return PlayerChooserViewHolder(viewItem)
+        return PlayerChooserViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: PlayerChooserViewHolder, position: Int) {
-        holder.bindTo(mPlayers[position])
+        holder.bindTo(players[position])
     }
 
     override fun onBindViewHolder(
@@ -104,114 +81,101 @@ class PlayerChooserViewAdapter : RecyclerView.Adapter<PlayerChooserViewHolder> {
             return
         }
         Log.d(TAG, "onBindViewHolder: with payload")
-        val o = payloads[0] as Bundle
-        for (key in o.keySet()) {
+        val payload = payloads.first() as Bundle
+        for (key in payload.keySet()) {
             when (key) {
-                PAYLOAD_THUMBNAIL -> holder.bindThumbnail(
-                    mPlayers[position]
-                )
-                PAYLOAD_AUTOCOMPLETE -> holder.bindAutoCompleteTextView(
-                    mPlayers[position]
-                )
-                PAYLOAD_TEXT -> holder.bindTextView(mPlayers[position])
-                PAYLOAD_POINTS -> holder.bindPointsBtn(mPlayers[position])
+                PAYLOAD_THUMBNAIL -> holder.bindThumbnail(players[position])
+                PAYLOAD_AUTOCOMPLETE -> holder.bindAutoCompleteTextView(players[position])
+                PAYLOAD_TEXT -> holder.bindTextView(players[position])
+                PAYLOAD_POINTS -> holder.bindPointsBtn(players[position])
             }
         }
     }
 
-    override fun getItemCount(): Int {
-        return mPlayers.size
+    override fun getItemCount(): Int = players.size
+
+    fun setAutocompleteItems(allPlayers: List<Player>) {
+        allPossiblePlayers = allPlayers
     }
 
-    fun setAutocompleteItems(allPlayers: List<Player?>) {
-        mAllPossiblePlayers = allPlayers
-    }
+    fun endGame(state: Map<Player, Int>) {
+        isEditable = false
 
-    val currentPlayers: List<Player>
-        get() {
-            return mPlayers
-                .map { it.player }
-                .filter { it.name.isNotEmpty() }
-        }
-
-    fun endGame(queueModel: QueueModel) {
-        val newList = mutableListOf<PlayerItemData>()
-        for (i in 0 until queueModel.playersCount) {
-            newList.add(
-                mPlayers[i].copy(
-                    points = queueModel.getPointsOfPlayer(i),
-                    isCurrent = false
-                )
+        val newList = players.map {
+            it.copy(
+                points = state[it] ?: 0,
+                isCurrent = false
             )
+        }.sortedBy { it.points }
+
+        val diffResult = DiffUtil.calculateDiff(MyDiffCallback(players, newList))
+        with(players) {
+            clear()
+            addAll(newList)
         }
-        newList.sortWith { left, right ->
-            Integer.valueOf(right.points).compareTo(left.points)
-        }
-        val diffResult = DiffUtil.calculateDiff(MyDiffCallback(mPlayers, newList))
-        mPlayers.clear()
-        mPlayers.addAll(newList)
         diffResult.dispatchUpdatesTo(this)
     }
 
-    fun updatePoints(previousPlayerIndex: Int, currentPlayerIndex: Int) {
-        val prevPlayer = mPlayers[previousPlayerIndex]
-        prevPlayer.points = mQueueModel.getPointsOfPlayer(previousPlayerIndex)
-        prevPlayer.isCurrent = false
-        mPlayers[currentPlayerIndex].isCurrent = true
+    fun setState(currentPlayerIndex: Int, state: Map<Player, Int>) {
+        players.forEachIndexed { it, player ->
+            with(player) {
+                points = state[player] ?: 0
+                isCurrent = it == currentPlayerIndex
+            }
+        }
         notifyDataSetChanged()
     }
 
     fun reset(hardReset: Boolean) {
+        isEditable = true
         if (hardReset) {
-            val size = mPlayers.size
-            mPlayers.clear()
-            mPlayers.add(PlayerItemData())
-            mPlayers.add(PlayerItemData())
+            val size = players.size
+            with(players) {
+                clear()
+                addAll(listOf(PlayerItemData(), PlayerItemData()))
+            }
             notifyItemRangeChanged(0, 2)
             notifyItemRangeRemoved(2, size - 2)
         } else {
-            val newList = mPlayers.map {
+            val newList = players.map {
                 it.copy(
                     points = 0,
-                    isEditable = true,
                     isCurrent = false
                 )
             }.sortedBy { it.initialPosition }
-            val diffResult = DiffUtil.calculateDiff(MyDiffCallback(mPlayers, newList))
-            mPlayers.clear()
-            mPlayers.addAll(newList)
+            val diffResult = DiffUtil.calculateDiff(MyDiffCallback(players, newList))
+            with(players) {
+                clear()
+                addAll(newList)
+            }
             diffResult.dispatchUpdatesTo(this)
         }
     }
 
     fun startGame() {
-        mPlayers.forEach { it.isEditable = false }
-        mPlayers.first().isCurrent = true
-        //        Bundle diff = new Bundle();
-//        diff.putBoolean(PAYLOAD_POINTS, true);
-//        diff.putBoolean(PAYLOAD_TEXT, true);
-//        diff.putBoolean(PAYLOAD_AUTOCOMPLETE, true);
-//        notifyItemRangeChanged(0, mPlayers.size(), diff);
-        notifyItemRangeChanged(0, mPlayers.size)
+        isEditable = false
+        players.first().isCurrent = true
+        notifyItemRangeChanged(0, players.size)
     }
 
     fun setRequestedPhoto(imageUri: Uri) {
-        if (mPhotoRequester != null) {
-            val pos = mPhotoRequester!!.adapterPosition
+        photoRequester?.let {
+            val pos = it.adapterPosition
             if (pos != RecyclerView.NO_POSITION) {
-                mPlayers[pos].player.image = imageUri.toString()
+                val playerInfoData = players[pos]
+                val newPlayerData = playerInfoData.player.copy(image = imageUri.toString())
+                playerInfoData.player = newPlayerData
                 notifyItemChanged(pos)
             }
-            mPhotoRequester = null
         }
+        photoRequester = null
     }
 
-    inner class PlayerChooserViewHolder internal constructor(viewItem: View) :
-        RecyclerView.ViewHolder(viewItem) {
-        val mThumbnail: ImageView
-        val mAutoCompleteTextView: AutoCompleteTextView
-        val mTextView: TextView
-        val mPointsBtn: Button
+    inner class PlayerChooserViewHolder internal constructor(
+        private val binding: PlayerChooserViewBinding
+    ) : RecyclerView.ViewHolder(binding.root) {
+
+        val textView get() = binding.text
 
         fun bindTo(playerInList: PlayerItemData) {
             bindThumbnail(playerInList)
@@ -221,55 +185,59 @@ class PlayerChooserViewAdapter : RecyclerView.Adapter<PlayerChooserViewHolder> {
         }
 
         fun bindThumbnail(playerInList: PlayerItemData) {
-            val context = mThumbnail.context
-            Glide.with(context)
+            Glide.with(binding.root.context)
                 .load(playerInList.image)
                 .placeholder(R.drawable.ic_contact_picture)
-                .into(mThumbnail)
+                .error(R.drawable.ic_contact_picture)
+                .into(binding.thumbnail)
         }
 
         fun bindAutoCompleteTextView(playerInList: PlayerItemData) {
-            if (playerInList.isEditable) {
-                mAutoCompleteTextView.setText(
-                    playerInList.name,
-                    false
-                )
-                mAutoCompleteTextView.visibility = View.VISIBLE
-            } else mAutoCompleteTextView.visibility = View.GONE
+            with(binding.text) {
+                if (isEditable) {
+                    visibility = View.VISIBLE
+                    setText(playerInList.name, false)
+                } else {
+                    visibility = View.GONE
+                }
+            }
         }
 
         fun bindTextView(playerInList: PlayerItemData) {
-            mTextView.visibility =
-                if (playerInList.isEditable) View.GONE else View.VISIBLE
-            mTextView.text = playerInList.name
-            mTextView.textSize =
-                if (playerInList.isCurrent) MyAnimator.FONT_LARGE_SIZE.toFloat() else MyAnimator.FONT_SMALL_SIZE.toFloat()
+            with(binding.staticText) {
+                visibility = if (isEditable) View.GONE else View.VISIBLE
+                text = playerInList.name
+                textSize = if (playerInList.isCurrent) {
+                    MyAnimator.FONT_LARGE_SIZE
+                } else {
+                    MyAnimator.FONT_SMALL_SIZE
+                }.toFloat()
+            }
         }
 
         fun bindPointsBtn(playerInList: PlayerItemData) {
-            if (playerInList.isEditable) {
-                mPointsBtn.setBackgroundResource(R.drawable.btn_cancel)
-                mPointsBtn.text = ""
-            } else {
-                mPointsBtn.setBackgroundResource(R.drawable.btn_uncheck)
-                mPointsBtn.text = playerInList.points.toString()
+            with(binding.pointsView) {
+                if (isEditable) {
+                    text = ""
+                    setBackgroundResource(R.drawable.btn_cancel)
+                } else {
+                    text = playerInList.points.toString()
+                    setBackgroundResource(R.drawable.btn_uncheck)
+                }
             }
         }
 
         init {
-            mThumbnail = viewItem.findViewById<View>(R.id.thumbnail) as ImageView
-            mAutoCompleteTextView = viewItem.findViewById<View>(R.id.text) as AutoCompleteTextView
-            mTextView = viewItem.findViewById<View>(R.id.staticText) as TextView
-            mPointsBtn = viewItem.findViewById<View>(R.id.pointsView) as Button
-            mThumbnail.setOnClickListener {
-                if (mAutoCompleteTextView.text.length > 0) {
-                    if (mActionListener != null) {
-                        mPhotoRequester = this@PlayerChooserViewHolder
-                        mActionListener.requestPhoto()
-                    }
+            binding.root.setOnClickListener {
+                Toast.makeText(binding.root.context, "Root", Toast.LENGTH_SHORT).show()
+            }
+            binding.thumbnail.setOnClickListener {
+                if (binding.text.text.isNotEmpty()) {
+                    photoRequester = this@PlayerChooserViewHolder
+                    actionListener.requestPhoto()
                 }
             }
-            mAutoCompleteTextView.addTextChangedListener(object : TextWatcher {
+            binding.text.addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(
                     s: CharSequence,
                     start: Int,
@@ -279,58 +247,62 @@ class PlayerChooserViewAdapter : RecyclerView.Adapter<PlayerChooserViewHolder> {
                 }
 
                 override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+
                 override fun afterTextChanged(s: Editable) {
                     val pos = adapterPosition
                     if (pos == RecyclerView.NO_POSITION) return
-                    mPlayers[pos].player.name = s.toString()
+                    val playerItemData = players[pos]
+                    val newPlayerData = playerItemData.player.copy(name = s.toString())
+                    playerItemData.player = newPlayerData
                 }
             })
-            mAutoCompleteTextView.setOnKeyListener(View.OnKeyListener { _, keyCode, _ ->
+            binding.text.setOnKeyListener { _, keyCode, _ ->
                 val pos = adapterPosition
-                if (pos == RecyclerView.NO_POSITION) return@OnKeyListener false
+                if (pos == RecyclerView.NO_POSITION) return@setOnKeyListener false
                 if (keyCode == KeyEvent.KEYCODE_DEL) {
-                    mPlayers[pos].reset()
-                    mThumbnail.setImageResource(R.drawable.ic_contact_picture)
+                    players[pos].reset()
+                    binding.thumbnail.setImageResource(R.drawable.ic_contact_picture)
                 }
-                mPlayers[pos].player.name = mAutoCompleteTextView.text.toString()
+                val playerItemData = players[pos]
+                val newPlayerData = playerItemData.player.copy(name = binding.text.text.toString())
+                playerItemData.player = newPlayerData
                 false
-            })
-            mAutoCompleteTextView.onItemClickListener =
-                OnItemClickListener { parent, view, position, _ ->
-                    val pos = adapterPosition
-                    if (pos == RecyclerView.NO_POSITION) return@OnItemClickListener
-                    val player = parent.getItemAtPosition(position) as Player
-                    mPlayers[pos].set(player, 0)
-                    Glide.with(view.context)
-                        .load(player.image)
-                        .placeholder(R.drawable.ic_contact_picture)
-                        .into(mThumbnail)
-                    val imm = view.context
-                        .getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                    imm.hideSoftInputFromWindow(mAutoCompleteTextView.windowToken, 0)
-                    val nextFocus = mAutoCompleteTextView.focusSearch(View.FOCUS_DOWN)
-                    nextFocus?.requestFocus(View.FOCUS_DOWN)
-                }
-            mAutoCompleteTextView.setAdapter(
-                PlayerChooserAdapter(
-                    mAutoCompleteTextView.context,
-                    mAllPossiblePlayers
+            }
+            binding.text.setOnItemClickListener { parent, view, position, _ ->
+                val pos = adapterPosition
+                if (pos == RecyclerView.NO_POSITION) return@setOnItemClickListener
+                val player = parent.getItemAtPosition(position) as Player
+                players[pos].set(player, 0)
+                Glide.with(view.context)
+                    .load(player.image)
+                    .placeholder(R.drawable.ic_contact_picture)
+                    .into(binding.thumbnail)
+                val imm = view.context
+                    .getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(binding.text.windowToken, 0)
+                val nextFocus = binding.text.focusSearch(View.FOCUS_DOWN)
+                nextFocus?.requestFocus(View.FOCUS_DOWN)
+            }
+            binding.text.setAdapter(
+                PlayerAutocompleteAdapter(
+                    binding.text.context,
+                    allPossiblePlayers
                 )
             )
-            mPointsBtn.setOnClickListener(View.OnClickListener {
+            binding.pointsView.setOnClickListener {
+                if (!isEditable) return@setOnClickListener
                 val pos = adapterPosition
-                if (pos >= 0 && pos < mPlayers.size) {
-                    val playerItemData = mPlayers[pos]
-                    if (!playerItemData.isEditable) return@OnClickListener
-                    if (mPlayers.size > 2) {
-                        mPlayers.removeAt(pos)
+                if (pos >= 0 && pos < players.size) {
+                    val playerItemData = players[pos]
+                    if (players.size > 2) {
+                        players.removeAt(pos)
                         notifyItemRemoved(pos)
                     } else {
                         playerItemData.reset()
                         notifyItemChanged(pos)
                     }
                 }
-            })
+            }
         }
     }
 

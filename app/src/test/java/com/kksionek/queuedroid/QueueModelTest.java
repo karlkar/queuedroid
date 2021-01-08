@@ -9,7 +9,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class QueueModelTest {
 
@@ -37,12 +37,12 @@ public class QueueModelTest {
 
     @Test
     public void getPoints() {
-        List<Integer> points = mModel.getPoints();
+        List<Integer> points = mModel.getPointList();
         assertEquals(points.size(), 2);
         assertEquals(0, (long)points.get(0));
         assertEquals(0, (long)points.get(1));
         mModel.nextTurn(10);
-        points = mModel.getPoints();
+        points = mModel.getPointList();
         assertEquals(points.size(), 2);
         assertEquals(10, (long)points.get(0));
         assertEquals(0, (long)points.get(1));
@@ -50,7 +50,7 @@ public class QueueModelTest {
         mModel.nextTurn(19);
         mModel.nextTurn(1);
         mModel.nextTurn(11);
-        points = mModel.getPoints();
+        points = mModel.getPointList();
         assertEquals(points.size(), 2);
         assertEquals(40, (long)points.get(0));
         assertEquals(10, (long)points.get(1));
@@ -63,8 +63,8 @@ public class QueueModelTest {
         mModel.nextTurn(1);
         mModel.nextTurn(11);
         mModel.newGame();
-        assertEquals(0, (long)mModel.getPoints().get(0));
-        assertEquals(0, (long)mModel.getPoints().get(1));
+        assertEquals(0, (long)mModel.getPointList().get(0));
+        assertEquals(0, (long)mModel.getPointList().get(1));
     }
 
     @Test

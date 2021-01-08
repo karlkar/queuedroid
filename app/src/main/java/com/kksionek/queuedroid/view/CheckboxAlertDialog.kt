@@ -1,58 +1,39 @@
 package com.kksionek.queuedroid.view
 
 import android.content.Context
-import android.content.DialogInterface
 import android.view.LayoutInflater
-import android.view.View
-import android.widget.CheckBox
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
-import com.kksionek.queuedroid.R
-import com.kksionek.queuedroid.model.Settings
+import com.kksionek.queuedroid.databinding.CheckboxAlertDialogBinding
 
-internal class CheckboxAlertDialog {
+object CheckboxAlertDialog {
 
-    interface OnDialogClosedListener {
-        fun onDialogClosed(result: Boolean)
+    fun interface OnDialogClosedListener {
+        fun onDialogClosed(accepted: Boolean, showAgain: Boolean)
     }
-
-    private var mContext: Context? = null
-    private var mDontShowAgain: CheckBox? = null
-    private var mClosedListener: OnDialogClosedListener? = null
 
     fun show(
-        context: Context?,
+        context: Context,
         @StringRes title: Int,
         @StringRes message: Int,
-        listener: OnDialogClosedListener?
+        listener: OnDialogClosedListener
     ) {
-        mContext = context
-        mClosedListener = listener
-        val eulaLayout = LayoutInflater.from(mContext)
-            .inflate(R.layout.checkbox_alert_dialog, null)
-        mDontShowAgain = eulaLayout.findViewById<View>(R.id.skip) as CheckBox
+        val binding = CheckboxAlertDialogBinding.inflate(
+            LayoutInflater.from(context)
+        )
 
-        AlertDialog.Builder(mContext!!)
-            .setView(eulaLayout)
+        AlertDialog.Builder(context)
+            .setView(binding.root)
             .setTitle(title)
             .setMessage(message)
-            .setPositiveButton(android.R.string.ok, DialogButtonClickListener(true))
-            .setNegativeButton(android.R.string.cancel, DialogButtonClickListener(false))
+            .setPositiveButton(android.R.string.ok) { dialog, _ ->
+                dialog.dismiss()
+                listener.onDialogClosed(true, !binding.skipCheckBox.isChecked)
+            }
+            .setNegativeButton(android.R.string.cancel) { dialog, _ ->
+                dialog.dismiss()
+                listener.onDialogClosed(false, !binding.skipCheckBox.isChecked)
+            }
             .show()
-    }
-
-    private inner class DialogButtonClickListener(
-        private var mRetVal: Boolean = false
-    ) : DialogInterface.OnClickListener {
-
-        override fun onClick(dialog: DialogInterface, which: Int) {
-            Settings.setBoolean(
-                mContext,
-                Settings.PREF_SHOW_NO_POINTS_CONFIRMATION_DIALOG,
-                !mDontShowAgain!!.isChecked
-            )
-            dialog.cancel()
-            mClosedListener!!.onDialogClosed(mRetVal)
-        }
     }
 }

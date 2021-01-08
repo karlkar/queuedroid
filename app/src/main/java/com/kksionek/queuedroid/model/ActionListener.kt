@@ -1,5 +1,5 @@
 package com.kksionek.queuedroid.model
 
-interface ActionListener {
+fun interface ActionListener {
     fun requestPhoto()
 }

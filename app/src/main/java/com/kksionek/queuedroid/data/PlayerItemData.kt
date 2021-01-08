@@ -3,7 +3,6 @@ package com.kksionek.queuedroid.data
 data class PlayerItemData(
     var player: Player = Player(),
     var points: Int = 0,
-    var isEditable: Boolean = false,
     var isCurrent: Boolean = false
 ) {
     val initialPosition: Int
@@ -21,7 +20,6 @@ data class PlayerItemData(
     fun set(player: Player, points: Int) {
         this.player = player
         this.points = points
-        isEditable = true
         isCurrent = false
     }
 
