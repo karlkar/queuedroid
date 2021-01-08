@@ -84,7 +84,7 @@ class MyAnimator : DefaultItemAnimator() {
             return super.animateChange(oldHolder, newHolder, preInfo, postInfo)
         }
         val viewHolder = newHolder as PlayerChooserViewHolder
-        val metrics = viewHolder.mTextView.context.resources.displayMetrics
+        val metrics = viewHolder.itemView.context.resources.displayMetrics
         val oldInfo = preInfo as PlayerItemInfo
         val newInfo = postInfo as PlayerItemInfo
         val oldSize = oldInfo.textSize / metrics.scaledDensity

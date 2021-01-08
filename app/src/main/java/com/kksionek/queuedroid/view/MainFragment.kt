@@ -27,17 +27,23 @@ import com.kksionek.queuedroid.R
 import com.kksionek.queuedroid.data.Player
 import com.kksionek.queuedroid.databinding.FragmentMainBinding
 import com.kksionek.queuedroid.model.*
+import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainFragment : Fragment(), PointsDialogFragment.PointsDialogListener, ActionListener {
 
     private var _binding: FragmentMainBinding? = null
     private val binding get() = _binding!!
+
+    @Inject
+    lateinit var settingsProviderImpl: SettingsProviderImpl
 
     private var mItemsContainer: LinearLayout? = null
 
@@ -74,7 +80,11 @@ class MainFragment : Fragment(), PointsDialogFragment.PointsDialogListener, Acti
 
         requireActivity().onBackPressedDispatcher.addCallback(this) {
             if (mBackCounter.getAndIncrement() < 1) {
-                Toast.makeText(requireContext(), R.string.activity_main_on_back_pressed, Toast.LENGTH_SHORT)
+                Toast.makeText(
+                    requireContext(),
+                    R.string.activity_main_on_back_pressed,
+                    Toast.LENGTH_SHORT
+                )
                     .show()
                 handler.postDelayed(2000) {
                     mBackCounter.set(0)
@@ -109,7 +119,7 @@ class MainFragment : Fragment(), PointsDialogFragment.PointsDialogListener, Acti
             secondBtn.setOnClickListener(mOnSettingsBtnClicked)
             thirdBtn.setText(R.string.activity_main_button_share)
             thirdBtn.setOnClickListener {
-                if (Settings.isFacebookEnabled(requireContext())
+                if (settingsProviderImpl.isFacebookEnabled()
                     && FbController.isInitilized
                     && FbController.isLogged
                 ) {
@@ -189,7 +199,7 @@ class MainFragment : Fragment(), PointsDialogFragment.PointsDialogListener, Acti
     override fun onResume() {
         super.onResume()
         with(binding) {
-            keyboardView.setColumnCount(Settings.getKeyboardColumnsCount(requireContext()))
+            keyboardView.setColumnCount(settingsProviderImpl.getKeyboardColumnsCount())
             adView.resume()
         }
     }
@@ -221,10 +231,10 @@ class MainFragment : Fragment(), PointsDialogFragment.PointsDialogListener, Acti
     private val autocompleteData: Unit
         get() {
             //TODO: Load contacts after change in settings
-            if (Settings.isContactsEnabled(requireContext())) {
+            if (settingsProviderImpl.isContactsEnabled()) {
                 ContactsController.loadContacts(requireContext(), mAllPlayers)
             }
-            if (Settings.isFacebookEnabled(requireContext()) && FbController.isInitilized) {
+            if (settingsProviderImpl.isFacebookEnabled() && FbController.isInitilized) {
                 if (FbController.isLogged) {
                     FbController.instance.getFriendData(mAllPlayers)
                     mPlayerChooserViewAdapter!!.setAutocompleteItems(mAllPlayers)
@@ -248,7 +258,9 @@ class MainFragment : Fragment(), PointsDialogFragment.PointsDialogListener, Acti
         if (requestCode == REQUEST_IMAGE_CAPTURE) {
             if (resultCode == AppCompatActivity.RESULT_OK) {
                 setImageData(mRequestedPhotoURI!!)
-            } else mRequestedPhotoURI = null
+            } else {
+                mRequestedPhotoURI = null
+            }
             return
         }
         super.onActivityResult(requestCode, resultCode, data)
@@ -363,16 +375,17 @@ class MainFragment : Fragment(), PointsDialogFragment.PointsDialogListener, Acti
 
     private inner class OnNextTurnBtnClicked : View.OnClickListener {
         override fun onClick(v: View) {
-            if (Settings.shouldUseInAppKeyboard(requireContext())) {
+            if (settingsProviderImpl.shouldUseInAppKeyboard()) {
                 val pointsCollected = binding.keyboardView.points
                 if (pointsCollected == 0
-                    && Settings.isShowNoPointsConfirmationDialog(requireContext())
+                    && settingsProviderImpl.isShowNoPointsConfirmationDialog()
                 ) {
                     val dialog = CheckboxAlertDialog()
                     dialog.show(
                         requireContext(),
                         R.string.checkbox_alert_dialog_title,
                         R.string.checkbox_alert_dialog_message,
+                        settingsProviderImpl,
                         object : CheckboxAlertDialog.OnDialogClosedListener {
                             override fun onDialogClosed(result: Boolean) {
                                 if (result) assignPointsAndNextTurn(0)
@@ -391,9 +404,9 @@ class MainFragment : Fragment(), PointsDialogFragment.PointsDialogListener, Acti
         with(binding) {
             activityMainButtonAddPlayer.visibility = View.GONE
             keyboardView.visibility =
-                if (Settings.shouldUseInAppKeyboard(requireContext())) View.VISIBLE else View.GONE
+                if (settingsProviderImpl.shouldUseInAppKeyboard()) View.VISIBLE else View.GONE
             keyboardView.clearPoints()
-            activityMainRecyclerview.keepScreenOn = Settings.isKeepOnScreen(requireContext())
+            activityMainRecyclerview.keepScreenOn = settingsProviderImpl.isKeepOnScreen()
             firstBtn.setText(R.string.activity_main_button_next_turn)
             firstBtn.setOnClickListener(mOnNextTurnBtnClicked)
             secondBtn.setText(R.string.activity_main_button_end_game)
@@ -402,7 +415,7 @@ class MainFragment : Fragment(), PointsDialogFragment.PointsDialogListener, Acti
     }
 
     private fun setupResultView() {
-        with (binding) {
+        with(binding) {
             keyboardView.visibility = View.GONE
             activityMainButtonAddPlayer.visibility = View.GONE
             firstBtn.setText(R.string.activity_main_button_new_game)

@@ -14,24 +14,26 @@ import androidx.preference.SwitchPreference
 import com.kksionek.queuedroid.R
 import com.kksionek.queuedroid.model.FbController
 import com.kksionek.queuedroid.model.FbController.FacebookLoginListener
-import com.kksionek.queuedroid.model.Settings
+import com.kksionek.queuedroid.model.SettingsProviderImpl
 import com.kksionek.queuedroid.view.MainFragment.Companion.PERMISSIONS_REQUEST_READ_CONTACTS
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SettingsFragment : PreferenceFragmentCompat() {
 
     private val sharedPreferences: SharedPreferences get() = preferenceManager.sharedPreferences
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        findPreference<Preference>(Settings.PREF_KEYBOARD_COLUMNS)?.let {
+        findPreference<Preference>(SettingsProviderImpl.PREF_KEYBOARD_COLUMNS)?.let {
             it.summary =
-                sharedPreferences.getString(Settings.PREF_KEYBOARD_COLUMNS, "5")
+                sharedPreferences.getString(SettingsProviderImpl.PREF_KEYBOARD_COLUMNS, "5")
             it.setOnPreferenceChangeListener { preference, newValue ->
                 preference.summary = newValue as String
                 true
             }
         }
-        findPreference<Preference>(Settings.PREF_USE_FACEBOOK)
+        findPreference<Preference>(SettingsProviderImpl.PREF_USE_FACEBOOK)
             ?.setOnPreferenceChangeListener { _, newValue ->
                 val value = newValue as Boolean
                 if (value && FbController.isInitilized && !FbController.isLogged) {
@@ -40,12 +42,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
                         object : FacebookLoginListener {
                             override fun onLogged() {}
                             override fun onCancel() {
-                                findPreference<SwitchPreference>(Settings.PREF_USE_FACEBOOK)?.isChecked =
+                                findPreference<SwitchPreference>(SettingsProviderImpl.PREF_USE_FACEBOOK)?.isChecked =
                                     false
                             }
 
                             override fun onError() {
-                                findPreference<SwitchPreference>(Settings.PREF_USE_FACEBOOK)?.isChecked =
+                                findPreference<SwitchPreference>(SettingsProviderImpl.PREF_USE_FACEBOOK)?.isChecked =
                                     false
                             }
                         })
@@ -63,7 +65,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     @TargetApi(Build.VERSION_CODES.M)
     fun requestPermission() {
-        findPreference<Preference>(Settings.PREF_USE_CONTACTS)?.setOnPreferenceChangeListener { _, newValue ->
+        findPreference<Preference>(SettingsProviderImpl.PREF_USE_CONTACTS)?.setOnPreferenceChangeListener { _, newValue ->
             val ac = requireActivity()
             if (newValue as Boolean
                 && ac.checkSelfPermission(Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED
@@ -79,7 +81,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     private fun onContactsPermissionResult(grantResults: IntArray) {
         if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-            findPreference<SwitchPreference>(Settings.PREF_USE_CONTACTS)?.isChecked = false
+            findPreference<SwitchPreference>(SettingsProviderImpl.PREF_USE_CONTACTS)?.isChecked = false
         }
     }
 
